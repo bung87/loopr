@@ -13,7 +13,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="market/candlestick-chart.html">
 <link rel="import" href="market/depth-chart.html">
 <link rel="import" href="market/operation-panel.html">
-<link rel="import" href="market/order-book.html">
 <link rel="import" href="market/recent-fills.html">
 <link rel="import" href="market/recent-orders.html">
 <link rel="import" href="market/top-orders.html">
@@ -41,37 +40,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
+
+        .sections>paper-card {
+            margin-bottom: 16px;
+            padding: 0 16px;
+        }
+
+        #charts {
+            padding-bottom: 0;
+            margin-bottom: 32px;
+        }
+
+
         paper-tabs {
             margin-bottom: 8px;
         }
 
-      /*  paper-tab {
-            background-color: rgba(0,0,0,0.02);
-        }*/
 
         .tables {
             min-height: 400px;
         }
 
-        paper-fab {
-            position: absolute;
-            right: 100px;
-            background-color: black;
-        }
 
-        paper-fab[show] {
-            background-color: var(--app-red-color);
-        }
-
-        paper-card[hide] {
-            display: none;
+        paper-card.operation-panel-container {
+            /*padding: 0;*/
         }
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <simple-toolbar slot="secondary-toolbar" title="Market" id="[[marketId()]]" back-link="#/markets"></simple-toolbar>
             <div class="sections">
-                <paper-card>
+                <paper-card id="charts">
                     <div class="vertical layout">
                         <paper-tabs selected="{{chartSelection}}" attr-for-selected="name">
                             <paper-tab name="candle">Candle Chart</paper-tab>
@@ -82,9 +81,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <depth-chart name="depth"></depth-chart>
                         </iron-pages>
                     </div>
-                    <paper-fab show$="[[fabShown]]" icon="gavel" id="fab" on-click="flip" elevation="1"></paper-fab>
                 </paper-card>
-                <paper-card hide$="[[fabShown]]">
+                <paper-card class="operation-panel-container">
                     <operation-panel></operation-panel>
                 </paper-card>
                 <paper-card>
@@ -133,23 +131,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 fabShown: {
                     type: Boolean,
-                    value: true
+                    value: false
                 }
             };
         }
 
-        flip() {
-            this.fabShown = !this.fabShown;
-            if (this.fabShown) {
-                this.$.fab.icon = "gavel";
-            } else {
-                this.$.fab.icon = "close";
-            }
-        }
+       
         marketId() {
-            if(this.id) return this.id.toUpperCase();
+            if (this.id) return this.id.toUpperCase();
         }
-        _isUnlocked(wallet){
+        _isUnlocked(wallet) {
             console.log(wallet)
             return null != this.wallet
         }

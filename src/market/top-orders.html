@@ -11,15 +11,28 @@
             width: 60px;
         }
 
-         vaadin-grid {
+        vaadin-grid {
             line-height: inherit;
+        }
+
+        h3 {
+            font-size: 14px;
+        }
+
+        .bid {
+            color: var(--app-green-color);
+        }
+
+        .ask {
+            color: var(--app-red-color);
         }
         </style>
         <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <div class="horizontal layout">
             <div class="asks flex">
-                <div class="horizontal center-justified layout"><h3>Buy</h3></div>
+                <div class="horizontal center-justified layout">
+                    <h3>Bids</h3></div>
                 <div>
                     <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                         <vaadin-grid-column width="50px">
@@ -29,7 +42,7 @@
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Price</template>
-                            <template>[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]</template>
+                            <template><span class="bid">[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]</span></template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Size</template>
@@ -41,7 +54,8 @@
             </div>
             <div class="seperator"></div>
             <div class="bids flex">
-                <div class="horizontal center-justified layout"><h3>Sell</h3></div>
+                <div class="horizontal center-justified layout">
+                    <h3>Asks</h3></div>
                 <div>
                     <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                         <vaadin-grid-column width="50px">
@@ -51,7 +65,7 @@
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Price</template>
-                            <template>[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]</template>
+                            <template><span class="ask">[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]</span></template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Size</template>

@@ -34,7 +34,7 @@
         }
         </style>
         <app-toolbar active="[[activeTab]]">
-            <paper-icon-button disabled noink></paper-icon-button>
+            <!-- <paper-icon-button disabled noink></paper-icon-button> -->
             <div condensed-title></div>
             <a href="#/markets" active$="[[isActiveTab('markets')]]" styleless>
                 <paper-button noink>Markets</paper-button>
@@ -49,7 +49,7 @@
                 <paper-button noink>Settings</paper-button>
             </a>
             <div condensed-title></div>
-            <paper-icon-button noink on-click="resetWallet"></paper-icon-button>
+            <!-- <paper-icon-button noink disabled></paper-icon-button> -->
         </app-toolbar>
     </template>
     <script>
