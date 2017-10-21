@@ -97,9 +97,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            --app-primary-color: var(--google-blue-500);
-            --app-primary-color-dark: var(--google-blue-700);
+     :host {
+            --app-primary-color: var(--paper-indigo-500);
+            --app-primary-color-dark: var(--paper-indigo-700);
             --app-secondary-color: black;
             --paper-spinner-color: var(--app-primary-color);
             --paper-spinner-stroke-width: 1px;
@@ -107,83 +107,90 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             --app-green-color: var(--paper-green-500);
             --app-text-color: rgba(0, 0, 0, .78);
             --app-text-color-light: rgba(0, 0, 0, .54);
+
+            --valo-border-radius: 0px;
+            --valo-primary-text-color: var(--app-text-color);
+            --valo-body-text-color: var(--app-text-color);
+            --valo-contrast-60pct: var(--app-text-color-light);
+            --valo-error-color: var(--paper-red-500);
             --vaadin-grid-header-cell: {
                 text-transform: uppercase;
-                /*background-color: #e0e0e0;*/
             }
-            --valo-border-radius: 0px;
-            display: block;
         }
 
-        app-drawer-layout:not([narrow]) [drawer-toggle] {
-            display: none;
-        }
+        display: block;
+    }
 
-        app-header {
-            /*color:var(--app-primary-color);*/
-            background-color: #fff;
-        }
+    app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+    }
 
-        app-header paper-icon-button {
-            --paper-icon-button-ink-color: white;
-        }
+    app-header {
+        /*color:var(--app-primary-color);*/
 
+        background-color: #fff;
+    }
 
-        a[styleless] {
-            color: inherit;
-            text-decoration: none;
-        }
+    app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+    }
 
 
-        .drawer-list {
-            margin: 0 20px;
-        }
+    a[styleless] {
+        color: inherit;
+        text-decoration: none;
+    }
 
-        .drawer-list a {
-            display: block;
-            padding: 0 16px;
-            text-decoration: none;
-            color: var(--app-secondary-color);
-            line-height: 40px;
-        }
 
-        .drawer-list a.iron-selected {
-            color: black;
-            font-weight: bold;
-        }
+    .drawer-list {
+        margin: 0 20px;
+    }
 
-        #pages {
-            display: none;
-        }
+    .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+    }
 
-        #loading {
-            padding-top: 30vh;
-            color: var(--app-primary-color);
-            font-weight: 200;
-        }
+    .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+    }
 
-        #loading paper-spinner-lite {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-        }
+    #pages {
+        display: none;
+    }
 
-        #loading iron-icon {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            top: 60px;
-        }
+    #loading {
+        padding-top: 30vh;
+        color: var(--app-primary-color);
+        font-weight: 200;
+    }
 
-        #lockButton.openned {
-            background-color: var(--app-red-color);
-            color: white;
-            border-radius: 50%;
-        }
+    #loading paper-spinner-lite {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+    }
 
-        paper-icon-button:not([narrow]) [drawer-toggle] {
-            display: none;
-        }
+    #loading iron-icon {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        top: 60px;
+    }
+
+    #lockButton.openned {
+        background-color: var(--app-red-color);
+        color: white;
+        border-radius: 50%;
+    }
+
+    paper-icon-button:not([narrow]) [drawer-toggle] {
+        display: none;
+    }
         </style>
         <!-- routing -->
         <app-location use-hash-as-path route="{{route}}">
