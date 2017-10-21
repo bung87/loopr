@@ -69,9 +69,6 @@
                                     Select Keystore File (UTC / JSON)
                                 </paper-button>
                             </div>
-                            <div id="test">
-                                [[walletContent]]
-                            </div>
                             <div class$="[[isPassWordRequiredClass(passwordRequired)]]">
                                 <div secondary-text>Great. Your wallet is password protected. Provide your password:</div>
                                 <div class="input-wrapper horizontal layout center-justified">
@@ -123,7 +120,7 @@
 
         ready() {
             super.ready();
-            this.$.fileInput.addEventListener('change', this.readFile, false);
+            this.$.fileInput.addEventListener('change', this.readFile.bind(this), false);
         }
 
         chooseFile() {
@@ -167,8 +164,9 @@
             }
 
             if (password) {
-                return 'hidden';
+                return 'visible';
             }
+            return 'hidden';
         }
 
         unlockClicked() {
