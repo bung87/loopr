@@ -316,35 +316,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
             appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
 
-            appConfig.formatValue = function(num, tokenConfig) {
-                if (tokenConfig) {
-                    return num.toFixed(tokenConfig.precision);
-                }
-            };
+            // appConfig.formatValue = function(num, tokenConfig) {
+            //     if (tokenConfig) {
+            //         return num.toFixed(tokenConfig.precision);
+            //     }
+            // };
 
-            appConfig.toFloatThenFormatValue = function(num, tokenConfig) {
-                if (tokenConfig) {
-                    const _num = Number(num) / (10 ** tokenConfig.digits);
-                    return _num.toFixed(tokenConfig.precision);
-                }
-            };
+            // appConfig.toFloatThenFormatValue = function(num, tokenConfig) {
+            //     if (tokenConfig) {
+            //         const _num = Number(num) / (10 ** tokenConfig.digits);
+            //         return _num.toFixed(tokenConfig.precision);
+            //     }
+            // };
 
 
-            appConfig.formatPrice = function(p, marketConfig) {
-                if (marketConfig) {
-                    return p.toFixed(marketConfig.pricePrecision);
-                }
-            }
+            // appConfig.formatPrice = function(p, marketConfig) {
+            //     if (marketConfig) {
+            //         return p.toFixed(marketConfig.pricePrecision);
+            //     }
+            // }
 
-            appConfig.toFloatThenFormatPrice = function(x, y, tokenxConfig, tokenyConfig) {
-                if (tokenxConfig && tokenyConfig) {
-                    const market = appConfig.computeMarketId(tokenxConfig.token, tokenyConfig.token);
-                    const marketConfig = appConfig.marketMap[market];
-                    const _x = Number(x) / (10 ** tokenxConfig.digits);
-                    const _y = Number(y) / (10 ** tokenyConfig.digits);
-                    return appConfig.formatPrice(_x / _y, marketConfig);
-                }
-            }
+            // appConfig.toFloatThenFormatPrice = function(x, y, tokenxConfig, tokenyConfig) {
+            //     if (tokenxConfig && tokenyConfig) {
+            //         const market = appConfig.computeMarketId(tokenxConfig.token, tokenyConfig.token);
+            //         const marketConfig = appConfig.marketMap[market];
+            //         const _x = Number(x) / (10 ** tokenxConfig.digits);
+            //         const _y = Number(y) / (10 ** tokenyConfig.digits);
+            //         return appConfig.formatPrice(_x / _y, marketConfig);
+            //     }
+            // }
 
             this.$.loading.style.display = "none";
             this.$.pages.style.display = "inherit";

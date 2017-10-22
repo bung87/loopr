@@ -9,8 +9,11 @@
         .t {
             opacity: 0.54;
         }
+        .p {
+            color: var(--app-text-color);
+        }
         </style>
-        [[head]]<span class="t">[[tail]]</span>[[postfix]]
+        [[head]]<span class="t">[[tail]]</span> <span class="p">[[postfix]]</span>
     </template>
     <script>
     class PrettyNumber extends Polymer.Element {
