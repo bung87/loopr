@@ -13,6 +13,7 @@
 
         vaadin-grid {
             line-height: inherit;
+            text-transform: uppercase;
         }
 
         h3 {
@@ -37,7 +38,7 @@
                     <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                         <vaadin-grid-column width="50px">
                             <template class="header">Amount</template>
-                            <template>[[numberFormat(item.orginalOrder.amountB)]] [[transtoUppercase(item.orginalOrder.tokenB)]]
+                            <template>[[numberFormat(item.orginalOrder.amountB)]] [[item.orginalOrder.tokenB]]
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
@@ -46,7 +47,7 @@
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Size</template>
-                            <template>[[numberFormat(item.orginalOrder.amountS)]] [[transtoUppercase(item.orginalOrder.tokenS)]]
+                            <template>[[numberFormat(item.orginalOrder.amountS)]] [[item.orginalOrder.tokenS]]
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
@@ -60,7 +61,7 @@
                     <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                         <vaadin-grid-column width="50px">
                             <template class="header">Amount</template>
-                            <template>[[numberFormat(item.orginalOrder.amountB)]] [[transtoUppercase(item.orginalOrder.tokenB)]]
+                            <template>[[numberFormat(item.orginalOrder.amountB)]] [[item.orginalOrder.tokenB]]
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
@@ -69,7 +70,7 @@
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Size</template>
-                            <template>[[numberFormat(item.orginalOrder.amountS)]] [[transtoUppercase(item.orginalOrder.tokenS)]]
+                            <template>[[numberFormat(item.orginalOrder.amountS)]] [[item.orginalOrder.tokenS]]
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
@@ -87,13 +88,6 @@
             return {
                 token: String
             };
-        }
-
-        transtoUppercase(str) {
-            if (str) {
-                return str.toUpperCase();
-            }
-            return '';
         }
 
         tranHextoNum(hex) {
