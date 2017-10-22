@@ -297,7 +297,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         ready() {
             super.ready();
-            this.ajax = this.$.ajax;
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
         }
@@ -308,18 +307,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             var appConfig = appConfigRaw;
+            appConfig.computeMarketId = function(tokenx, tokeny) { return tokenx + "-" + tokeny; }
+
+
             appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
             appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
             appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
-            appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => this._marketId(o));
-            appConfig.marketIds = _.map(appConfigRaw.markets, o => this._marketId(o));
+            appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+            appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+
+            // appConfig.formatValue = function(num, tokenConfig) {
+            //     if (tokenConfig) {
+            //         return num.toFixed(tokenConfig.precision);
+            //     }
+            // };
+
+            // appConfig.toFloatThenFormatValue = function(num, tokenConfig) {
+            //     if (tokenConfig) {
+            //         const _num = Number(num) / (10 ** tokenConfig.digits);
+            //         return _num.toFixed(tokenConfig.precision);
+            //     }
+            // };
+
+
+            // appConfig.formatPrice = function(p, marketConfig) {
+            //     if (marketConfig) {
+            //         return p.toFixed(marketConfig.pricePrecision);
+            //     }
+            // }
+
+            // appConfig.toFloatThenFormatPrice = function(x, y, tokenxConfig, tokenyConfig) {
+            //     if (tokenxConfig && tokenyConfig) {
+            //         const market = appConfig.computeMarketId(tokenxConfig.token, tokenyConfig.token);
+            //         const marketConfig = appConfig.marketMap[market];
+            //         const _x = Number(x) / (10 ** tokenxConfig.digits);
+            //         const _y = Number(y) / (10 ** tokenyConfig.digits);
+            //         return appConfig.formatPrice(_x / _y, marketConfig);
+            //     }
+            // }
+
             this.$.loading.style.display = "none";
             this.$.pages.style.display = "inherit";
             return appConfig;
-        }
-
-        _marketId(market) {
-            return market.tokenx + "-" + market.tokeny;
         }
 
         _walletChanged(wallet) {
@@ -351,9 +380,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _pageChanged(page) {
             const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
-
-            console.log(resolvedPageUrl);
-
             Polymer.importHref(
                 resolvedPageUrl,
                 null,
