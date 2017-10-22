@@ -28,14 +28,15 @@
             color: var(--app-red-color);
         }
         </style>
-        <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal layout">
             <div class="asks flex">
                 <div class="horizontal center-justified layout">
                     <h3>Bids</h3></div>
                 <div>
-                    <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+                    <!--  <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                         <vaadin-grid-column width="50px">
                             <template class="header">Amount</template>
                             <template>[[numberFormat(item.orginalOrder.amountB)]] [[item.orginalOrder.tokenB]]
@@ -50,7 +51,7 @@
                             <template>[[numberFormat(item.orginalOrder.amountS)]] [[item.orginalOrder.tokenS]]
                             </template>
                         </vaadin-grid-column>
-                    </vaadin-grid>
+                    </vaadin-grid> -->
                 </div>
             </div>
             <div class="seperator"></div>
@@ -58,19 +59,19 @@
                 <div class="horizontal center-justified layout">
                     <h3>Asks</h3></div>
                 <div>
-                    <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+                    <vaadin-grid aria-label="Basic Binding Example" items="[[processed.asks]]">
                         <vaadin-grid-column width="50px">
                             <template class="header">Amount</template>
-                            <template>[[numberFormat(item.orginalOrder.amountB)]] [[item.orginalOrder.tokenB]]
+                            <template>[[item.size]] [[tokenxConfig.unit]]
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Price</template>
-                            <template><span class="ask">[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]</span></template>
+                            <template><span class="ask">[[item.price]] [[priceUnit]]</span></template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Size</template>
-                            <template>[[numberFormat(item.orginalOrder.amountS)]] [[item.orginalOrder.tokenS]]
+                            <template>[[item.total]] [[tokenyConfig.unit]]
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
@@ -86,28 +87,51 @@
 
         static get properties() {
             return {
-                token: String
+                resp: Object,
+                processed: {
+                    type: Object,
+                    computed: '_process(resp)'
+                },
+                tokenx: String,
+                tokeny: String,
+                market: {
+                    type: String,
+                    computed: '_computeMarketId(tokenx, tokeny)'
+                }
             };
         }
 
-        tranHextoNum(hex) {
-            if (hex) {
-                return Number(hex);
+        _computeMarketId(tokenx, tokeny) {
+            return tokenx + "-" + tokeny;
+        }
+
+        _process(resp) {
+             console.log("=============" + resp)
+            if (resp) {
+                console.log(resp);
+                this.tokenxConfig = this.appConfig.tokenMap[this.tokenx];
+                this.tokenyConfig = this.appConfig.tokenMap[this.tokeny];
+                this.marketConfig = this.appConfig.marketMap[this.market];
+                console.log(this.marketConfig)
+                this.priceUnit = this.tokenxConfig.unit + "/" + this.tokenyConfig.unit;
+
+                console.log(this.priceUnit)
+
+                const f = function(i) {
+                    var item = {};
+                    item.price = this.appConfig.formatPrice(i.price, this.marketConfig);
+                    item.size = this.appConfig.formatValue(i.size, this.tokenxConfig);
+                    item.total = this.appConfig.formatValue(i.size * i.price, this.tokenyConfig);
+                    return item;
+                }.bind(this);
+
+                var processed = {};
+                processed.asks = _.map(resp.asks, f);
+                processed.bids = _.map(resp.bids, f);
+
+                 console.log(processed);
+                return processed;
             }
-            return '';
-        }
-
-        numberFormat(num) {
-            const size = this.tranHextoNum(num);
-            return (size / 1000000000000000000).toFixed(4);
-        }
-
-        getPrice(s, b) {
-
-            const sell = this.numberFormat(s);
-            const buy = this.numberFormat(b);
-            return (sell / buy).toFixed(8);
-
         }
     }
 
