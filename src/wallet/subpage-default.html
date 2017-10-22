@@ -34,35 +34,46 @@
             color: var(--app-primary-color-dark);
         }
 
-        .sections>paper-card {
-            padding: 0;
+        .sections paper-card {
+            height: 360px;
+            width: 360px;
         }
 
-        .space{
+        .space {
             padding-bottom: 20px;
             padding-top: 30px;
         }
 
+        .card-content {
+            height: 200px;
+        }
+
+        .seperator {
+            width: 100px;
+            text-align: center;
+            color: var(--app-text-color-light);
+        }
         </style>
         <div class="sections">
-            <paper-card>
-                <div class="card-content">Looper gives you the ability to generate new wallets so you can store your ETH & Tokens yourself, not on an exchange. This process happens entirely in your browser. Looper is not a web wallet. We are a client-side interface that allows you to interact with the Ethereum blockchain. We never save, store, or transmit any sensitive information ever. Therefore, when you generate a new wallet, you are responsible for safely backing it up.</div>
-                <div class=" input-wrapper horizontal layout center-justified space">
-                    <a href="/#/generatewallet"><paper-button primary>Generate Ethereum Wallet</paper-button></a>
-                </div>
-            </paper-card>
-            <paper-card transparent elevation=0>
-                <div class="horizontal center layout">
-                    <div class="flex or">or</div>
-                </div>
-            </paper-card>
-            <paper-card >
-                <div class="card-content">Some content</div>
-                <div class="input-wrapper horizontal layout center-justified space">
-                    <a href="/#/unlockwallet"><paper-button primary>Unlock Keystore File (UTC / JSON)</paper-button></a>
-                </div>
-            </paper-card>
-
+            <div class="horizontal center flex-justified layout">
+                <paper-card>
+                    <div class="card-content">Looper gives you the ability to generate new wallets so you can store your ETH & Tokens yourself, not on an exchange. This process happens entirely in your browser. Looper is not a web wallet. We are a client-side interface that allows you to interact with the Ethereum blockchain. We never save, store, or transmit any sensitive information ever. Therefore, when you generate a new wallet, you are responsible for safely backing it up.</div>
+                    <div class=" input-wrapper horizontal layout center-justified space">
+                        <a href="/#/generatewallet">
+                            <paper-button primary>Generate Ethereum Wallet</paper-button>
+                        </a>
+                    </div>
+                </paper-card>
+                <div class="seperator">OR</div>
+                <paper-card>
+                    <div class="card-content">Some content</div>
+                    <div class="input-wrapper horizontal layout center-justified space">
+                        <a href="/#/unlockwallet">
+                            <paper-button primary>Unlock Keystore File (UTC / JSON)</paper-button>
+                        </a>
+                    </div>
+                </paper-card>
+            </div>
         </div>
     </template>
     <script>

@@ -65,6 +65,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/scary-cookie-consent/scary-cookie-consent.html">
 <link rel="import" href="my-icons.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="utils/external-lib-imports.html">
+<link rel="import" href="utils/pretty-number.html">
+<link rel="import" href="utils/time-str.html">
+<link rel="import" href="utils/global-variable.html">
+<link rel="import" href="utils/notification-panel.html">
+<link rel="import" href="utils/market-selector.html">
 <link rel="import" href="looper-page/looper-toolbar.html">
 <link rel="import" href="looper-page/looper-footer.html">
 <link rel="import" href="looper-page/simple-toolbar.html">
@@ -72,17 +79,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="looper-page/ethereum-signer.html">
 <link rel="import" href="looper-page/signtosend-dialog.html">
 <link rel="import" href="looper-page/signtosend-dialog.html">
-<link rel="import" href="utils/pretty-number.html">
-<link rel="import" href="utils/time-str.html">
-<link rel="import" href="utils/global-variable.html">
-<link rel="import" href="utils/notification-panel.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-rings.html">
 <link rel="lazy-import" href="page-ring.html">
 <link rel="lazy-import" href="page-orders.html">
 <link rel="lazy-import" href="page-order.html">
-<link rel="lazy-import" href="page-fills.html">
+<link rel="lazy-import" href="page-trades.html">
 <link rel="lazy-import" href="page-wallet.html">
 <link rel="lazy-import" href="page-transfer">
 <link rel="lazy-import" href="page-authorize">
@@ -98,13 +101,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
      :host {
-            --app-primary-color: var(--paper-indigo-500);
-            --app-primary-color-dark: var(--paper-indigo-700);
+            --app-primary-color: var(--google-blue-500);
+            --app-primary-color-dark: var(--google-blue-700);
             --app-secondary-color: black;
             --paper-spinner-color: var(--app-primary-color);
             --paper-spinner-stroke-width: 1px;
-            --app-red-color: var(--paper-red-500);
-            --app-green-color: var(--paper-green-500);
+            --app-red-color: var(--google-red-500);
+            --app-green-color: var(--google-green-500);
             --app-text-color: rgba(0, 0, 0, .78);
             --app-text-color-light: rgba(0, 0, 0, .54);
 
@@ -112,7 +115,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             --valo-primary-text-color: var(--app-text-color);
             --valo-body-text-color: var(--app-text-color);
             --valo-contrast-60pct: var(--app-text-color-light);
-            --valo-error-color: var(--paper-red-500);
+            --valo-error-color: var(--google-red-500);
             --vaadin-grid-header-cell: {
                 text-transform: uppercase;
             }
@@ -126,9 +129,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     app-header {
-        /*color:var(--app-primary-color);*/
-
-        background-color: #fff;
+        color: #fff;
+        height: 96px;
+        background-color: var(--app-primary-color-dark);
     }
 
     app-header paper-icon-button {
@@ -203,7 +206,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfig}}"></iron-ajax>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -248,7 +251,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-orders name="orders"></page-orders>
                     <page-order name="order" id={{pageId}}></page-order>
-                    <page-fills name="fills" market={{pageId}}></page-fills>
+                    <page-trades name="trades" market={{pageId}}></page-trades>
                     <page-convert name="convert" id={{pageId}}></page-convert>
                     <page-authorize name="authorize" id={{pageId}}></page-authorize>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
@@ -280,9 +283,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 routeData: Object,
                 rootPath: String,
                 subrouteData: Object,
+                appConfigRaw: Object,
                 appConfig: {
                     type: Object,
-                    observer: '_appConfigLoaded',
+                    computed: '_computeAppConfig(appConfigRaw)'
                 },
                 wallet: {
                     type: Object,
@@ -298,9 +302,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
         }
 
-        _appConfigLoaded() {
+        _computeAppConfig(appConfigRaw) {
+            if (appConfigRaw === null) {
+                return null;
+            }
+
+            var appConfig = appConfigRaw;
+            appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
+            appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
+            appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
+            appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => this._marketId(o));
+            appConfig.marketIds = _.map(appConfigRaw.markets, o => this._marketId(o));
             this.$.loading.style.display = "none";
             this.$.pages.style.display = "inherit";
+            return appConfig;
+        }
+
+        _marketId(market) {
+            return market.tokenx + "-" + market.tokeny;
         }
 
         _walletChanged(wallet) {

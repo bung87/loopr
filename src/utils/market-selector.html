@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<script src="../../bower_components/moment/moment.js"></script>
+<dom-module id="market-selector">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+        <style include="shared-styles">
+         :host {
+            display: block;
+        }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <div class="horizontal center layout">
+            <div class="flex"></div>
+            <div class="label">Market</div>
+            <vaadin-combo-box id="market" placeholder="LRC-WETH" items="[[items)]]"></vaadin-combo-box>
+        </div>
+    </template>
+    <script>
+    class MarketSelector extends Polymer.Element {
+        static get is() {
+            return 'market-selector';
+        }
+
+        static get properties() {
+            return {
+                appConfig: Object,
+                selectedId: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                selectedMarket: {
+                    type: Object
+                },
+                items: {
+                    type: Array,
+                    computed: '_computeItems(appConfig.marketIds)'
+                }
+            };
+        }
+        _computeItems(marketIds) {
+            return _.map(marketIds, function(id) {
+                return { "value": id, "label": Id };
+            })
+        }
+    }
+
+    customElements.define(MarketSelector.is, MarketSelector);
+    </script>
+</dom-module>

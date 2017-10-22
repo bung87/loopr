@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <!-- <link rel="import" href="../../bower_components/paper-button/paper-button.html"> -->
-<dom-module id="recent-fills" fit>
+<dom-module id="trade-table" fit>
     <template>
         <style include="shared-styles">
          :host {
@@ -48,9 +48,9 @@
         </vaadin-grid>
     </template>
     <script>
-    class RecentFills extends Polymer.Element {
+    class TradeTable extends Polymer.Element {
         static get is() {
-            return 'recent-fills';
+            return 'trade-table';
         }
 
         /**
@@ -133,6 +133,6 @@
         }
     }
 
-    window.customElements.define(RecentFills.is, RecentFills);
+    window.customElements.define(TradeTable.is, TradeTable);
     </script>
 </dom-module>

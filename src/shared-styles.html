@@ -64,17 +64,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: var(--app-text-color);
         }
 
-        .sections>paper-card {
+        .sections paper-card {
             width: 100%;
             margin-bottom: 32px;
             padding: 32px 16px;
-            /*            box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+            box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
             0 1px 10px 0 rgba(0, 0, 0, 0.12),
-            0 2px 4px -1px rgba(0, 0, 0, 0.4);*/
+            0 2px 4px -1px rgba(0, 0, 0, 0.4);
         }
+        /*  .sections paper-card:hover {
+            box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+        }*/
 
-
-        .sections>paper-card[transparent] {
+        .sections paper-card[transparent] {
             color: var(--app-text-color-light);
             text-transform: uppercase;
             text-align: left;
@@ -193,11 +195,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         vaadin-grid {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--app-text-color);
             border: none;
             height: 100%;
-            line-height: 32px;
+            line-height: 20px;
+            font-weight: normal;
         }
 
         vaadin-grid .left-aligned {
@@ -217,6 +220,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         @media(min-width:1024px) {
+            .sections {
+                padding-top: 64px;
+            }
             .sections>paper-card {
                 width: 1024px;
             }

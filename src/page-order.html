@@ -8,9 +8,8 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="shared-styles.html">
-<link rel="import" href="market/recent-fills.html">
-<link rel="import" href="market/recent-orders.html">
+<link rel="import" href="market/trade-table.html">
+<link rel="import" href="market/order-table.html">
 <dom-module id="page-order">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
@@ -62,7 +61,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </paper-card>
                 <paper-card transparent>Historial Fills</paper-card>
                 <paper-card>
-                    <recent-fills filter-mine name="myfills" hash-type="Ring" market="[[id]]"></recent-fills>
+                    <trade-table filter-mine name="myfills" hash-type="Ring" market="[[id]]"></trade-table>
                 </paper-card>
                 <div class="footer-spacer"></div>
                 <looper-footer></looper-footer>

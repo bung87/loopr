@@ -8,8 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="shared-styles.html">
-<link rel="import" href="market/recent-orders.html">
+<link rel="import" href="market/order-table.html">
 <dom-module id="page-orders">
     <template>
         <style include="shared-styles">
@@ -21,7 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <simple-toolbar slot="secondary-toolbar" title="Orders" back-link="#/markets"></simple-toolbar>
             <div class="sections">
                 <paper-card>
-                    <recent-orders></recent-orders>
+                    <order-table></order-table>
                 </paper-card>
                 <div class="footer-spacer"></div>
                 <looper-footer></looper-footer>

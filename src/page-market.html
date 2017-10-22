@@ -9,14 +9,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="shared-styles.html">
 <link rel="import" href="market/candlestick-chart.html">
 <link rel="import" href="market/depth-chart.html">
 <link rel="import" href="market/operation-panel.html">
-<link rel="import" href="market/recent-fills.html">
-<link rel="import" href="market/recent-orders.html">
+<link rel="import" href="market/trade-table.html">
+<link rel="import" href="market/order-table.html">
 <link rel="import" href="market/top-orders.html">
-<script src="../bower_components/highstock/highstock.js"></script>
+
 <dom-module id="page-market">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment paper-material-styles"></style>
@@ -41,9 +40,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
 
-        .sections>paper-card {
-            margin-bottom: 16px;
-            padding: 0 16px;
+        .sections paper-card {
+            /*margin-bottom: 16px;*/
+            /*padding: 0 16px;*/
+            padding-top: 16px;
         }
 
         #charts {
@@ -92,18 +92,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div class="vertical layout">
                         <paper-tabs selected="{{dataSelection}}" attr-for-selected="name">
                             <paper-tab name="orders">Recent Orders</paper-tab>
-                            <paper-tab name="fills">Recent Fills</paper-tab>
+                            <paper-tab name="trades">Recent Trades</paper-tab>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <paper-tab name="myorders">My Orders</paper-tab>
                                 <paper-tab name="myfills">My Fills</paper-tab>
                             </template>
                         </paper-tabs>
                         <iron-pages selected="{{dataSelection}}" attr-for-selected="name">
-                            <recent-fills name="fills" token="{{id}}" hash-type="Ring"></recent-fills>
-                            <recent-orders name="orders" token="{{id}}"></recent-orders>
+                            <trade-table name="trades" token="{{id}}" hash-type="Ring"></trade-table>
+                            <order-table name="orders" token="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <recent-fills filter-mine name="myfills" hash-type="Ring"></recent-fills>
-                                <recent-orders filter-mine name="myorders"></recent-orders>
+                                <trade-table filter-mine name="myfills" hash-type="Ring"></trade-table>
+                                <order-table filter-mine name="myorders"></order-table>
                             </template>
                         </iron-pages>
                     </div>

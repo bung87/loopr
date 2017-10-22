@@ -20,5 +20,8 @@
     "test": "polymer test",
     "test:integration": "polymer build # test that psk builds without error with the CLI",
     "start": "polymer serve"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
   }
 }

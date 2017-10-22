@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<dom-module id="recent-orders" fit>
+<dom-module id="order-table" fit>
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
@@ -72,9 +72,9 @@
         </vaadin-grid>
     </template>
     <script>
-    class RecentOrders extends Polymer.Element {
+    class OrderTable extends Polymer.Element {
         static get is() {
-            return 'recent-orders';
+            return 'order-table';
         }
 
         static get properties() {
@@ -122,6 +122,6 @@
 
     }
 
-    window.customElements.define(RecentOrders.is, RecentOrders);
+    window.customElements.define(OrderTable.is, OrderTable);
     </script>
 </dom-module>

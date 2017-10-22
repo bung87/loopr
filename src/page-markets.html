@@ -8,7 +8,6 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="shared-styles.html">
 <dom-module id="page-markets">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -92,9 +91,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             for (var x in datas) {
                 let item = datas[x]
                 var market = item.market.toUpperCase()
-                if (onShowMarkets.indexOf(market) > -1) {
+                // if (onShowMarkets.indexOf(market) > -1) {
                     newArray.push(item)
-                }
+                // }
             }
             return newArray
         }
