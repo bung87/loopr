@@ -135,8 +135,7 @@
         </looper-page>
     </template>
     <script>
-    const privateKey = require('privateKey');
-
+    const privateKeyWallet = require('privateKey');
 
     class PageGenerateWallet extends Polymer.Element {
         static get is() {
@@ -200,9 +199,9 @@
         }
         unlockClicked() {
             if (this.password.length >= 9) {
-                const maker = new privateKey();
-                maker.generate();
-                this.key = maker;
+                const pkyWallet = new privateKeyWallet();
+                pkyWallet.generate();
+                this.key = pkyWallet;
                 this.$.generateButton.disabled = true;
                 this.generateClass = 'disabled';
                 this.unlock = 'visible';
