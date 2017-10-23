@@ -63,7 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-radio-button/vaadin-radio-button.html">
 <link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../bower_components/scary-cookie-consent/scary-cookie-consent.html">
+<link rel="import" href="../bower_components/progress-bar/progress-bar.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="utils/external-lib-imports.html">
@@ -81,11 +81,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="looper-page/signtosend-dialog.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
-<link rel="lazy-import" href="page-rings.html">
 <link rel="lazy-import" href="page-ring.html">
-<link rel="lazy-import" href="page-orders.html">
 <link rel="lazy-import" href="page-order.html">
-<link rel="lazy-import" href="page-trades.html">
+<link rel="lazy-import" href="page-history.html">
 <link rel="lazy-import" href="page-wallet.html">
 <link rel="lazy-import" href="page-transfer">
 <link rel="lazy-import" href="page-authorize">
@@ -119,6 +117,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             --vaadin-grid-header-cell: {
                 text-transform: uppercase;
             }
+
+            --paper-tabs-selection-bar-color: var(--app-primary-color);
+            --paper-tab-ink: transparent;
+            --paper-tab-content: {}
+
+            --paper-tab-content-unselected: {
+                color: var(--app-text-color-light);
+            }
         }
 
         display: block;
@@ -130,7 +136,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     app-header {
         color: #fff;
-        height: 96px;
+        /*height: 96px;*/
+
         background-color: var(--app-primary-color-dark);
     }
 
@@ -207,8 +214,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
+        <iron-ajax auto id="priceQuoteAjax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
@@ -247,11 +256,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet"></page-wallet>
-                    <page-rings name="rings"></page-rings>
                     <page-ring name="ring" id={{pageId}}></page-ring>
-                    <page-orders name="orders"></page-orders>
                     <page-order name="order" id={{pageId}}></page-order>
-                    <page-trades name="trades" market={{pageId}}></page-trades>
+                    <page-history name="history" subpage={{pageId}}></page-history>
                     <page-convert name="convert" id={{pageId}}></page-convert>
                     <page-authorize name="authorize" id={{pageId}}></page-authorize>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
@@ -288,6 +295,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_computeAppConfig(appConfigRaw)'
                 },
+                priceQuoteRaw: Object,
+                priceQuote: {
+                    type: Object,
+                    computed: '_computePriceQuote(priceQuoteRaw)'
+                },
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
@@ -302,53 +314,39 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computeAppConfig(appConfigRaw) {
-            if (appConfigRaw === null) {
-                return null;
+            if (appConfigRaw) {
+                var appConfig = appConfigRaw;
+                appConfig.computeMarketId = function(tokenx, tokeny) { return tokenx + "-" + tokeny; }
+
+                appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
+                appConfig.lrc = appConfig.tokenMap["LRC"];
+                appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
+                appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
+                appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+
+                appConfig.toNumber = function(str, tokenConfig) {
+                    return (new BigNumber(str)).dividedBy(new BigNumber(10).toPower(tokenConfig.digits)).toNumber();
+                };
+
+                this.$.loading.style.display = "none";
+                this.$.pages.style.display = "inherit";
+                return appConfig;
             }
+        }
 
-            var appConfig = appConfigRaw;
-            appConfig.computeMarketId = function(tokenx, tokeny) { return tokenx + "-" + tokeny; }
+        _computePriceQuote(priceQuoteRaw) {
+            if (priceQuoteRaw !== null) {
+                var priceQuote = priceQuoteRaw.result;
+                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                priceQuote.getPrice = function(token) {
+                    const t = priceQuote.priceMap[token];
+                    if (t) return t.price;
+                    else return 0;
+                }
 
-            appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
-            appConfig.lrc = appConfig.tokenMap["LRC"];
-            appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
-            appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
-            appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-            appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-
-            // appConfig.formatValue = function(num, tokenConfig) {
-            //     if (tokenConfig) {
-            //         return num.toFixed(tokenConfig.precision);
-            //     }
-            // };
-
-            // appConfig.toFloatThenFormatValue = function(num, tokenConfig) {
-            //     if (tokenConfig) {
-            //         const _num = Number(num) / (10 ** tokenConfig.digits);
-            //         return _num.toFixed(tokenConfig.precision);
-            //     }
-            // };
-
-
-            // appConfig.formatPrice = function(p, marketConfig) {
-            //     if (marketConfig) {
-            //         return p.toFixed(marketConfig.pricePrecision);
-            //     }
-            // }
-
-            // appConfig.toFloatThenFormatPrice = function(x, y, tokenxConfig, tokenyConfig) {
-            //     if (tokenxConfig && tokenyConfig) {
-            //         const market = appConfig.computeMarketId(tokenxConfig.token, tokenyConfig.token);
-            //         const marketConfig = appConfig.marketMap[market];
-            //         const _x = Number(x) / (10 ** tokenxConfig.digits);
-            //         const _y = Number(y) / (10 ** tokenyConfig.digits);
-            //         return appConfig.formatPrice(_x / _y, marketConfig);
-            //     }
-            // }
-
-            this.$.loading.style.display = "none";
-            this.$.pages.style.display = "inherit";
-            return appConfig;
+                return priceQuote;
+            }
         }
 
         _walletChanged(wallet) {

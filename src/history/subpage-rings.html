@@ -1,0 +1,88 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="subpage-rings">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+         :host {
+            display: block;
+        }
+        </style>
+        <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+            <vaadin-grid-column width="50px">
+                <template class="header">
+                    <div class="left-aligned">Hash</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="#/ring/[[item.ringhash]]">
+                            <div class="long-hash">[[item.ringhash]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
+                <template class="header">
+                    <div class="left-aligned">Miner</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="//etherscan.io/address/[[item.miner]]" target="_blank">
+                            <div class="long-hash">[[item.miner]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
+                <template class="header">
+                    <div class="left-aligned">Fee Recepient</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="//etherscan.io/address/[[item.feeRecepient]]" target="_blank">
+                            <div class="long-hash">[[item.feeRecepient]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
+                <template class="header">
+                    <div class="left-aligned">Transaction Hash</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="//etherscan.io/tx/[[item.transactionHash]]" target="_blank">
+                            <div class="long-hash">[[item.transactionHash]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
+                <template class="header">Block Num</template>
+                <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
+            </vaadin-grid-column>
+        </vaadin-grid>
+    </template>
+    <script>
+    class SubpageRings extends Polymer.Element {
+        static get is() { return 'subpage-rings'; }
+        tranHextoNum(hex) {
+            if (hex) {
+                return Number(hex);
+            }
+            return 'Error';
+        }
+    }
+
+    window.customElements.define(SubpageRings.is, SubpageRings);
+    </script>
+</dom-module>

@@ -7,7 +7,7 @@
         }
 
         paper-button {
-            height: 48px;
+            height: 64px;
             min-width: 120px;
             margin: 0;
         }
@@ -15,7 +15,7 @@
         app-toolbar {
             color: #fff;
             background-color: var(--app-primary-color);
-            height: 48px;
+            /*height: 48px;*/
         }
 
         a>paper-button {
@@ -40,14 +40,11 @@
             <a href="#/markets" active$="[[isActiveTab('markets')]]" styleless>
                 <paper-button noink>Markets</paper-button>
             </a>
+            <a href="#/history" active$="[[isActiveTab('history')]]" styleless>
+                <paper-button noink>History</paper-button>
+            </a>
             <a id="walletlink" href="#/wallet" active$="[[isActiveTab('wallet')]]" styleless>
                 <paper-button noink>Wallet</paper-button>
-            </a>
-            <a href="#/rings" active$="[[isActiveTab('rings')]]" styleless>
-                <paper-button noink>Rings</paper-button>
-            </a>
-            <a href="#/trades" active$="[[isActiveTab('trades')]]" styleless>
-                <paper-button noink>Trades</paper-button>
             </a>
             <a href="#/settings" active$="[[isActiveTab('settings')]]" styleless>
                 <paper-button noink>Settings</paper-button>

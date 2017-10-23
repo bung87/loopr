@@ -24,49 +24,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: var(--app-red-color);
         }
         </style>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
+        </iron-ajax>
         <looper-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <looper-toolbar slot="secondary-toolbar" active-tab="markets">
             </looper-toolbar>
             <div class="sections">
-                <paper-card>
-                    <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{data}}" debounce-duration="300">
-                    </iron-ajax>
-                    <vaadin-grid aria-label="Markets" items="[[_filterMarkets(data.result)]]">
-                        <!-- items="[[_show(data.result, size)]]" -->
+                <paper-card tablewrapper>
+                    <!-- <progress-bar  class="fast"></progress-bar> -->
+                    <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
+                    <vaadin-grid aria-label="Markets" items="[[tickers]]">
                         <vaadin-grid-column>
                             <template class="header">Market</template>
-                            <template><a href="#/market/[[_a(item.market)]]">[[item.market]]</a></template>
+                            <template><a href="#/market/[[item.market]]">[[item.market]]</a></template>
                         </vaadin-grid-column>
                         <vaadin-grid-column>
                             <template class="header">Last Price</template>
                             <template>
-                                <pretty-number v="[[item.last]]" d=4></pretty-number>
+                                <pretty-number v="[[item.last]]" d=[[item.pricePrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="60px">
                             <template class="header">Change</template>
                             <template>
-                                <div class$="[[_class(item.change)]]">[[_showChange(item.change)]]</pretty-number>
+                                <div class$="[[item.changeClass]]">[[item.changeStr]]</pretty-number>
                                 </div>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">24Hr Volume</template>
                             <template>
-                                <pretty-number v="[[item.vol]]" d=2>
+                                <pretty-number v="[[item.vol]]" d=[[item.volumnPrecision]]>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Bid</template>
                             <template>
-                                <pretty-number v="[[item.buy]]" d=2>
+                                <pretty-number v="[[item.buy]]" d=[[item.pricePrecision]]>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Ask</template>
                             <template>
-                                <pretty-number v="[[item.sell]]" d=2>
+                                <pretty-number v="[[item.sell]]" d=[[item.pricePrecision]]>
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
@@ -80,63 +81,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     class PageMarkets extends Polymer.Element {
         static get is() { return 'page-markets'; }
 
-        ready() {
-            super.ready();
-            this.size = 10;
+        static get properties() {
+            return {
+                resp: Object,
+                tickers: {
+                    type: Object,
+                    computed: '_process(resp.result)'
+                }
+            };
         }
 
-        _filter(datas) {
-            let onShowMarkets = this.appConfig.markets
-            let newArray = new Array()
-            for (var x in datas) {
-                let item = datas[x]
-                var market = item.market.toUpperCase()
-                // if (onShowMarkets.indexOf(market) > -1) {
-                    newArray.push(item)
-                // }
+        _process(result) {
+            if (result) {
+                return _.map(result, function(i) {
+                    var item = i;
+                    if (i.change > 0) {
+                        item.changeClass = "increase";
+                        item.changeStr = "+" + i.change.toFixed(1) + "%";
+                    } else if (i.change < 0) {
+                        item.changeClass = "decrease";
+                        item.changeStr = i.change.toFixed(1) + "%";
+                    } else {
+                        item.changeClass = "";
+                        item.changeStr = "0.0%";
+                    }
+
+                    const marketConfig = this.appConfig.marketMap[i.market];
+                    if (marketConfig) {
+                        item.pricePrecision = marketConfig.pricePrecision;
+
+                        const tokenxConfig = this.appConfig.tokenMap[marketConfig.tokenx];
+                        if (tokenxConfig) {
+                            item.volumnPrecision = tokenxConfig.precision;
+                        } else {
+                            item.volumnPrecision = defaultVolumePrecision;
+                        }
+
+                    } else {
+                        item.pricePrecision = this.appConfig.defaultPricePrecision;
+                        item.volumnPrecision = this.appConfig.defaultVolumePrecision;
+                    }
+
+                    return item;
+                }.bind(this));
             }
-            return newArray
-        }
-
-        _filterMarkets(datas) {
-            if (!datas) return;
-            return this._filter(datas)
-        }
-
-        _a(value) {
-            if (!value) {
-                return "#";
-            }
-            let array = value.split("/")
-            return array[0].toLowerCase() + "-" + array[1].toLowerCase()
-        }
-
-        _show(data, size) {
-            if (!data) {
-                return;
-            }
-            return data.slice(0, size)
-        }
-
-        _showAll() {
-            if (!this.data) {
-                return;
-            }
-            this.size = this.data.result.size
-        }
-
-        _class(value) {
-            if (value > 0) return "increase";
-            else if (value < 0) return "decrease";
-            else return "";
-        }
-
-        _showChange(value) {
-            if (value > 0) {
-                return "+" + value.toFixed(1) + "%";
-            } else if (value < 0) {
-                return value.toFixed(1) + "%";
-            } else { return '-'; }
         }
     }
 
