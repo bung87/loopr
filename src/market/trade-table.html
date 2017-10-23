@@ -23,10 +23,13 @@
                     </div>
                 </template>
             </vaadin-grid-column>
+
             <vaadin-grid-column width="40px">
                 <template class="header">Amount</template>
                 <template><pretty-number v="[[item.fillAmountS]]" d=4 postfix="([[_findSymbol(item.tokenS)]])"></pretty-number></template>
             </vaadin-grid-column>
+
+
             <vaadin-grid-column width="40px">
                 <template class="header">Price</template>
                 <template>

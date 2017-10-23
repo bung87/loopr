@@ -30,6 +30,10 @@
             color: var(--google-grey-500);
         }
 
+        .warning {
+            color: var(--paper-amber-700);
+        }
+
         ul {
             padding: 0;
             list-style: none;
@@ -37,34 +41,52 @@
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300"></iron-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card>
-                <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/walletEther.json" handle-as="json" last-response="{{ethers}}" debounce-duration="300">
-                </iron-ajax>
-                <vaadin-grid aria-label="Ethers" items="[[ethers.result.ether]]" size=2>
+                <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
-                        <template>[[_findSymbol(item.contract)]]</template>
+                        <template>[[item.name]]</template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
-                        <template>[[item.balance]]([[item.unit]])</template>
+                        <template>
+                            <pretty-number v=[[item.balanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="60px">
                         <template class="header">Price (USD)</template>
-                        <template>[[item.priceUSD]]</template>
+                        <template>
+                            <pretty-number v=12 d=1 postfix="abc"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
-                        <template class="header">Value (USD)</template>
-                        <template>[[item.valueUSD]]</template>
+                        <template class="header">Allowance</template>
+                        <template>
+                            <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="100px">
-                        <template class="header">Operations</template>
+                        <template class="header"></template>
                         <template>
                             <div class="horizontal end-justified layout">
-                                <div><a href="#/transfer/[[_toLowerSymbol(item.contract)]]">transfer</a></div>
-                                <div style="margin-left: 10px;"><a href="#/convert">convert</a></div>
+                                <div><a href="#/transfer/[[item.token]]">Transfer</a></div>
+                                <div><a href="#/market/[[item.token]]-WETH">Trade</a></div>
+                                <div class="horizontal layout">
+                                    <div><a href="#/authorize/[[item.token]]">Authorize</a></div>
+                                    <template is="dom-if" if="[[item.allowanceWarning]]">
+                                        <div id="warn-[[item.token]]">
+                                            <iron-icon class="warning" icon="warning"></iron-icon>
+                                        </div>
+                                        <paper-tooltip for="warn-[[item.token]]" position="left">
+                                            <p>
+                                                Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
+                                            </p>
+                                        </paper-tooltip>
+                                    </template>
+                                </div>
                             </div>
                         </template>
                     </vaadin-grid-column>
@@ -72,42 +94,44 @@
             </paper-card>
             <paper-card transparent>ERC20 Tokens</paper-card>
             <paper-card>
-                <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/walletTokens.json" handle-as="json" last-response="{{tokens}}" debounce-duration="300">
-                </iron-ajax>
-                <vaadin-grid aria-label="Tokens" items="[[tokens.result.tokens]]">
+                <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
-                        <template>[[_findSymbol(item.contract)]]</template>
+                        <template>[[item.name]]</template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
-                        <template>[[item.balance]]</template>
+                        <template>
+                            <pretty-number v=[[item.balanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="60px">
                         <template class="header">Price (USD)</template>
-                        <template>[[item.priceUSD]]</template>
+                        <template>
+                            <pretty-number v=12 d=1 postfix="abc"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
-                        <template class="header">Value (USD)</template>
-                        <template>[[item.valueUSD]]</template>
+                        <template class="header">Allowance</template>
+                        <template>
+                            <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="100px">
-                        <template class="header">Operations</template>
+                        <template class="header"></template>
                         <template>
                             <div class="horizontal end-justified layout">
-                                <div><a href="#/transfer/[[_toLowerSymbol(item.contract)]]">transfer</a></div>
-                                <div style="margin-left: 10px;"><a href="#/market/[[_toLowerSymbol(item.contract)]]">trade</a></div>
-                                <div class="horizontal layout" style="margin-left: 10px;">
-                                    <div><a href="#/authorize/[[_toLowerSymbol(item.contract)]]">allowance</a></div>
-                                    <template is="dom-if" if="{{_allowanceWarn(item.contract, item.allowance)}}">
-                                        <div>
-                                            <a href="#" id="warn{{item.contract}}">
-                                                <iron-icon icon="icons:error"></iron-icon>
-                                            </a>
+                                <div><a href="#/transfer/[[item.token]]">Transfer</a></div>
+                                <div><a href="#/market/[[item.token]]-WETH">Trade</a></div>
+                                <div class="horizontal layout">
+                                    <div><a href="#/authorize/[[item.token]]">Authorize</a></div>
+                                    <template is="dom-if" if="[[item.allowanceWarning]]">
+                                        <div id="warn-[[item.token]]">
+                                            <iron-icon class="warning" icon="warning"></iron-icon>
                                         </div>
-                                        <paper-tooltip for="warn{{item.contract}}" position="left">
+                                        <paper-tooltip for="warn-[[item.token]]" position="left">
                                             <p>
-                                                allowance left: [[item.allowance]] is lower than [[_getAllowance(item.contract)]]
+                                                Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
                                             </p>
                                         </paper-tooltip>
                                     </template>
@@ -123,66 +147,45 @@
         static get is() { return 'subpage-ready'; }
 
         static get properties() {
-            return {};
-        }
-
-        ready(){
-            if(!this.wallet){
-                window.location.href = "#/wallet"
-                return
-            }
-            super.ready()
-        }
-
-        _convertToArray(wallet) {
-            var array = new Array();
-            array.push(wallet)
-            return array
-        }
-
-        _findTokenConfig(address) {
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                var token = tokens[x];
-                if (token.contract == address) {
-                    return token;
+            return {
+                resp: Object,
+                etherTokens: Array,
+                erc20Tokens: {
+                    type: Array,
+                    computed: '_computeBalances(resp)'
                 }
-            }
+
+            };
         }
 
-        _toLowerSymbol(address) {
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit.toLowerCase()
-            } else {
-                return "?";
-            }
-        }
+        _computeBalances(resp) {
+            if (resp) {
+                const items = _.map(resp.result.tokens, function(i) {
+                    var item = i;
+                    const tokenConfig = this.appConfig.tokenMap[i.token];
+                    if (!tokenConfig) { return null; }
 
-        _findSymbol(address) {
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit
-            } else {
-                return "?";
-            }
-        }
+                    if (tokenConfig.name) {
+                        item.name = tokenConfig.name + "/" + i.token;
+                    } else {
+                        item.name = i.token;
+                    }
+                    item.balanceValue = this.appConfig.toNumber(i.balance, tokenConfig);
+                    item.allowanceValue = this.appConfig.toNumber(i.allowance, tokenConfig);
+                    item.precision = tokenConfig.precision;
+                    item.unit = tokenConfig.unit;
+                    item.address = tokenConfig.address;
+                    item.allowanceWarning = (item.allowanceValue < tokenConfig.allowanceWarn);
+                    return item;
+                }.bind(this));
 
-        _getAllowance(address) {
-            var token = this._findTokenConfig(address);
-            if (!token) {
-                return 0;
-            }
-            return token.allowanceWarn
-        }
+                this.etherTokens = _.filter(items, function(i) {
+                    return i !== null && (i.token === 'WETH' || i.token === 'ETH');
+                });
 
-        _allowanceWarn(address, allowance) {
-            var token = this._findTokenConfig(address);
-            if (!token) {
-                return false;
-            }
-            if (token.allowanceWarn > 0 && (!allowance || allowance < token.allowanceWarn)) {
-                return true;
+                return _.filter(items, function(i) {
+                    return i !== null && i.token !== 'WETH' && i.token !== 'ETH';
+                });
             }
         }
     }

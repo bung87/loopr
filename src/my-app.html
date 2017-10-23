@@ -320,6 +320,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
             appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
 
+            appConfig.toNumber = function(str, tokenConfig) {
+                return (new BigNumber(str)).dividedBy(new BigNumber(10).toPower(tokenConfig.digits)).toNumber();
+            };
+
             // appConfig.formatValue = function(num, tokenConfig) {
             //     if (tokenConfig) {
             //         return num.toFixed(tokenConfig.precision);
