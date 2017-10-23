@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="market/candlestick-chart.html">
 <link rel="import" href="market/depth-chart.html">
 <link rel="import" href="market/operation-panel.html">
-<link rel="import" href="market/trade-table.html">
+<link rel="import" href="market/trade-table-market.html">
 <link rel="import" href="market/order-table.html">
 <link rel="import" href="market/top-orders.html">
 
@@ -99,7 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </template>
                         </paper-tabs>
                         <iron-pages selected="{{dataSelection}}" attr-for-selected="name">
-                            <trade-table name="trades" token="{{id}}" hash-type="Ring"></trade-table>
+                            <trade-table-market name="trades" token="{{id}}" market="[[id]]"></trade-table-market>
                             <order-table name="orders" token="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <trade-table filter-mine name="myfills" hash-type="Ring"></trade-table>
