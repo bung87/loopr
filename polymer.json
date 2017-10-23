@@ -4,11 +4,9 @@
     "fragments": [
         "src/page-markets.html",
         "src/page-market.html",
-        "src/page-rings.html",
+        "src/page-history.html",
         "src/page-ring.html",
-        "src/page-orders.html",
         "src/page-order.html",
-        "src/page-fills.html",
         "src/page-wallet.html",
         "src/page-authorize.html",
         "src/page-convert.html",
