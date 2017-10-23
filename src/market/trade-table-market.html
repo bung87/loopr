@@ -6,14 +6,18 @@
          :host {
             display: block;
         }
+
+        div.long-hash {
+            width: 80px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="80px">
                 <template class="header">
-                    <div class="left-aligned">Ring Hash</div>
+                    <div class="left-aligned">Ring</div>
                 </template>
                 <template>
                     <div class="left-aligned">
@@ -23,12 +27,12 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="5px">
+            <vaadin-grid-column width="40px">
                 <template class="header">Index</template>
                 <template>[[item.ringIndex]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
-                <template class="header">Order Hash</template>
+            <vaadin-grid-column width="90px">
+                <template class="header">Order</template>
                 <template>
                     <div class="left-aligned">
                         <a href="[[item.orderLink]]">
@@ -37,35 +41,35 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="10px">
+            <vaadin-grid-column width="40px">
                 <template class="header">Type</template>
                 <template><span style$="color:[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="120px">
                 <template class="header">Amount([[unitS]])</template>
                 <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]]></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
-                <template class="header">Price([[unitS]]/[[unitB]])</template>
+            <vaadin-grid-column width="80px">
+                <template class="header">Price</template>
                 <template>
                     <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="120px">
                 <template class="header">Size([[unitB]])</template>
                 <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]]></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="120px">
                 <template class="header">Lrc-Fee</template>
                 <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="80px">
+            <vaadin-grid-column width="120px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
              </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="130px">
                 <template class="header">Time</template>
                 <template><time-str seconds="[[item.timestamp]]"></time-str></template>
             </vaadin-grid-column>
