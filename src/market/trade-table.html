@@ -11,18 +11,34 @@
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <vaadin-grid-column width="40px">
-                <template class="header">
-                    <div class="left-aligned">Ring Hash</div>
-                </template>
-                <template>
-                    <div class="left-aligned">
-                        <a href="[[item.ringLink]]">
-                            <div class="long-hash">[[item.ringHash]]</div>
-                        </a>
-                    </div>
-                </template>
-            </vaadin-grid-column>
+            <template is="dom-if" if="[[_showOrder()]]">
+                <vaadin-grid-column width="40px">
+                    <template class="header">
+                        <div class="left-aligned">Ring Hash</div>
+                    </template>
+                    <template>
+                        <div class="left-aligned">
+                            <a href="[[item.ringLink]]">
+                                <div class="long-hash">[[item.ringHash]]</div>
+                            </a>
+                        </div>
+                    </template>
+                </vaadin-grid-column>
+            </template>
+            <template is="dom-if" if="[[_showRing()]]">
+                <vaadin-grid-column width="40px">
+                    <template class="header">
+                        <div class="left-aligned">Order Hash</div>
+                    </template>
+                    <template>
+                        <div class="left-aligned">
+                            <a href="[[item.orderLink]]">
+                                <div class="long-hash">[[item.orderHash]]</div>
+                            </a>
+                        </div>
+                    </template>
+                </vaadin-grid-column>
+            </template>
             <vaadin-grid-column width="5px">
                 <template class="header">Index</template>
                 <template>[[item.ringIndex]]</template>
@@ -35,8 +51,6 @@
                 <template class="header">Amount</template>
                 <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number></template>
             </vaadin-grid-column>
-
-
             <vaadin-grid-column width="40px">
                 <template class="header">Price</template>
                 <template>
@@ -57,10 +71,12 @@
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
-                 <template class="header">Time</template>
-                 <template><time-str seconds="[[item.timestamp]]"></time-str></template>
-            </vaadin-grid-column>
+            <template is="dom-if" if="[[_showOrder()]]">
+                <vaadin-grid-column width="40px">
+                    <template class="header">Time</template>
+                    <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+                </vaadin-grid-column>
+            </template>
         </vaadin-grid>
     </template>
     <script>
@@ -70,7 +86,7 @@
         }
 
         /**
-         * hashType: oneof:[order, ring]
+         * subType: oneof:[order, ring]
          * market: lrc-eos
          */
         static get properties() {
@@ -78,7 +94,7 @@
                 token: {
                     type: String,
                 },
-                hashType: {
+                subType: {
                     type: String
                 },
                 orders: {
@@ -86,6 +102,16 @@
                     computed: '_computeOrders(resp)'
                 }
             };
+        }
+
+        _showOrder(){
+            if(!this.subType) return false
+            return "order" === this.subType.toLowerCase()
+        }
+
+        _showRing(){
+            if(!this.subType) return false
+            return "ring" === this.subType.toLowerCase()
         }
 
         _computOrderItem(item){
@@ -151,40 +177,6 @@
         _computeOrders(resp){
             if(!resp || !resp.result) return
             return _.map(resp.result.data, o => this._computOrderItem(o));
-        }
-
-        _showRingHash(){
-            if(!this.hashType) return false
-            return "ring" === this.hashType.toLowerCase()
-        }
-
-        _showOrderHash(){
-            if(!this.hashType) return false
-            return "order" === this.hashType.toLowerCase()
-        }
-
-        _hashTitle(){
-            if(!this.hashType) return "#"
-            let type = this.hashType.toLowerCase()
-            if("order" === type){
-                return "Order Hash"
-            } else if("ring" === type){
-                return "Ring Hash"
-            } else {
-                return "Hash"
-            }
-        }
-
-        _hashLink(hash){
-            if(!hash || !this.hashType) return "#"
-            let type = this.hashType.toLowerCase()
-            if("order" === type){
-                return "#/order/"+hash
-            } else if("ring" === type){
-                return "#/ring/"+hash
-            } else {
-                return "#"
-            }
         }
 
         _findTokenConfig(address) {
