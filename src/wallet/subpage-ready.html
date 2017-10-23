@@ -8,41 +8,43 @@
             display: block;
         }
 
-        .item>a {
-            padding-right: 16px;
-        }
-
-        .header {
-            background-color: var(--google-grey-100);
-        }
-
-        .header .item {
-            color: var(--google-grey-500);
-        }
-
-        .wallet-summary {
-            padding: 16px 0 16px 0;
-            margin: 16px;
-        }
-
-        .wallet-summary .head {
-            /*min-width: 120px;*/
-            color: var(--google-grey-500);
-        }
-
         .warning {
             color: var(--paper-amber-700);
         }
 
-        ul {
-            padding: 0;
-            list-style: none;
+        .allowance {
+            @apply --layout-horizontal;
+            @apply --center-justified-horizontal;
         }
+
+        .operations {
+            @apply --layout-horizontal;
+        }
+
+        .operations a {
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .summary {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+         .summary >div {
+            padding: 8px;
+         }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300"></iron-ajax>
         <div class="sections">
+            <paper-card transparent>
+                <div class="summary horizontal center center-justified layout">
+                    <div>Wallet Total Value:</div>
+                    <div>1234552323.1212 USD</div>
+                </div>
+            </paper-card>
             <paper-card transparent>Ether</paper-card>
             <paper-card>
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
@@ -65,28 +67,26 @@
                     <vaadin-grid-column width="50px">
                         <template class="header">Allowance</template>
                         <template>
-                            <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                            <div class="allowance">
+                                <template is="dom-if" if="[[item.allowanceWarning]]">
+                                    <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
+                                    <paper-tooltip for="warn-[[item.token]]" position="left">
+                                        Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
+                                    </paper-tooltip>
+                                </template>
+                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                            </div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="100px">
                         <template class="header"></template>
                         <template>
-                            <div class="horizontal end-justified layout">
-                                <div><a href="#/transfer/[[item.token]]">Transfer</a></div>
-                                <div><a href="#/market/[[item.token]]-WETH">Trade</a></div>
-                                <div class="horizontal layout">
-                                    <div><a href="#/authorize/[[item.token]]">Authorize</a></div>
-                                    <template is="dom-if" if="[[item.allowanceWarning]]">
-                                        <div id="warn-[[item.token]]">
-                                            <iron-icon class="warning" icon="warning"></iron-icon>
-                                        </div>
-                                        <paper-tooltip for="warn-[[item.token]]" position="left">
-                                            <p>
-                                                Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
-                                            </p>
-                                        </paper-tooltip>
-                                    </template>
-                                </div>
+                            <div class="operations">
+                                <a href="#/transfer/[[item.token]]">Transfer</a>
+                                <a href="#/convert">Convert</a>
+                                <template is="dom-if" if="[[_isWETH(item.token)]]">
+                                    <a href="#/authorize/[[item.token]]">Authorize</a>
+                                </template>
                             </div>
                         </template>
                     </vaadin-grid-column>
@@ -114,28 +114,24 @@
                     <vaadin-grid-column width="50px">
                         <template class="header">Allowance</template>
                         <template>
-                            <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                            <div class="allowance">
+                                <template is="dom-if" if="[[item.allowanceWarning]]">
+                                    <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
+                                    <paper-tooltip for="warn-[[item.token]]" position="left">
+                                        Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
+                                    </paper-tooltip>
+                                    <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                                </template>
+                            </div>
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="100px">
                         <template class="header"></template>
                         <template>
-                            <div class="horizontal end-justified layout">
-                                <div><a href="#/transfer/[[item.token]]">Transfer</a></div>
-                                <div><a href="#/market/[[item.token]]-WETH">Trade</a></div>
-                                <div class="horizontal layout">
-                                    <div><a href="#/authorize/[[item.token]]">Authorize</a></div>
-                                    <template is="dom-if" if="[[item.allowanceWarning]]">
-                                        <div id="warn-[[item.token]]">
-                                            <iron-icon class="warning" icon="warning"></iron-icon>
-                                        </div>
-                                        <paper-tooltip for="warn-[[item.token]]" position="left">
-                                            <p>
-                                                Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
-                                            </p>
-                                        </paper-tooltip>
-                                    </template>
-                                </div>
+                            <div class="operations">
+                                <a href="#/transfer/[[item.token]]">Transfer</a>
+                                <a href="#/market/[[item.token]]-WETH">Trade</a>
+                                <a href="#/authorize/[[item.token]]">Authorize</a>
                             </div>
                         </template>
                     </vaadin-grid-column>
@@ -188,6 +184,8 @@
                 });
             }
         }
+
+        _isWETH(token) { return token === 'WETH'; }
     }
 
     window.customElements.define(SubpageReady.is, SubpageReady);
