@@ -81,11 +81,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="looper-page/signtosend-dialog.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
-<link rel="lazy-import" href="page-rings.html">
 <link rel="lazy-import" href="page-ring.html">
-<link rel="lazy-import" href="page-orders.html">
 <link rel="lazy-import" href="page-order.html">
-<link rel="lazy-import" href="page-trades.html">
+<link rel="lazy-import" href="page-history.html">
 <link rel="lazy-import" href="page-wallet.html">
 <link rel="lazy-import" href="page-transfer">
 <link rel="lazy-import" href="page-authorize">
@@ -118,6 +116,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             --valo-error-color: var(--google-red-500);
             --vaadin-grid-header-cell: {
                 text-transform: uppercase;
+            }
+
+            --paper-tabs-selection-bar-color: var(--app-primary-color);
+            --paper-tab-ink: transparent;
+            --paper-tab-content: {}
+
+            --paper-tab-content-unselected: {
+                color: var(--app-text-color-light);
             }
         }
 
@@ -247,11 +253,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet"></page-wallet>
-                    <page-rings name="rings"></page-rings>
                     <page-ring name="ring" id={{pageId}}></page-ring>
-                    <page-orders name="orders"></page-orders>
                     <page-order name="order" id={{pageId}}></page-order>
-                    <page-trades name="trades" market={{pageId}}></page-trades>
+                    <page-history name="history" subpage={{pageId}}></page-history>
                     <page-convert name="convert" id={{pageId}}></page-convert>
                     <page-authorize name="authorize" id={{pageId}}></page-authorize>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
