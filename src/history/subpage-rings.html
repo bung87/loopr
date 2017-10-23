@@ -36,7 +36,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <div class="long-hash">[[item.miner]]</div>
+                        <a href="//etherscan.io/address/[[item.miner]]" target="_blank">
+                            <div class="long-hash">[[item.miner]]</div>
+                        </a>
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -46,7 +48,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <div class="long-hash">[[item.feeRecepient]]</div>
+                        <a href="//etherscan.io/address/[[item.feeRecepient]]" target="_blank">
+                            <div class="long-hash">[[item.feeRecepient]]</div>
+                        </a>
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -56,13 +60,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <div class="long-hash">[[item.transactionHash]]</div>
+                        <a href="//etherscan.io/tx/[[item.transactionHash]]" target="_blank">
+                            <div class="long-hash">[[item.transactionHash]]</div>
+                        </a>
                     </div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Block Num</template>
-                <template>[[tranHextoNum(item.blockNum)]]</template>
+                <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
             </vaadin-grid-column>
         </vaadin-grid>
     </template>

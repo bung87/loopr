@@ -22,8 +22,9 @@
         }
 
         .operations a {
-            min-width: 60px;
             text-align: center;
+            padding-left: 4px;
+            padding-right: 4px;
         }
 
         .summary {
@@ -45,7 +46,7 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <!-- ------ -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300"></iron-ajax>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>
@@ -55,7 +56,8 @@
                 </div>
             </paper-card>
             <paper-card transparent>Ether</paper-card>
-            <paper-card>
+            <paper-card tablewrapper>
+                <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
@@ -109,7 +111,8 @@
                 </vaadin-grid>
             </paper-card>
             <paper-card transparent>ERC20 Tokens</paper-card>
-            <paper-card>
+            <paper-card tablewrapper>
+                <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>

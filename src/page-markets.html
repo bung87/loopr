@@ -24,14 +24,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: var(--app-red-color);
         }
         </style>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
+        </iron-ajax>
         <looper-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <looper-toolbar slot="secondary-toolbar" active-tab="markets">
             </looper-toolbar>
             <div class="sections">
-                <paper-card>
-                    <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
-                    </iron-ajax>
+                <paper-card tablewrapper>
+                    <!-- <progress-bar  class="fast"></progress-bar> -->
+                    <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
                     <vaadin-grid aria-label="Markets" items="[[tickers]]">
                         <vaadin-grid-column>
                             <template class="header">Market</template>
