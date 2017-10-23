@@ -31,18 +31,27 @@
             font-weight: 700;
             text-transform: uppercase;
         }
-         .summary >div {
+
+        .summary>div {
             padding: 8px;
-         }
+        }
+
+        .long-name {
+            color: var(--app-text-color-light);
+            padding-left: 4px;
+        }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
+        <!-- ------ -->
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300"></iron-ajax>
+        <!-- ------ -->
         <div class="sections">
             <paper-card transparent>
                 <div class="summary horizontal center center-justified layout">
                     <div>Wallet Total Value:</div>
-                    <div>1234552323.1212 USD</div>
+                    <div>[[totalValue]] [[priceQuote.fiat]]</div>
                 </div>
             </paper-card>
             <paper-card transparent>Ether</paper-card>
@@ -50,7 +59,8 @@
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
-                        <template>[[item.name]]</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]<span class="long-name">[[item.name]]</span></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -59,22 +69,28 @@
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="60px">
-                        <template class="header">Price (USD)</template>
+                        <template class="header">Price ([[priceQuote.fiat]])</template>
                         <template>
-                            <pretty-number v=12 d=1 postfix="abc"></pretty-number>
+                            <pretty-number v=[[item.price]] d=2></pretty-number>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column width="50px">
-                        <template class="header">Allowance</template>
+                    <vaadin-grid-column width="60px">
+                        <template class="header">Value ([[priceQuote.fiat]])</template>
+                        <template>
+                            <pretty-number v=[[item.total]] d=2></pretty-number>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="80px">
+                        <template class="header">Loopring Allowance</template>
                         <template>
                             <div class="allowance">
+                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
                                 <template is="dom-if" if="[[item.allowanceWarning]]">
                                     <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
                                     <paper-tooltip for="warn-[[item.token]]" position="left">
                                         Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
                                     </paper-tooltip>
                                 </template>
-                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
                             </div>
                         </template>
                     </vaadin-grid-column>
@@ -97,7 +113,8 @@
                 <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
-                        <template>[[item.name]]</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]<span class="long-name">[[item.name]]</span></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -106,21 +123,27 @@
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="60px">
-                        <template class="header">Price (USD)</template>
+                        <template class="header">Price ([[priceQuote.fiat]])</template>
                         <template>
-                            <pretty-number v=12 d=1 postfix="abc"></pretty-number>
+                            <pretty-number v=[[item.price]] d=2></pretty-number>
                         </template>
                     </vaadin-grid-column>
-                    <vaadin-grid-column width="50px">
-                        <template class="header">Allowance</template>
+                    <vaadin-grid-column width="60px">
+                        <template class="header">Value ([[priceQuote.fiat]])</template>
+                        <template>
+                            <pretty-number v=[[item.total]] d=2></pretty-number>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="80px">
+                        <template class="header">Loopring Allowance</template>
                         <template>
                             <div class="allowance">
+                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
                                 <template is="dom-if" if="[[item.allowanceWarning]]">
                                     <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
                                     <paper-tooltip for="warn-[[item.token]]" position="left">
                                         Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
                                     </paper-tooltip>
-                                    <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
                                 </template>
                             </div>
                         </template>
@@ -144,7 +167,9 @@
 
         static get properties() {
             return {
+                priceQuote: Object,
                 resp: Object,
+                totalValue: Number,
                 etherTokens: Array,
                 erc20Tokens: {
                     type: Array,
@@ -156,25 +181,27 @@
 
         _computeBalances(resp) {
             if (resp) {
+                var totalValue = 0;
                 const items = _.map(resp.result.tokens, function(i) {
                     var item = i;
                     const tokenConfig = this.appConfig.tokenMap[i.token];
                     if (!tokenConfig) { return null; }
 
-                    if (tokenConfig.name) {
-                        item.name = tokenConfig.name + "/" + i.token;
-                    } else {
-                        item.name = i.token;
-                    }
+                    item.name = tokenConfig.name
                     item.balanceValue = this.appConfig.toNumber(i.balance, tokenConfig);
                     item.allowanceValue = this.appConfig.toNumber(i.allowance, tokenConfig);
                     item.precision = tokenConfig.precision;
                     item.unit = tokenConfig.unit;
                     item.address = tokenConfig.address;
                     item.allowanceWarning = (item.allowanceValue < tokenConfig.allowanceWarn);
+                    item.price = this.priceQuote.getPrice(item.token);
+                    item.total = item.price * item.balanceValue;
+                    totalValue += item.total;
+
                     return item;
                 }.bind(this));
 
+                this.totalValue = totalValue;
                 this.etherTokens = _.filter(items, function(i) {
                     return i !== null && (i.token === 'WETH' || i.token === 'ETH');
                 });
