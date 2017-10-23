@@ -94,7 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <trade-table-market name="trades" token="{{id}}" market="[[id]]"></trade-table-market>
                             <order-table name="orders" token="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="myfills" hash-type="Ring"></trade-table>
+                                <trade-table filter-mine name="myfills" sub-type="order"></trade-table>
                                 <order-table filter-mine name="myorders"></order-table>
                             </template>
                         </iron-pages>

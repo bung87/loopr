@@ -82,7 +82,6 @@
         }
 
         /**
-         * hashType: oneof:[order, ring]
          * market: lrc-eos
          */
         static get properties() {
@@ -168,40 +167,6 @@
             return _.map(resp.result.data, o => this._computOrderItem(o));
         }
 
-        _showRingHash(){
-            if(!this.hashType) return false
-            return "ring" === this.hashType.toLowerCase()
-        }
-
-        _showOrderHash(){
-            if(!this.hashType) return false
-            return "order" === this.hashType.toLowerCase()
-        }
-
-        _hashTitle(){
-            if(!this.hashType) return "#"
-            let type = this.hashType.toLowerCase()
-            if("order" === type){
-                return "Order Hash"
-            } else if("ring" === type){
-                return "Ring Hash"
-            } else {
-                return "Hash"
-            }
-        }
-
-        _hashLink(hash){
-            if(!hash || !this.hashType) return "#"
-            let type = this.hashType.toLowerCase()
-            if("order" === type){
-                return "#/order/"+hash
-            } else if("ring" === type){
-                return "#/ring/"+hash
-            } else {
-                return "#"
-            }
-        }
-
         _findTokenConfig(address) {
             var tokens = this.appConfig.tokens;
             for (var x in tokens) {
@@ -228,8 +193,8 @@
             }
             return 0;
         }
-        typeStyle(isBuy) {
 
+        typeStyle(isBuy) {
             return isBuy ? 'var(--app-green-color)' : 'var(--app-red-color)';
         }
 
