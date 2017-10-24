@@ -1,7 +1,6 @@
 const signer = require('./signer.js');
 const ethUtil = require('ethereumjs-util');
 const _ = require('lodash');
-const hexUtil = require('./hex-utils.js');
 const BN = require('bn.js');
 
 function Order(data) {
@@ -19,6 +18,7 @@ function Order(data) {
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
 
+    const prefix = ethUtil.toBuffer("\x19Ethereum Signed Message:\n32");
 
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
@@ -26,17 +26,20 @@ function Order(data) {
         const hash = signer.solSHA3(orderTypes, [protocol, owner, tokenS, tokenB,
             new BN(Number(amountS).toString(10), 10),
             new BN(Number(amountB).toString(10), 10),
-            new BN(timestamp.toString(10), 10),
-            new BN(ttl.toString(10), 10),
-            new BN(salt.toString(10), 10),
-            new BN(lrcFee.toString(10), 10),
+            new BN(Number(timestamp).toString(10), 10),
+            new BN(Number(ttl).toString(10), 10),
+            new BN(Number(salt).toString(10), 10),
+            new BN(Number(lrcFee).toString(10), 10),
             buyNoMoreThanAmountB,
             marginSplitPercentage])
-        console.log(hash.toString('hex'));
+
+        const finalHash = ethUtil.sha3(Buffer.concat([prefix, hash]));
+
         if (_.isString(privateKey)) {
-            privateKey = Buffer.from(hexUtil.stripHex(privateKey), 'hex');
+            privateKey =ethUtil.toBuffer(privateKey);
         }
-        const signature = ethUtil.ecsign(hash, privateKey);
+
+        const signature = ethUtil.ecsign(finalHash, privateKey);
 
         return {
             protocol,

@@ -20812,8 +20812,7 @@ function validator() {
         if (!address) {
             return false;
         }
-        if (address === '0x0000000000000000000000000000000000000000') return false;
-        return validateEtherAddress(address);
+        return ethereumUtil.isValidAddress(address);
     };
 
     this.isValidHex = function(str) {
