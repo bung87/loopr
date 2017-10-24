@@ -12,8 +12,6 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
-        <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
             <vaadin-grid-column width="80px">
                 <template class="header">
@@ -43,7 +41,9 @@
             </vaadin-grid-column>
             <vaadin-grid-column width="120px">
                 <template class="header">Amount([[unitS]])</template>
-                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]]></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]]></pretty-number>
+                </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="80px">
                 <template class="header">Price</template>
@@ -53,22 +53,30 @@
             </vaadin-grid-column>
             <vaadin-grid-column width="120px">
                 <template class="header">Size([[unitB]])</template>
-                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]]></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]]></pretty-number>
+                </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="120px">
                 <template class="header">Lrc-Fee</template>
-                <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="120px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
-             </vaadin-grid-column>
+            </vaadin-grid-column>
             <vaadin-grid-column width="130px">
                 <template class="header">Time</template>
-                <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+                <template>
+                    <time-str seconds="[[item.timestamp]]"></time-str>
+                </template>
             </vaadin-grid-column>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -97,28 +105,31 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready()
-            if(!this.market) return
+            if (!this.market) return
             let tokenS = this.market.split("-")[0].toUpperCase()
             let tokenB = this.market.split("-")[1].toUpperCase()
             this.unitS = this.appConfig.tokenMap[tokenS].unit
             this.unitB = this.appConfig.tokenMap[tokenB].unit
         }
 
-        _computOrderItem(item){
-            if(!item || !this.market) return
+        _computOrderItem(item) {
+            if (!item || !this.market) return
             let currSell = this.market.split("-")[0]
-            item.ringLink = "#/ring/"+item.ringHash
-            item.orderLink = "#/order/"+item.orderHash
-            item.txLink = "https://etherscan.io/tx/"+item.txHash
+            item.ringLink = "#/ring/" + item.ringHash
+            item.orderLink = "#/order/" + item.orderHash
+            item.txLink = "https://etherscan.io/tx/" + item.txHash
             item.typeStyle = item.tokenS === currSell.toUpperCase() ? 'var(--app-red-color)' : 'var(--app-green-color)';
             item.buyOrSell = item.tokenS === currSell.toUpperCase() ? "Sell" : "Buy"
             const marketConfig = this.appConfig.marketMap[this.market.toUpperCase()];
             const defaultPricePrecision = 3;
             const defaultVolumePrecision = 5;
-            if(item.tokenB === currSell.toUpperCase()){
-                let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
+            if (item.tokenB === currSell.toUpperCase()) {
+                let tempS = item.tokenS,
+                    tempB = item.tokenB,
+                    tempAmountS = item.fillAmountS,
+                    tempAmountB = item.fillAmountB;
                 item.tokenS = tempB
                 item.fillAmountS = tempAmountB
                 item.tokenB = tempS
@@ -127,7 +138,7 @@
             item.fillAmountS = this._tranHextoNum(item.fillAmountS)
             item.fillAmountB = this._tranHextoNum(item.fillAmountB)
             item.fee = this._tranHextoNum(item.fee)
-            item.price = this.calPrice(item.fillAmountB,item.fillAmountS)
+            item.price = this.calPrice(item.fillAmountB, item.fillAmountS)
             if (marketConfig) {
                 item.pricePrecision = marketConfig.pricePrecision;
                 const tokenxConfigS = this.appConfig.tokenMap[item.tokenS];
@@ -162,8 +173,8 @@
             return '-1';
         }
 
-        _computeOrders(resp){
-            if(!resp || !resp.result) return
+        _computeOrders(resp) {
+            if (!resp || !resp.result) return
             return _.map(resp.result.data, o => this._computOrderItem(o));
         }
 
@@ -178,7 +189,7 @@
         }
 
         _findSymbol(address) {
-            if(!address) return
+            if (!address) return
             var token = this._findTokenConfig(address);
             if (token) {
                 return token.unit
@@ -200,6 +211,10 @@
 
         getType(isBuy) {
             return isBuy ? 'Buy' : 'Sell';
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

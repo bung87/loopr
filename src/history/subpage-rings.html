@@ -16,7 +16,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -70,6 +69,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template class="header">Block Num</template>
                 <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
             </vaadin-grid-column>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -80,6 +81,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return Number(hex);
             }
             return 'Error';
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

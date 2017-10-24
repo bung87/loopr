@@ -16,11 +16,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <order-table></order-table>
+        <order-table id="orders"></order-table>
     </template>
     <script>
     class SubpageOrders extends Polymer.Element {
         static get is() { return 'subpage-orders'; }
+
+        go() {
+            const page = this.$.orders.go();
+        }
     }
 
     window.customElements.define(SubpageOrders.is, SubpageOrders);

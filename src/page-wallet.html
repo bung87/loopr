@@ -20,7 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <looper-page>
             <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
-            <iron-pages selected="[[subpage]]" attr-for-selected="name" role="main">
+            <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
                 <subpage-ready name="ready"></subpage-ready>
             </iron-pages>
@@ -45,6 +45,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ready() {
             super.ready();
             this.addEventListener('reset-wallet', e => this.subpage = 'default');
+        }
+
+        go() {
+            const page = this.$.pages.selectedItem;
+            if (page && page.go) page.go();
         }
     }
 
