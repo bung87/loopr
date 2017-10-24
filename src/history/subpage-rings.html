@@ -16,62 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <vaadin-grid-column width="50px">
-                <template class="header">
-                    <div class="left-aligned">Hash</div>
-                </template>
-                <template>
-                    <div class="left-aligned">
-                        <a href="#/ring/[[item.ringhash]]">
-                            <div class="long-hash">[[item.ringhash]]</div>
-                        </a>
-                    </div>
-                </template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
-                <template class="header">
-                    <div class="left-aligned">Miner</div>
-                </template>
-                <template>
-                    <div class="left-aligned">
-                        <a href="//etherscan.io/address/[[item.miner]]" target="_blank">
-                            <div class="long-hash">[[item.miner]]</div>
-                        </a>
-                    </div>
-                </template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
-                <template class="header">
-                    <div class="left-aligned">Fee Recepient</div>
-                </template>
-                <template>
-                    <div class="left-aligned">
-                        <a href="//etherscan.io/address/[[item.feeRecepient]]" target="_blank">
-                            <div class="long-hash">[[item.feeRecepient]]</div>
-                        </a>
-                    </div>
-                </template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
-                <template class="header">
-                    <div class="left-aligned">Transaction Hash</div>
-                </template>
-                <template>
-                    <div class="left-aligned">
-                        <a href="//etherscan.io/tx/[[item.transactionHash]]" target="_blank">
-                            <div class="long-hash">[[item.transactionHash]]</div>
-                        </a>
-                    </div>
-                </template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
-                <template class="header">Block Num</template>
-                <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
-            </vaadin-grid-column>
-            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
-        </vaadin-grid>
+        <trade-table-market sub-type="ring" market="[[id]]"></trade-table-market>
     </template>
     <script>
     class SubpageRings extends Polymer.Element {
