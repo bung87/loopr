@@ -194,27 +194,28 @@
                 return (amount * price).toPrecision(this.tokenb.config.precision);
             }
 
-            placeBuyOrder() {
-//                if (!this.wallet) {
+           async placeBuyOrder() {
+                if (!this.wallet) {
 //                    this.dispatchEvent(new CustomEvent('notification', {
 //                        bubbles: true,
 //                        composed: true,
 //                        detail: "please set your wallet first"
 //                    }));
 //                    return;
-//                }
                     this.wallet = {
                         address: '0xD091341B21758C34AedC95FD27699197dA71b782',
                         privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
                     };
+                }
+
 
                 let data = {};
                 data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
                 data.owner = this.wallet.address;
-                data.tokenS = this.tokenb.config.contract;
-                data.tokenB = this.tokens.config.contract;
-                data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
-                data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
+                data.tokenS =this.tokens.config.contract;
+                data.tokenB = this.tokenb.config.contract;
+                data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
+                data.amountB = '0x' + (Number(this.sellTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
                 data.timestamp = new Date().getTime();
                 data.ttl = 10 * 24 * 3600;
                 data.salt = 10;
@@ -230,13 +231,65 @@
                     id: 22
                 };
                 const para = JSON.stringify(body);
-                fetch('http://10.137.107.63:3000', {
+              const res =  await fetch('http://10.137.107.63:3000', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: para
-                }).then(r => r.json()).then(res => console.log(JSON.stringify(res)));
+                }).then(r => r.json());
+
+              console.log(JSON.stringify(res));
+
+            }
+
+           async placeSellOrder(){
+
+               if (!this.wallet) {
+//                    this.dispatchEvent(new CustomEvent('notification', {
+//                        bubbles: true,
+//                        composed: true,
+//                        detail: "please set your wallet first"
+//                    }));
+//                    return;
+                   this.wallet = {
+                       address: '0xD091341B21758C34AedC95FD27699197dA71b782',
+                       privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
+                   };
+               }
+
+
+               let data = {};
+               data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
+               data.owner = this.wallet.address;
+               data.tokenS = this.tokenb.config.contract;
+               data.tokenB = this.tokens.config.contract;
+               data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
+               data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
+               data.timestamp = new Date().getTime();
+               data.ttl = 10 * 24 * 3600;
+               data.salt = 10;
+               data.lrcFee = 10;
+               data.buyNoMoreThanAmountB = true;
+               data.marginSplitPercentage = 50;
+               const order = new Order(data);
+               const signed = order.sign(this.wallet.privateKey);
+               const body = {
+                   jsonrpc: '2.0',
+                   method: 'loopring_submitOrder',
+                   params: signed,
+                   id: 22
+               };
+               const para = JSON.stringify(body);
+               const res =  await fetch('http://10.137.107.63:3000', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json'
+                   },
+                   body: para
+               }).then(r => r.json());
+
+               console.log(JSON.stringify(res));
 
             }
         }
