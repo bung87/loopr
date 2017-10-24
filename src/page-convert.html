@@ -152,7 +152,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-convert'; }
         static get properties() {
             return {
-                id: String
+                id: String,
+                localWallet: {
+                    type: Object,
+                    computed: '_computeWallet(wallet)'
+                }
             };
         }
         constructor() {
@@ -163,10 +167,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
         ready() {
-            if(!this.wallet){
-                window.location.href = "#/wallet"
-                return
-            }
+//            console.log(this.wallet)
+//            if(!this.wallet){
+//                console.log("return")
+//                window.location.href = "#/wallet"
+//                return
+//            }
             super.ready();
             this.leftTokenName = this.configData.ETH.name;
             this.leftTokenIcon = this.configData.ETH.icon;
@@ -178,6 +184,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.rightTokenName = this.configData.ETH.name;
                 this.rightTokenIcon = this.configData.ETH.icon;
             }
+        }
+        _computeWallet(wallet){
+            console.log(this.wallet)
+            if(!this.wallet){
+                console.log("return")
+                window.location.href = "#/wallet"
+                return
+            }
+            this.localWallet = wallet
         }
         signToSend() {
             var detail = { raw: "raw message" };

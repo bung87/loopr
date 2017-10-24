@@ -4,18 +4,24 @@
     <template>
         <style include="shared-styles">
          :host {
-            display: block;
+             display: block;
          }
+         /*:host([hidden-in-order]) {*/
+             /*display: none;*/
+         /*}*/
+         /*:host([hidden-in-ring]) {*/
+             /*display: none;*/
+         /*}*/
          div.long-hash {
-            width: 80px;
+             width: 80px;
          }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <template is="dom-if" if="[[_showOrder()]]">
-                <vaadin-grid-column width="40px">
+        <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
+
+                <vaadin-grid-column hidden-in-ring width="40px">
                     <template class="header">
                         <div class="left-aligned">Ring</div>
                     </template>
@@ -27,19 +33,7 @@
                         </div>
                     </template>
                 </vaadin-grid-column>
-                <vaadin-grid-column width="40px">
-                    <template class="header">
-                        <div class="left-aligned">Tx</div>
-                    </template>
-                    <template>
-                        <div class="left-aligned">
-                            <a href="[[item.txLink]]" target="_blank">
-                                <div class="long-hash">[[item.txHash]]</div>
-                            </a>
-                        </div>
-                    </template>
-                </vaadin-grid-column>
-            </template>
+
             <template is="dom-if" if="[[_showRing()]]">
                 <vaadin-grid-column width="40px">
                     <template class="header">
@@ -63,17 +57,11 @@
                 <template><span style$="color:[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="90px">
-                <template class="header">Amount</template>
+                <template class="header">Sold</template>
                 <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="30px">
-                <template class="header">Price</template>
-                <template>
-                    <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]"></pretty-number>
-                </template>
-            </vaadin-grid-column>
             <vaadin-grid-column width="90px">
-                <template class="header">Size</template>
+                <template class="header">Bought</template>
                 <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="40px">
@@ -115,8 +103,18 @@
                 orders: {
                     type: Object,
                     computed: '_computeOrders(resp)'
-                }
+                },
+                filterMine: Boolean
             };
+        }
+
+        ready(){
+            super.ready();
+            if(this.filterMine){
+                console.log("filter mine")
+            } else {
+                console.log("no filter mine")
+            }
         }
 
         _showOrder(){

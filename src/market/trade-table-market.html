@@ -10,12 +10,20 @@
         div.long-hash {
             width: 80px;
         }
+
+        .red {
+            color: var(--app-red-color);
+        }
+
+        .green {
+            color: var(--app-green-color);
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <vaadin-grid-column width="80px">
+        <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
+            <vaadin-grid-column hidden$="[[hiddenRing]]" width="50px">
                 <template class="header">
                     <div class="left-aligned">Ring</div>
                 </template>
@@ -27,7 +35,7 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="50px">
                 <template class="header">Order</template>
                 <template>
                     <div class="left-aligned">
@@ -37,35 +45,54 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column hidden$="[[hiddenIndex]]" width="20px">
+                <template class="header">Index</template>
+                <template>[[item.ringIndex]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
                 <template class="header">Type</template>
-                <template><span style$="color:[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
+                <template><span class$="[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
             </vaadin-grid-column>
+
             <vaadin-grid-column width="120px">
-                <template class="header">Amount([[unitS]])</template>
-                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]]></pretty-number></template>
+                <template class="header">
+                    <template is="dom-if" if="[[_showInMarket()]]">
+                        Sold([[unitS]])
+                    </template>
+                    <template is="dom-if" if="[[!_showInMarket()]]">
+                        Sold
+                    </template>
+                </template>
+                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="80px">
+            <vaadin-grid-column hidden$="[[hiddenPrice]]" width="80px">
                 <template class="header">Price</template>
                 <template>
                     <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="120px">
-                <template class="header">Size([[unitB]])</template>
-                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]]></pretty-number></template>
+                <template class="header">
+                    <template is="dom-if" if="[[_showInMarket()]]">
+                        Bought([[unitB]])
+                    </template>
+                    <template is="dom-if" if="[[!_showInMarket()]]">
+                        Bought
+                    </template>
+                </template>
+                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="90px">
                 <template class="header">Lrc-Fee</template>
                 <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="90px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
              </vaadin-grid-column>
-            <vaadin-grid-column width="130px">
+            <vaadin-grid-column hidden$="[[hiddenTime]]" width="100px">
                 <template class="header">Time</template>
                 <template><time-str seconds="[[item.timestamp]]"></time-str></template>
             </vaadin-grid-column>
@@ -82,6 +109,7 @@
         }
 
         /**
+        *  subType: oneof:[order, ring, market]
          * market: lrc-eos
          */
         static get properties() {
@@ -89,101 +117,140 @@
                 token: {
                     type: String,
                 },
-                market: String,
+                subType: {
+                    type: String
+                },
+                market: {
+                    type: String
+                },
                 orders: {
                     type: Object,
-                    computed: '_computeOrders(resp)'
+                    computed: '_computeOrders(appConfig, resp)'
                 }
             };
         }
 
         ready(){
-            super.ready()
-            if(!this.market) return
-            let tokenS = this.market.split("-")[0].toUpperCase()
-            let tokenB = this.market.split("-")[1].toUpperCase()
-            this.unitS = this.appConfig.tokenMap[tokenS].unit
-            this.unitB = this.appConfig.tokenMap[tokenB].unit
+            super.ready();
+            if(this.subType){
+                let subType = this.subType.toLowerCase();
+                this.hiddenPrice = true;
+                if("ring" === subType) {
+                    this.hiddenRing = true;
+                    this.hiddenTime = true;
+                }
+                if("order" === subType) {
+                    this.hiddenOrder = true;
+                }
+                if("market" === subType) {
+                    this.hiddenIndex = true;
+                }
+            }
         }
 
-        _computOrderItem(item){
-            if(!item || !this.market) return
-            let currSell = this.market.split("-")[0]
-            item.ringLink = "#/ring/"+item.ringHash
-            item.orderLink = "#/order/"+item.orderHash
-            item.txLink = "https://etherscan.io/tx/"+item.txHash
-            item.typeStyle = item.tokenS === currSell.toUpperCase() ? 'var(--app-red-color)' : 'var(--app-green-color)';
-            item.buyOrSell = item.tokenS === currSell.toUpperCase() ? "Sell" : "Buy"
-            const marketConfig = this.appConfig.marketMap[this.market.toUpperCase()];
-            const defaultPricePrecision = 3;
-            const defaultVolumePrecision = 5;
-            if(item.tokenB === currSell.toUpperCase()){
-                let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
-                item.tokenS = tempB
-                item.fillAmountS = tempAmountB
-                item.tokenB = tempS
-                item.fillAmountB = tempAmountS
-            }
-            item.fillAmountS = this._tranHextoNum(item.fillAmountS)
-            item.fillAmountB = this._tranHextoNum(item.fillAmountB)
-            item.fee = this._tranHextoNum(item.fee)
-            item.price = this.calPrice(item.fillAmountB,item.fillAmountS)
-            if (marketConfig) {
-                item.pricePrecision = marketConfig.pricePrecision;
-                const tokenxConfigS = this.appConfig.tokenMap[item.tokenS];
-                if (tokenxConfigS) {
-                    item.volumnPrecisionS = tokenxConfigS.precision;
-                } else {
-                    item.volumnPrecisionS = defaultVolumePrecision;
-                }
-                const tokenxConfigB = this.appConfig.tokenMap[item.tokenB];
-                if (tokenxConfigB) {
-                    item.volumnPrecisionB = tokenxConfigB.precision;
-                } else {
-                    item.volumnPrecisionB = defaultVolumePrecision;
-                }
-            } else {
+        _showInMarket(){
+            return this.market;
+        }
+
+        _computOrderItem(appConfig, item){
+            if(item && appConfig){
+                const defaultPricePrecision = 3;
+                const defaultVolumePrecision = 5;
                 item.pricePrecision = defaultPricePrecision;
                 item.volumnPrecisionS = defaultVolumePrecision;
                 item.volumnPrecisionB = defaultVolumePrecision;
+                item.ringLink = "#/ring/"+item.ringHash;
+                item.orderLink = "#/order/"+item.orderHash;
+                item.txLink = "https://etherscan.io/tx/"+item.txHash;
+                if(this.market){
+                    let marketConfig = appConfig.getMarket(this.market);
+                    this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
+                    this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
+                    item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
+                    item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
+                    this._computePrecisionInMarket(item, marketConfig, appConfig);
+                } else {
+                    item.buyOrSell = item.tokenS +"⇢"+item.tokenB;
+                    this._computePrecision(item, appConfig)
+                }
+                item.fillAmountS = Number(item.fillAmountS);
+                item.fillAmountB = Number(item.fillAmountB);
+                item.fee = Number(item.fee);
+                item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
+                item.feeLrc = Number(item.feeLrc);
+                let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
+                item.marginSplit = Number(item.marginSplit);
+                item.marginSplitUnit = marginSplitToken.unit;
+                item.marginSplitPrecision = marginSplitToken.precision;
+                return item;
             }
-            item.feeLrc = this._tranHextoNum(item.feeLrc)
-            let marginSplitToken = this.appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
-            item.marginSplit = this._tranHextoNum(item.marginSplit)
-            item.marginSplitUnit = marginSplitToken.unit
-            item.marginSplitPrecision = marginSplitToken.precision
-            return item
         }
 
-        _tranHextoNum(hex) {
-            if (hex) {
-                return Number(hex);
+        _computePrecisionInMarket(item, marketConfig, appConfig){
+            const defaultPricePrecision = 3;
+            const defaultVolumePrecision = 5;
+            if(item.tokenB === marketConfig.tokenx){
+                let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
+                item.tokenS = tempB;
+                item.fillAmountS = tempAmountB;
+                item.tokenB = tempS;
+                item.fillAmountB = tempAmountS;
             }
-            return '-1';
+            item.pricePrecision = marketConfig.pricePrecision;
+            const tokenxConfigS = appConfig.tokenMap[item.tokenS];
+            if (tokenxConfigS) {
+                item.volumnPrecisionS = tokenxConfigS.precision;
+            } else {
+                item.volumnPrecisionS = defaultVolumePrecision;
+            }
+            const tokenxConfigB = appConfig.tokenMap[item.tokenB];
+            if (tokenxConfigB) {
+                item.volumnPrecisionB = tokenxConfigB.precision;
+            } else {
+                item.volumnPrecisionB = defaultVolumePrecision;
+            }
         }
 
-        _computeOrders(resp){
-            if(!resp || !resp.result) return
-            return _.map(resp.result.data, o => this._computOrderItem(o));
+        _computePrecision(item, appConfig){
+            let precisionS = this._fillMarket(item.tokenS, appConfig);
+            item.volumnPrecisionS = precisionS.pricePrecision;
+            item.pricePrecision = precisionS.pricePrecision;
+            const tokenSConfig = appConfig.tokenMap[item.tokenS.toUpperCase()];
+            if (tokenSConfig) {
+                item.unitS = tokenSConfig.unit;
+            } else {
+                item.unitS = "";
+            }
+            let precisionB = this._fillMarket(item.tokenB, appConfig)
+            item.volumnPrecisionB = precisionB.pricePrecision;
+            const tokenBConfig = appConfig.tokenMap[item.tokenB];
+            if (tokenBConfig) {
+                item.unitB = tokenBConfig.unit;
+            } else {
+                item.unitB = "";
+            }
         }
 
-        _findTokenConfig(address) {
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                var token = tokens[x];
-                if (token.contract == address) {
-                    return token;
+        _fillMarket(tokenName, appConfig){
+            const defaultPricePrecision = 3;
+            const defaultVolumePrecision = 5;
+            const marketConfig = appConfig.marketMap[tokenName.toUpperCase()+"-WETH"];
+            let pricePrecision = defaultPricePrecision, volumnPrecision = defaultVolumePrecision
+            if (marketConfig) {
+                pricePrecision = marketConfig.pricePrecision;
+                const tokenxConfig = appConfig.tokenMap[tokenName];
+                if (tokenxConfig) {
+                    volumnPrecision = tokenxConfig.precision;
+                } else {
+                    volumnPrecision = defaultVolumePrecision;
                 }
             }
+            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
         }
 
-        _findSymbol(address) {
-            if(!address) return
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit
-            } else {
-                return "?";
+        _computeOrders(appConfig, resp){
+            if(resp && appConfig){
+                return _.map(resp.result.data, o => this._computOrderItem(appConfig, o));
             }
         }
 

@@ -325,6 +325,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
 
+                let tempThis = this;
+                appConfig.getMarket = function(marketKey) {
+                    if(marketKey){
+                        let marketArr = marketKey.split("-");
+                        if(marketArr.length === 2){
+                            let market = appConfig.marketMap[appConfig.computeMarketId(marketArr[0].toUpperCase(), marketArr[1].toUpperCase())];
+                            if(!market){
+                                tempThis._showPage404()
+                            } else {
+                                return market;
+                            }
+                        } else {
+                            console.log("error market: "+marketKey)
+                            tempThis._showPage404();
+                        }
+                    } else {
+                        console.log("error market: "+marketKey)
+                        tempThis._showPage404();
+                    }
+                }
+
                 appConfig.toNumber = function(str, tokenConfig) {
                     return (new BigNumber(str)).dividedBy(new BigNumber(10).toPower(tokenConfig.digits)).toNumber();
                 };
