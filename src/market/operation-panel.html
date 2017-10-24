@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <!-- <link rel="import" href="../../bower_components/paper-button/paper-button.html"> -->
+
 <dom-module id="operation-panel" fit>
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment paper-material-styles"></style>
@@ -99,13 +100,12 @@
                     <div slot="suffix">[[tokenb.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">&nbsp;</div>
-                <paper-button>Buy</paper-button>
+                <paper-button on-click="placeOrder">Buy</paper-button>
             </div>
             </div>
         </iron-pages>
     </template>
     <script>
-        const Order = require('order');
     class OperationPanel extends Polymer.Element {
         static get is() { return 'operation-panel'; }
 
@@ -179,6 +179,10 @@
         }
         _multiply(amount, price) {
             return (amount * price).toPrecision(this.tokenb.config.precision);
+        }
+
+        placeOrder(){
+
         }
     }
 
