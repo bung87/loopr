@@ -15,7 +15,7 @@ function validator() {
         if (!address) {
             return false;
         }
-        return validateEtherAddress(address);
+        return ethereumUtil.isValidAddress(address);
     };
 
     this.isValidHex = function(str) {
