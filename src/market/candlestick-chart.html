@@ -11,9 +11,10 @@
             min-width: 1000px;
         }
         </style>
-        <iron-ajax auto handle-as="json" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}"></iron-ajax>
         <div class="wrapper">
             <div id="container"></div>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" handle-as="json" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </div>
     </template>
     <script>
@@ -124,6 +125,10 @@
                     }
                 }]
             });
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

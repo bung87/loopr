@@ -55,8 +55,8 @@
                 <template class="header">Status</template>
                 <template>
                     <div class="horizontal end-justified layout">
-                    <paper-progress value="[[numberFormat(item.totalDealedAmountB)]]" secondary-progress="[[testBalance(item.orginalOrder.amountB)]]" max="[[numberFormat(item.orginalOrder.amountB)]]"></paper-progress>
-                </div>
+                        <paper-progress value="[[numberFormat(item.totalDealedAmountB)]]" secondary-progress="[[testBalance(item.orginalOrder.amountB)]]" max="[[numberFormat(item.orginalOrder.amountB)]]"></paper-progress>
+                    </div>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
@@ -69,6 +69,8 @@
                     </div>
                 </template>
             </vaadin-grid-column>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -84,7 +86,7 @@
         }
 
         testBalance(num) {
-          return 0.6 * this.numberFormat(num);
+            return 0.6 * this.numberFormat(num);
         }
 
         transtoUppercase(str) {
@@ -102,13 +104,13 @@
         }
 
         numberFormat(num) {
-            if(!num) return 0;
+            if (!num) return 0;
             const size = this.tranHextoNum(num);
             return size / 1000000000000000000;
         }
 
         getPrice(s, b) {
-            if(!s || !b) return 0;
+            if (!s || !b) return 0;
             const sell = this.numberFormat(s);
             const buy = this.numberFormat(b);
             return (sell / buy);
@@ -124,6 +126,9 @@
             return tokenB === this.token ? 'Buy' : 'Sell';
         }
 
+        go() {
+            this.$.ajax.generateRequest();
+        }
     }
 
     window.customElements.define(OrderTable.is, OrderTable);

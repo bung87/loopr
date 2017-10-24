@@ -4,24 +4,17 @@
     <template>
         <style include="shared-styles">
          :host {
-             display: block;
-         }
-         /*:host([hidden-in-order]) {*/
-             /*display: none;*/
-         /*}*/
-         /*:host([hidden-in-ring]) {*/
-             /*display: none;*/
-         /*}*/
-         div.long-hash {
-             width: 80px;
-         }
+            display: block;
+        }
+
+        div.long-hash {
+            width: 80px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
-        <!-- The array is set as the <vaadin-grid>'s "items" property -->
-        <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
-
-                <vaadin-grid-column hidden-in-ring width="40px">
+        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+            <template is="dom-if" if="[[_showOrder()]]">
+                <vaadin-grid-column width="40px">
                     <template class="header">
                         <div class="left-aligned">Ring</div>
                     </template>
@@ -64,22 +57,28 @@
                 <template class="header">Bought</template>
                 <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
-                <template class="header">Lrc-Fee</template>
-                <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
+            <vaadin-grid-column width="40px ">
+                <template class="header ">Lrc-Fee</template>
+                <template>
+                    <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
-                <template class="header">Margin-Split</template>
+            <vaadin-grid-column width="90px ">
+                <template class="header ">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <template is="dom-if" if="[[_showOrder()]]">
-                <vaadin-grid-column width="40px">
-                    <template class="header">Time</template>
-                    <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+            <template is="dom-if " if="[[_showOrder()]]">
+                <vaadin-grid-column width="40px ">
+                    <template class="header ">Time</template>
+                    <template>
+                        <time-str seconds="[[item.timestamp]]"></time-str>
+                    </template>
                 </vaadin-grid-column>
             </template>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -122,16 +121,16 @@
             return "order" === this.subType.toLowerCase()
         }
 
-        _showRing(){
-            if(!this.subType) return false
-            return "ring" === this.subType.toLowerCase()
+        _showRing() {
+            if (!this.subType) return false
+            return "ring " === this.subType.toLowerCase()
         }
 
-        _computOrderItem(item){
-            item.ringLink = "#/ring/"+item.ringHash
-            item.orderLink = "#/order/"+item.orderHash
-            item.txLink = "https://etherscan.io/tx/"+item.txHash
-            item.buyOrSell = item.tokenS +"⇢"+item.tokenB;
+        _computOrderItem(item) {
+            item.ringLink = "#/ring/ " + item.ringHash
+            item.orderLink = "#/order/ " + item.orderHash
+            item.txLink = "https://etherscan.io/tx/ " + item.txHash
+            item.buyOrSell = item.tokenS + "⇢ " + item.tokenB;
             let precisionS = this._fillMarket(item.tokenS);
             item.volumnPrecisionS = precisionS.pricePrecision;
             item.pricePrecision = precisionS.pricePrecision;
@@ -139,7 +138,7 @@
             if (tokenSConfig) {
                 item.unitS = tokenSConfig.unit;
             } else {
-                item.unitS = "";
+                item.unitS = " ";
             }
             let precisionB = this._fillMarket(item.tokenB)
             item.volumnPrecisionB = precisionB.pricePrecision;
@@ -147,13 +146,13 @@
             if (tokenBConfig) {
                 item.unitB = tokenBConfig.unit;
             } else {
-                item.unitB = "";
+                item.unitB = " ";
             }
 
             item.fillAmountS = this._tranHextoNum(item.fillAmountS)
             item.fillAmountB = this._tranHextoNum(item.fillAmountB)
             item.fee = this._tranHextoNum(item.fee)
-            item.price = this.calPrice(item.fillAmountB,item.fillAmountS)
+            item.price = this.calPrice(item.fillAmountB, item.fillAmountS)
 
             item.feeLrc = this._tranHextoNum(item.feeLrc);
             let marginSplitToken = this.appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
@@ -163,11 +162,12 @@
             return item
         }
 
-        _fillMarket(tokenName){
+        _fillMarket(tokenName) {
             const defaultPricePrecision = 3;
             const defaultVolumePrecision = 5;
-            const marketConfig = this.appConfig.marketMap[tokenName.toUpperCase()+"-WETH"];
-            let pricePrecision = defaultPricePrecision, volumnPrecision = defaultVolumePrecision
+            const marketConfig = this.appConfig.marketMap[tokenName.toUpperCase() + "-WETH "];
+            let pricePrecision = defaultPricePrecision,
+                volumnPrecision = defaultVolumePrecision
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
                 const tokenxConfig = this.appConfig.tokenMap[tokenName];
@@ -177,7 +177,7 @@
                     volumnPrecision = defaultVolumePrecision;
                 }
             }
-            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
+            return { pricePrecision: pricePrecision, volumnPrecision: volumnPrecision }
         }
 
         _tranHextoNum(hex) {
@@ -187,8 +187,8 @@
             return '-1';
         }
 
-        _computeOrders(resp){
-            if(!resp || !resp.result) return
+        _computeOrders(resp) {
+            if (!resp || !resp.result) return
             return _.map(resp.result.data, o => this._computOrderItem(o));
         }
 
@@ -203,12 +203,12 @@
         }
 
         _findSymbol(address) {
-            if(!address) return
+            if (!address) return
             var token = this._findTokenConfig(address);
             if (token) {
                 return token.unit
             } else {
-                return "?";
+                return "? ";
             }
         }
 
@@ -225,6 +225,10 @@
 
         getType(isBuy) {
             return isBuy ? 'Buy' : 'Sell';
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

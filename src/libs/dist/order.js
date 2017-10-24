@@ -38212,7 +38212,6 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":106,"_process":87,"inherits":105}],"order":[function(require,module,exports){
-(function (Buffer){
 const signer = require('./signer.js');
 const ethUtil = require('ethereumjs-util');
 const _ = require('lodash');
@@ -38232,9 +38231,7 @@ function Order(data) {
     var lrcFee = data.lrcFee;
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
-
-    const prefix = ethUtil.toBuffer("\x19Ethereum Signed Message:\n32");
-
+    
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
     this.sign = function (privateKey) {
@@ -38246,9 +38243,9 @@ function Order(data) {
             new BN(Number(salt).toString(10), 10),
             new BN(Number(lrcFee).toString(10), 10),
             buyNoMoreThanAmountB,
-            marginSplitPercentage])
+            marginSplitPercentage]);
 
-        const finalHash = ethUtil.sha3(Buffer.concat([prefix, hash]));
+        const finalHash = ethUtil.hashPersonalMessage(hash);
 
         if (_.isString(privateKey)) {
             privateKey =ethUtil.toBuffer(privateKey);
@@ -38278,5 +38275,4 @@ function Order(data) {
 
 module.exports = Order;
 
-}).call(this,require("buffer").Buffer)
-},{"./signer.js":75,"bn.js":2,"buffer":79,"ethereumjs-util":28,"lodash":54}]},{},[]);
+},{"./signer.js":75,"bn.js":2,"ethereumjs-util":28,"lodash":54}]},{},[]);

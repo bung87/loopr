@@ -8,14 +8,12 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="market/candlestick-chart.html">
 <link rel="import" href="market/depth-chart.html">
 <link rel="import" href="market/operation-panel.html">
 <link rel="import" href="market/trade-table-market.html">
 <link rel="import" href="market/order-table.html">
 <link rel="import" href="market/top-orders.html">
-
 <dom-module id="page-market">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -65,7 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-tab name="candle">Candle Chart</paper-tab>
                             <paper-tab name="depth">Depth Chart</paper-tab>
                         </paper-tabs>
-                        <iron-pages selected="{{chartSelection}}" attr-for-selected="name">
+                        <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}" attr-for-selected="name">
                             <candlestick-chart name="candle"></candlestick-chart>
                             <depth-chart name="depth"></depth-chart>
                         </iron-pages>
@@ -75,7 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <operation-panel></operation-panel>
                 </paper-card>
                 <paper-card>
-                    <top-orders tokenx="LRC" tokeny="WETH"></top-orders>
+                    <top-orders id="orderbook" tokenx="LRC" tokeny="WETH"></top-orders>
                 </paper-card>
                 <paper-card class="tables">
                     <div class="vertical layout">
@@ -87,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-tab name="myfills">My Fills</paper-tab>
                             </template>
                         </paper-tabs>
-                        <iron-pages selected="{{dataSelection}}" attr-for-selected="name">
+                        <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
                             <trade-table-market name="trades" sub-type="market" token="{{id}}" market="[[id]]"></trade-table-market>
                             <order-table name="orders" token="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
@@ -118,23 +116,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     value: "orders"
                 },
-                fabShown: {
-                    type: Boolean,
-                    value: false
+                selectedTable: {
+                    type: Object,
+                    observer: '_selectedTableChanged'
+                },
+                selectedChart: {
+                    type: Object,
+                    observer: '_selectedChartChanged'
                 }
             };
         }
+
         ready(){
             super.ready()
             console.log("market:"+this.id)
         }
-       
+
         marketId() {
             if (this.id) return this.id.toUpperCase();
         }
         _isUnlocked(wallet) {
             console.log(wallet)
             return null != this.wallet
+        }
+
+        _selectedTableChanged(selectedTable) {
+            if (selectedTable && selectedTable.go) selectedTable.go();
+        }
+
+        _selectedChartChanged(selectedChart) {
+            if (selectedChart && selectedChart.go) selectedChart.go();
+        }
+
+        go() {
+            _selectedTableChanged(this.selectedTable);
+            _selectedChartChanged(this.selectedChart);
+            this.$.orderbook.go();
         }
     }
 

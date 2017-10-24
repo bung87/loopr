@@ -252,7 +252,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-spinner-lite alt="Loading configuration..." active class="thick"></paper-spinner-lite>
                     <div>Loading configuration...</div>
                 </div>
-                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
+                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet"></page-wallet>
@@ -303,6 +303,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
+                },
+                selectedPage: {
+                    type: Object,
+                    observer: '_selectedPageChanged'
                 }
             };
         }
@@ -406,6 +410,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 true);
         }
 
+        _selectedPageChanged(page) {
+            if (page && page.go) page.go();
+        }
         _routeIdChanged(pageId) {
             this.pageId = pageId || '';
         }

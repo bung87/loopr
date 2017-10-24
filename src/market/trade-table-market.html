@@ -84,7 +84,9 @@
             </vaadin-grid-column>
             <vaadin-grid-column width="90px">
                 <template class="header">Lrc-Fee</template>
-                <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="90px">
                 <template class="header">Margin-Split</template>
@@ -94,8 +96,12 @@
              </vaadin-grid-column>
             <vaadin-grid-column hidden$="[[hiddenTime]]" width="100px">
                 <template class="header">Time</template>
-                <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+                <template>
+                    <time-str seconds="[[item.timestamp]]"></time-str>
+                </template>
             </vaadin-grid-column>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -267,6 +273,10 @@
 
         getType(isBuy) {
             return isBuy ? 'Buy' : 'Sell';
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

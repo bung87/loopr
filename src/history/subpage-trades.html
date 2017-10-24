@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="flex"></div>
             <!-- <market-selector></market-selector> -->
         </div>
-        <trade-table hash-type="Ring" market="[[market]]"></trade-table>
+        <trade-table id="trades" hash-type="Ring" market="[[market]]"></trade-table>
     </template>
     <script>
     class SubpageTrades extends Polymer.Element {
@@ -31,6 +31,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 market: String
             };
+        }
+
+        go() {
+            this.$.trades.go();
         }
     }
 

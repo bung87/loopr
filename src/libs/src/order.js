@@ -18,8 +18,6 @@ function Order(data) {
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
 
-    const prefix = ethUtil.toBuffer("\x19Ethereum Signed Message:\n32");
-
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
     this.sign = function (privateKey) {
@@ -31,9 +29,9 @@ function Order(data) {
             new BN(Number(salt).toString(10), 10),
             new BN(Number(lrcFee).toString(10), 10),
             buyNoMoreThanAmountB,
-            marginSplitPercentage])
+            marginSplitPercentage]);
 
-        const finalHash = ethUtil.sha3(Buffer.concat([prefix, hash]));
+        const finalHash = ethUtil.hashPersonalMessage(hash);
 
         if (_.isString(privateKey)) {
             privateKey =ethUtil.toBuffer(privateKey);
