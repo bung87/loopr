@@ -20,7 +20,6 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column hidden$="[[hiddenRing]]" width="50px">
