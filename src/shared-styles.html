@@ -72,9 +72,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             0 1px 10px 0 rgba(0, 0, 0, 0.12),
             0 2px 4px -1px rgba(0, 0, 0, 0.4);
         }
-        /*  .sections paper-card:hover {
-            box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-        }*/
+
+        .sections paper-card[tablewrapper] {
+            padding: 0;
+        }
+
+        .sections paper-card[tablewrapper]>vaadin-grid {
+            margin: 30px 16px 32px 16px;
+            min-height: 200px;
+        }
 
         .sections paper-card[transparent] {
             color: var(--app-text-color-light);
@@ -169,6 +175,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             border-radius: 0;
         }
 
+        paper-progress {
+            width: 100%;
+            --paper-progress-active-color: var(--app-primary-color);
+            --paper-progress-height: 2px;
+            padding: 0;
+            margin: 0;
+        }
+
+        paper-progress[disabled] {
+            opacity: 0;
+        }
+
         paper-item {
             padding-top: 8px;
             padding-bottom: 8px;
@@ -216,7 +234,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         vaadin-grid-cell-content {
-            text-align: right;
+            /*text-align: right;*/
         }
 
         @media(min-width:1024px) {

@@ -51,9 +51,9 @@
     "paper-tooltip": "PolymerElements/paper-tooltip#^2.0.1",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "iron-label": "PolymerElements/iron-label#^2.0.0",
-    "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "moment": "^2.19.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "bignumber.js": "^4.1.0"
   },
   "resolutions": {
     "polymer": "^2.0.0",
@@ -62,7 +62,8 @@
     "iron-selector": "^2.0.0",
     "paper-styles": "^2.0.0",
     "iron-resizable-behavior": "^v2.0.0",
-    "iron-a11y-keys-behavior": "^v2.0.0"
+    "iron-a11y-keys-behavior": "^v2.0.0",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"

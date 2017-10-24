@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{order}}" debounce-duration="300">
         </iron-ajax>
         <looper-page>
-            <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="#/orders"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <div class="sections">
                 <paper-card transparent>Order Detail</paper-card>
@@ -61,7 +61,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </paper-card>
                 <paper-card transparent>Historial Fills</paper-card>
                 <paper-card>
-                    <trade-table filter-mine name="myfills" hash-type="Ring" market="[[id]]"></trade-table>
+                    <trade-table filter-mine name="myfills" sub-type="order" market="[[id]]"></trade-table>
                 </paper-card>
                 <div class="footer-spacer"></div>
                 <looper-footer></looper-footer>

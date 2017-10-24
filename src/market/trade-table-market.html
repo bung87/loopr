@@ -1,0 +1,208 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<!-- <link rel="import" href="../../bower_components/paper-button/paper-button.html"> -->
+<dom-module id="trade-table-market" fit>
+    <template>
+        <style include="shared-styles">
+         :host {
+            display: block;
+        }
+
+        div.long-hash {
+            width: 80px;
+        }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <!-- The array is set as the <vaadin-grid>'s "items" property -->
+        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+            <vaadin-grid-column width="80px">
+                <template class="header">
+                    <div class="left-aligned">Ring</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="[[item.ringLink]]">
+                            <div class="long-hash">[[item.ringHash]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="90px">
+                <template class="header">Order</template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="[[item.orderLink]]">
+                            <div class="long-hash">[[item.orderHash]]</div>
+                        </a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="40px">
+                <template class="header">Type</template>
+                <template><span style$="color:[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="120px">
+                <template class="header">Amount([[unitS]])</template>
+                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]]></pretty-number></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="80px">
+                <template class="header">Price</template>
+                <template>
+                    <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="120px">
+                <template class="header">Size([[unitB]])</template>
+                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]]></pretty-number></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="120px">
+                <template class="header">Lrc-Fee</template>
+                <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="120px">
+                <template class="header">Margin-Split</template>
+                <template>
+                    <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
+                </template>
+             </vaadin-grid-column>
+            <vaadin-grid-column width="130px">
+                <template class="header">Time</template>
+                <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+            </vaadin-grid-column>
+        </vaadin-grid>
+    </template>
+    <script>
+    class TradeTableMarket extends Polymer.Element {
+        static get is() {
+            return 'trade-table-market';
+        }
+
+        constructor() {
+            super();
+        }
+
+        /**
+         * market: lrc-eos
+         */
+        static get properties() {
+            return {
+                token: {
+                    type: String,
+                },
+                market: String,
+                orders: {
+                    type: Object,
+                    computed: '_computeOrders(resp)'
+                }
+            };
+        }
+
+        ready(){
+            super.ready()
+            if(!this.market) return
+            let tokenS = this.market.split("-")[0].toUpperCase()
+            let tokenB = this.market.split("-")[1].toUpperCase()
+            this.unitS = this.appConfig.tokenMap[tokenS].unit
+            this.unitB = this.appConfig.tokenMap[tokenB].unit
+        }
+
+        _computOrderItem(item){
+            if(!item || !this.market) return
+            let currSell = this.market.split("-")[0]
+            item.ringLink = "#/ring/"+item.ringHash
+            item.orderLink = "#/order/"+item.orderHash
+            item.txLink = "https://etherscan.io/tx/"+item.txHash
+            item.typeStyle = item.tokenS === currSell.toUpperCase() ? 'var(--app-red-color)' : 'var(--app-green-color)';
+            item.buyOrSell = item.tokenS === currSell.toUpperCase() ? "Sell" : "Buy"
+            const marketConfig = this.appConfig.marketMap[this.market.toUpperCase()];
+            const defaultPricePrecision = 3;
+            const defaultVolumePrecision = 5;
+            if(item.tokenB === currSell.toUpperCase()){
+                let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
+                item.tokenS = tempB
+                item.fillAmountS = tempAmountB
+                item.tokenB = tempS
+                item.fillAmountB = tempAmountS
+            }
+            item.fillAmountS = this._tranHextoNum(item.fillAmountS)
+            item.fillAmountB = this._tranHextoNum(item.fillAmountB)
+            item.fee = this._tranHextoNum(item.fee)
+            item.price = this.calPrice(item.fillAmountB,item.fillAmountS)
+            if (marketConfig) {
+                item.pricePrecision = marketConfig.pricePrecision;
+                const tokenxConfigS = this.appConfig.tokenMap[item.tokenS];
+                if (tokenxConfigS) {
+                    item.volumnPrecisionS = tokenxConfigS.precision;
+                } else {
+                    item.volumnPrecisionS = defaultVolumePrecision;
+                }
+                const tokenxConfigB = this.appConfig.tokenMap[item.tokenB];
+                if (tokenxConfigB) {
+                    item.volumnPrecisionB = tokenxConfigB.precision;
+                } else {
+                    item.volumnPrecisionB = defaultVolumePrecision;
+                }
+            } else {
+                item.pricePrecision = defaultPricePrecision;
+                item.volumnPrecisionS = defaultVolumePrecision;
+                item.volumnPrecisionB = defaultVolumePrecision;
+            }
+            item.feeLrc = this._tranHextoNum(item.feeLrc)
+            let marginSplitToken = this.appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
+            item.marginSplit = this._tranHextoNum(item.marginSplit)
+            item.marginSplitUnit = marginSplitToken.unit
+            item.marginSplitPrecision = marginSplitToken.precision
+            return item
+        }
+
+        _tranHextoNum(hex) {
+            if (hex) {
+                return Number(hex);
+            }
+            return '-1';
+        }
+
+        _computeOrders(resp){
+            if(!resp || !resp.result) return
+            return _.map(resp.result.data, o => this._computOrderItem(o));
+        }
+
+        _findTokenConfig(address) {
+            var tokens = this.appConfig.tokens;
+            for (var x in tokens) {
+                var token = tokens[x];
+                if (token.contract == address) {
+                    return token;
+                }
+            }
+        }
+
+        _findSymbol(address) {
+            if(!address) return
+            var token = this._findTokenConfig(address);
+            if (token) {
+                return token.unit
+            } else {
+                return "?";
+            }
+        }
+
+        calPrice(b, s) {
+            if (b && s && s !== 0) {
+                return (b / s);
+            }
+            return 0;
+        }
+
+        typeStyle(isBuy) {
+            return isBuy ? 'var(--app-green-color)' : 'var(--app-red-color)';
+        }
+
+        getType(isBuy) {
+            return isBuy ? 'Buy' : 'Sell';
+        }
+    }
+
+    window.customElements.define(TradeTableMarket.is, TradeTableMarket);
+    </script>
+</dom-module>
