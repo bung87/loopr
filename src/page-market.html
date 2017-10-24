@@ -13,7 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="market/operation-panel.html">
 <link rel="import" href="market/trade-table-market.html">
 <link rel="import" href="market/order-table.html">
-<link rel="import" href="market/top-orders.html">
+<link rel="import" href="market/order-book.html">
 <dom-module id="page-market">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -73,7 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <operation-panel></operation-panel>
                 </paper-card>
                 <paper-card>
-                    <top-orders id="orderbook" tokenx="LRC" tokeny="WETH"></top-orders>
+                    <order-book id="orderbook" tokenx="LRC" tokeny="WETH"></order-book>
                 </paper-card>
                 <paper-card class="tables">
                     <div class="vertical layout">
@@ -135,6 +135,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         marketId() {
             if (this.id) return this.id.toUpperCase();
         }
+
         _isUnlocked(wallet) {
             console.log(wallet)
             return null != this.wallet
@@ -149,9 +150,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            _selectedTableChanged(this.selectedTable);
-            _selectedChartChanged(this.selectedChart);
-            this.$.orderbook.go();
+            console.log("fdsafdsafdasfa")
+            this._selectedTableChanged(this.selectedTable);
+            this._selectedChartChanged(this.selectedChart);
         }
     }
 
