@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="market/trade-table-market.html">
+<link rel="import" href="market/trade-table.html">
 <dom-module id="page-ring">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
@@ -84,7 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-card transparent>Recent Trades</paper-card>
                 <paper-card>
                     <div class="card-content">
-                        <trade-table-market sub-type="ring" market="[[id]]"></trade-table-market>
+                        <trade-table display-mode="ring" market="[[id]]"></trade-table>
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
