@@ -12,6 +12,10 @@
             --paper-progress-active-color: var(--app-primary-color);
             --paper-progress-secondary-color: var(--paper-amber-500);
         }
+
+      /*  .long-hash {
+            width: 70px;
+        }*/
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
@@ -22,7 +26,7 @@
                 <template>
                     <div class="left-aligned">
                         <a href="#/order/[[item.orginalOrder.hash]]">
-                            <div class="long-hash"> [[item.orginalOrder.hash]]</div>
+                            <span class="long-hash">[[item.orginalOrder.hash]]</span>
                         </a>
                     </div>
                 </template>
