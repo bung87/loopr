@@ -18,8 +18,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{order}}" debounce-duration="300">
-        </iron-ajax>
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -30,31 +28,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Original Sell Amount</div>
-                                <div secondary>[[_orginalSell(order)]]</div>
+                                <div secondary>
+                                    <pretty-number v="[[orderItem.amountS]]" d=[[orderItem.precisionS]] postfix="[[orderItem.tokenS]]"></pretty-number>
+                                </div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title "> Original Buy Amount</div>
-                                <div secondary>[[_originalBuy(order)]]</div>
+                                <div secondary>
+                                    <pretty-number v="[[orderItem.amountB]]" d=[[orderItem.precisionB]] postfix="[[orderItem.tokenB]]"></pretty-number>
+                                </div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Filled Sell Amount</div>
-                                <div secondary>[[_filledSell(order)]]</div>
+                                <div secondary><pretty-number v="[[orderItem.totalDealedAmountS]]" d=[[orderItem.precisionS]] postfix="[[orderItem.tokenS]]"></pretty-number></div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Filled Buy Amount</div>
-                                <div secondary>[[_filledBuy(order)]]</div>
+                                <div secondary><pretty-number v="[[orderItem.totalDealedAmountB]]" d=[[orderItem.precisionB]] postfix="[[orderItem.tokenB]]"></pretty-number></div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Status</div>
-                                <div secondary>[[order.result.status]]</div>
+                                <div secondary>[[orderItem.status]]</div>
                             </paper-item-body>
                         </paper-item>
                     </div>
@@ -67,6 +69,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <looper-footer></looper-footer>
             </div>
         </looper-page>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
+        </iron-ajax>
     </template>
     <script>
     class PageOrder extends Polymer.Element {
@@ -76,57 +80,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get properties() {
             return {
                 id: String,
-                keyValueArray: Array
+                orderItem: {
+                    type: Object,
+                    computed:'_computeOrder(appConfig, resp)'
+                }
             };
         }
         ready() {
             super.ready();
             console.log("order:" + this.id)
         }
-        _orginalSell(data) {
-            return data.result.orginalOrder.amountS + "(" + this._formatValue(data.result.orginalOrder.tokenS) + ")"
-        }
-        _originalBuy(data) {
-            return data.result.orginalOrder.amountB + "(" + this._formatValue(data.result.orginalOrder.tokenB) + ")"
-        }
-        _filledSell(data) {
-            return data.result.totalDealedAmountS + "(" + this._formatValue(data.result.orginalOrder.tokenS) + ")"
-        }
-        _filledBuy(data) {
-            return data.result.totalDealedAmountB + "(" + this._formatValue(data.result.orginalOrder.tokenB) + ")"
-        }
-        _fillInArray(data) {
-            if (!data) return [];
-            let array = new Array();
-            array.push({ "Original Sell Amount": data.result.orginalOrder.amountS + "(" + this._formatValue(data.result.orginalOrder.tokenS) + ")" })
-            array.push({ "Original Buy Amount": data.result.orginalOrder.amountB + "(" + this._formatValue(data.result.orginalOrder.tokenB) + ")" })
-            array.push({ "Filled Sell Amount": data.result.totalDealedAmountS + "(" + this._formatValue(data.result.orginalOrder.tokenS) + ")" })
-            array.push({ "Filled Buy Amount": data.result.totalDealedAmountB + "(" + this._formatValue(data.result.orginalOrder.tokenB) + ")" })
-            array.push({ "Status": data.result.status })
-            this.keyValueArray = array
-        }
-        _findTokenConfig(address) {
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                var token = tokens[x];
-                if (token.contract == address) {
-                    return token;
-                }
+        _computeOrder(appConfig, resp){
+            if(appConfig && resp) {
+                let data = resp.result;
+                let tokenS = appConfig.getTokenByName(data.orginalOrder.tokenS);
+                let tokenB = appConfig.getTokenByName(data.orginalOrder.tokenB);
+                let result = {
+                    tokenS: tokenS.unit, amountS: Number(data.orginalOrder.amountS), precisionS: tokenS.precision, totalDealedAmountS: Number(data.totalDealedAmountS),
+                    tokenB: tokenB.unit, amountB: Number(data.orginalOrder.amountB), precisionB: tokenB.precision, totalDealedAmountB: Number(data.totalDealedAmountB),
+                    status: data.status
+                };
+                return result;
             }
         }
-        _formatValue(address) {
-            if (!address) return;
-            let token = this._findTokenConfig(address)
-            if (!token) return "?";
-            return token.unit
-        }
-        _number(value) {
-            if (!value) return 0
-            return new Number(value)
-        }
-        _above0(value) {
-            if (!value) return false
-            return this._number(value) > 0
+        _update(){
+            this.ring = this._computeOrder(this.appConfig, this.resp)
         }
     }
 

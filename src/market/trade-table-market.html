@@ -159,11 +159,9 @@
 
         _computOrderItem(appConfig, item){
             if(item && appConfig){
-                const defaultPricePrecision = 3;
-                const defaultVolumePrecision = 5;
-                item.pricePrecision = defaultPricePrecision;
-                item.volumnPrecisionS = defaultVolumePrecision;
-                item.volumnPrecisionB = defaultVolumePrecision;
+                item.pricePrecision = appConfig.marketConfig.defaultPricePrecision;
+                item.volumnPrecisionS = appConfig.marketConfig.defaultVolumePrecision;
+                item.volumnPrecisionB = appConfig.marketConfig.defaultVolumePrecision;
                 item.ringLink = "#/ring/"+item.ringHash;
                 item.orderLink = "#/order/"+item.orderHash;
                 item.txLink = "https://etherscan.io/tx/"+item.txHash;
@@ -192,8 +190,7 @@
         }
 
         _computePrecisionInMarket(item, marketConfig, appConfig){
-            const defaultPricePrecision = 3;
-            const defaultVolumePrecision = 5;
+            const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
             if(item.tokenB === marketConfig.tokenx){
                 let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
                 item.tokenS = tempB;
@@ -237,17 +234,13 @@
         }
 
         _fillMarket(tokenName, appConfig){
-            const defaultPricePrecision = 3;
-            const defaultVolumePrecision = 5;
-            const marketConfig = appConfig.marketMap[tokenName.toUpperCase()+"-WETH"];
-            let pricePrecision = defaultPricePrecision, volumnPrecision = defaultVolumePrecision
+            let marketConfig = appConfig.getMarket(tokenName+"-WETH");
+            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
                 const tokenxConfig = appConfig.tokenMap[tokenName];
                 if (tokenxConfig) {
                     volumnPrecision = tokenxConfig.precision;
-                } else {
-                    volumnPrecision = defaultVolumePrecision;
                 }
             }
             return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}

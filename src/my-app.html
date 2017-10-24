@@ -328,8 +328,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
                 appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
 
                 let tempThis = this;
+                appConfig.getTokenByName = function(tokenName) {
+                    if(tokenName) {
+                        return appConfig.tokenMap[tokenName.toUpperCase()];
+                    }
+                }
                 appConfig.getMarket = function(marketKey) {
                     if(marketKey){
                         let marketArr = marketKey.split("-");

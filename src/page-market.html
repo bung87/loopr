@@ -82,14 +82,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-tab name="trades">Recent Trades</paper-tab>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <paper-tab name="myorders">My Orders</paper-tab>
-                                <paper-tab name="myfills">My Fills</paper-tab>
+                                <paper-tab name="mytrades">My Trades</paper-tab>
                             </template>
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
                             <trade-table-market name="trades" sub-type="market" token="{{id}}" market="[[id]]"></trade-table-market>
                             <order-table name="orders" token="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table-market filter-mine name="myfills" sub-type="order"></trade-table-market>
+                                <trade-table-market filter-mine name="mytrades" sub-type="order"></trade-table-market>
                                 <order-table filter-mine name="myorders"></order-table>
                             </template>
                         </iron-pages>
