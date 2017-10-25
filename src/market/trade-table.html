@@ -8,7 +8,7 @@
         }
 
         div.long-hash {
-            width: 80px;
+            width: 55px;
         }
 
         .red {
@@ -18,23 +18,25 @@
         .green {
             color: var(--app-green-color);
         }
+
+        vaadin-grid-column {
+            min-width: 10px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
-            <vaadin-grid-column hidden$="[[hiddenRing]]" width="50px">
+            <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
                 <template class="header">
                     <div class="left-aligned">Ring</div>
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <a href="[[item.ringLink]]">
-                            <div class="long-hash">[[item.ringHash]]</div>
-                        </a>
+                        <a href="[[item.ringLink]]"><div class="long-hash">[[item.ringHash]]</div></a>#[[item.ringIndex]]
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="50px">
+            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="20px">
                 <template class="header">Order</template>
                 <template>
                     <div class="left-aligned">
@@ -44,16 +46,12 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenIndex]]" width="20px">
-                <template class="header">Index</template>
-                <template>[[item.ringIndex]]</template>
-            </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Type</template>
                 <template><span class$="[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
             </vaadin-grid-column>
 
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="95px">
                 <template class="header">
                     <template is="dom-if" if="[[_showInMarket()]]">
                         Amount([[unitS]])
@@ -70,7 +68,7 @@
                     <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="95px">
                 <template class="header">
                     <template is="dom-if" if="[[_showInMarket()]]">
                         Size([[unitB]])
@@ -81,19 +79,19 @@
                 </template>
                 <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column width="95px">
                 <template class="header">Lrc-Fee</template>
                 <template>
                     <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column width="95px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
              </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenTime]]" width="100px">
+            <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
                 <template class="header">Time</template>
                 <template>
                     <time-str seconds="[[item.timestamp]]"></time-str>
@@ -148,7 +146,6 @@
                     this.hiddenOrder = true;
                 }
                 if("market" === displayMode) {
-                    this.hiddenIndex = true;
                     this.hiddenPrice = false;
                 }
                 if("history-ring" === displayMode) {
