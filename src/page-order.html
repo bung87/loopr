@@ -21,6 +21,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <div class="sections">
                 <paper-card transparent>Order Detail</paper-card>
                 <paper-card>
@@ -69,7 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <looper-footer></looper-footer>
             </div>
         </looper-page>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
+        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
         </iron-ajax>
     </template>
     <script>
@@ -83,12 +85,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 orderItem: {
                     type: Object,
                     computed:'_computeOrder(appConfig, resp)'
+                },
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
         ready() {
             super.ready();
             console.log("order:" + this.id)
+        }
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
         _computeOrder(appConfig, resp){
             if(appConfig && resp) {

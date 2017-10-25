@@ -44,9 +44,11 @@
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <!-- ------ -->
-        <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>
@@ -177,8 +179,11 @@
                 erc20Tokens: {
                     type: Array,
                     computed: '_computeBalances(resp)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
-
             };
         }
 
@@ -213,6 +218,10 @@
                     return i !== null && i.token !== 'WETH' && i.token !== 'ETH';
                 });
             }
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         _isWETH(token) { return token === 'WETH'; }

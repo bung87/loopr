@@ -62,6 +62,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-radio-button/vaadin-radio-button.html">
 <link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/scary-cookie/scary-cookie.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="utils/external-lib-imports.html">
@@ -211,12 +212,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
+        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
+        <iron-ajax auto id="priceQuoteAjax" url="[[relay]]/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -258,7 +261,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage={{pageId}}></page-history>
                     <page-convert name="convert" id={{pageId}}></page-convert>
-                    <page-authorize name="authorize" id={{pageId}}></page-authorize>
+                    <page-authorize name="authorize" token={{pageId}}></page-authorize>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
                     <page-settings name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
@@ -305,6 +308,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 selectedPage: {
                     type: Object,
                     observer: '_selectedPageChanged'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(appConfigRaw)'
                 }
             };
         }
@@ -386,6 +393,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             } else {
                 this.$.walletPage.subpage = "default";
+            }
+        }
+
+        _selectedRelay(appConfigRaw){
+            if(appConfigRaw){
+                if(!this.settingsRelay){ //get value stored in cookie or set first relay in config
+                    this.settingsRelay = appConfigRaw.relays[0].value;
+                }
             }
         }
 

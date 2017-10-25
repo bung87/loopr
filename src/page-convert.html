@@ -153,10 +153,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get properties() {
             return {
                 id: String,
-                localWallet: {
+                wallet: {
                     type: Object,
-                    computed: '_computeWallet(wallet)'
-                }
+                    observer: '_walletChanged',
+                },
             };
         }
         constructor() {
@@ -166,12 +166,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 WETH: { name: 'WETH', icon: 'images/token/ether_erc20.png' }
             }
         }
+
         ready() {
 //            console.log(this.wallet)
 //            if(!this.wallet){
 //                console.log("return")
 //                window.location.href = "#/wallet"
-//                return
+//                return;
 //            }
             super.ready();
             this.leftTokenName = this.configData.ETH.name;
@@ -185,15 +186,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.rightTokenIcon = this.configData.ETH.icon;
             }
         }
-        _computeWallet(wallet){
-            console.log(this.wallet)
-            if(!this.wallet){
-                console.log("return")
-                window.location.href = "#/wallet"
-                return
+
+        _walletChanged(wallet) {
+            if (!wallet || !wallet.address) {
+                window.location.href = "#/wallet";
             }
-            this.localWallet = wallet
         }
+
         signToSend() {
             var detail = { raw: "raw message" };
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));

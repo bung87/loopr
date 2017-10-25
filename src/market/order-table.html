@@ -3,18 +3,29 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        paper-progress {
-            width: 100%;
-            --paper-progress-active-color: var(--app-primary-color);
-            --paper-progress-secondary-color: var(--paper-amber-500);
-        }
+            paper-progress {
+                width: 100%;
+                --paper-progress-active-color: var(--app-primary-color);
+                --paper-progress-secondary-color: var(--paper-amber-500);
+            }
+
+            .red {
+                color: var(--app-red-color);
+            }
+
+            .green {
+                color: var(--app-green-color);
+            }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
                     <div class="left-aligned">Hash</div>
@@ -29,32 +40,33 @@
             </vaadin-grid-column>
             <vaadin-grid-column width="20px">
                 <template class="header">Type</template>
-                <template><span style$="color:[[typeStyle(item.orginalOrder.tokenB)]]"> [[getType(item.orginalOrder.tokenB)]]</span>
+                <template>
+                    <span class$="[[item.typeClass]]">[[item.typeTitle]]</span>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
                 <template>
-                    <pretty-number v="[[numberFormat(item.orginalOrder.amountB)]]" d=4 postfix="[[transtoUppercase(item.orginalOrder.tokenB)]]"></pretty-number>
+                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Price</template>
                 <template>
-                    <pretty-number v="[[getPrice(item.orginalOrder.amountS,item.orginalOrder.amountB)]]" d=8></pretty-number>
+                    <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
                 <template>
-                    <pretty-number v="[[numberFormat(item.orginalOrder.amountS)]]" d=4 postfix="[[transtoUppercase(item.orginalOrder.tokenS)]]"></pretty-number>
+                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Status</template>
                 <template>
                     <div class="horizontal end-justified layout">
-                        <paper-progress value="[[numberFormat(item.totalDealedAmountB)]]" secondary-progress="[[testBalance(item.orginalOrder.amountB)]]" max="[[numberFormat(item.orginalOrder.amountB)]]"></paper-progress>
+                        <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.processed]]" max="[[item.amountB]]"></paper-progress>
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -69,7 +81,7 @@
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -80,19 +92,68 @@
 
         static get properties() {
             return {
-                token: String,
+                market: String,
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
+                },
+                orders: {
+                    type: Object,
+                    computed: '_computeOrders(appConfig, resp)'
+                }
             };
         }
 
-        testBalance(num) {
-            return 0.6 * this.numberFormat(num);
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
-        transtoUppercase(str) {
-            if (str) {
-                return str.toUpperCase();
+        _computeOrders(appConfig, resp) {
+            if(appConfig && resp && resp.result.data){
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
             }
-            return '';
+        }
+
+        _computeItem(appConfig, order){
+            if(this.market){
+                let marketConfig = appConfig.getMarket(this.market);
+                if(null != marketConfig){
+                    order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
+                    order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
+                } else {
+                    this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
+                }
+            }
+            let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);
+            order.tokenB = order.orginalOrder.tokenB.toUpperCase();
+            order.amountB = this.numberFormat(order.orginalOrder.amountB);
+            order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
+            order.pricePrecision = precisionB.pricePrecision;
+            order.volumnPrecisionB = precisionB.volumnPrecision;
+            let precisionS = this._getTokenPrecision(order.orginalOrder.tokenS, appConfig);
+            order.tokenS = order.orginalOrder.tokenS.toUpperCase();
+            order.amountS = this.numberFormat(order.orginalOrder.amountS);
+            order.volumnPrecisionS = precisionS.volumnPrecision;
+            order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB);
+            order.processed = this.testBalance(order.amountB);
+            return order;
+        }
+
+        _getTokenPrecision(tokenName, appConfig){
+            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+            let marketConfig = appConfig.getMarket(tokenName+"-WETH");
+            if (marketConfig) {
+                pricePrecision = marketConfig.pricePrecision;
+            }
+            const tokenxConfig = appConfig.tokenMap[tokenName];
+            if (tokenxConfig) {
+                volumnPrecision = tokenxConfig.precision;
+            }
+            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
+        }
+
+        testBalance(num) {
+            return 0.6 * num;
         }
 
         tranHextoNum(hex) {
@@ -113,16 +174,6 @@
             const sell = this.numberFormat(s);
             const buy = this.numberFormat(b);
             return (sell / buy);
-
-        }
-
-        typeStyle(tokenB) {
-
-            return tokenB === this.token ? 'var(--app-green-color)' : 'var(--app-red-color)';
-        }
-
-        getType(tokenB) {
-            return tokenB === this.token ? 'Buy' : 'Sell';
         }
 
         go() {

@@ -26,6 +26,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <looper-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <looper-toolbar slot="secondary-toolbar" active-tab="markets">
             </looper-toolbar>
             <div class="sections">
@@ -51,24 +53,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <vaadin-grid-column width="50px">
                             <template class="header">24Hr Volume</template>
                             <template>
-                                <pretty-number v="[[item.vol]]" d=[[item.volumnPrecision]]>
+                                <pretty-number v="[[item.vol]]" d=[[item.volumnPrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Bid</template>
                             <template>
-                                <pretty-number v="[[item.buy]]" d=[[item.pricePrecision]]>
+                                <pretty-number v="[[item.buy]]" d=[[item.pricePrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Ask</template>
                             <template>
-                                <pretty-number v="[[item.sell]]" d=[[item.pricePrecision]]>
+                                <pretty-number v="[[item.sell]]" d=[[item.pricePrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
                     <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-                    <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
+                    <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
                     </iron-ajax>
                 </paper-card>
                 <div class="footer-spacer flex"></div>
@@ -86,8 +88,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tickers: {
                     type: Object,
                     computed: '_process(resp.result)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         _process(result) {

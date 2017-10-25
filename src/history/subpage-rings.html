@@ -12,10 +12,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
+            div.long-hash {
+                width: 80px;
+            }
         </style>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
                  <vaadin-grid-column width="50px">
                      <template class="header">
@@ -29,6 +34,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                          </div>
                      </template>
                  </vaadin-grid-column>
+                 <vaadin-grid-column width="10px">
+                      <template class="header">
+                          <div class="left-aligned">Trades</div>
+                      </template>
+                      <template>
+                          <div class="left-aligned">
+                              <div class="long-hash">[[item.tradeAmount]]</div>
+                          </div>
+                      </template>
+                  </vaadin-grid-column>
                  <vaadin-grid-column width="50px">
                      <template class="header">
                          <div class="left-aligned">Miner</div>
@@ -69,13 +84,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                      <template class="header">Block Num</template>
                      <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
                  </vaadin-grid-column>
+                 <vaadin-grid-column width="50px">
+                      <template class="header">Time</template>
+                      <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+                  </vaadin-grid-column>
                  <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-                 <iron-ajax auto id="ajax" url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+                 <iron-ajax auto id="ajax" url="[[relay]]//Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
              </vaadin-grid>
     </template>
     <script>
     class SubpageRings extends Polymer.Element {
         static get is() { return 'subpage-rings'; }
+
+        static get properties() {
+            return {
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
+                }
+            }
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
         tranHextoNum(hex) {
             if (hex) {
                 return Number(hex);

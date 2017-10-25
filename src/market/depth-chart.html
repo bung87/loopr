@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <dom-module id="depth-chart" fit>
     <template>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <style include="shared-styles">
          :host {
             display: block;
@@ -14,7 +16,7 @@
         <div class="wrapper">
             <div id="container"></div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" handle-as="json" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/candleTick.json" on-response="handleResponse" loading="{{loading}}"></iron-ajax>
+            <iron-ajax auto id="ajax" handle-as="json" url="[[relay]]/Loopring/mock-relay-data/master/candleTick.json" on-response="handleResponse" loading="{{loading}}"></iron-ajax>
         </div>
     </template>
     <script>
@@ -23,8 +25,15 @@
 
         static get properties() {
             return {
-
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
+                }
             };
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         handleResponse(e) {

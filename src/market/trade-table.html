@@ -20,6 +20,8 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column hidden$="[[hiddenRing]]" width="50px">
@@ -100,7 +102,7 @@
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
@@ -131,6 +133,10 @@
                 orders: {
                     type: Object,
                     computed: '_computeOrders(appConfig, resp)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
@@ -162,6 +168,10 @@
 
         _showInMarket(){
             return this.market;
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         _computOrderItem(appConfig, item){
@@ -225,7 +235,7 @@
         }
 
         _computePrecision(item, appConfig){
-            let precisionS = this._fillMarket(item.tokenS, appConfig);
+            let precisionS = this._getTokenPrecision(item.tokenS, appConfig);
             item.volumnPrecisionS = precisionS.pricePrecision;
             item.pricePrecision = precisionS.pricePrecision;
             const tokenSConfig = appConfig.tokenMap[item.tokenS.toUpperCase()];
@@ -234,7 +244,7 @@
             } else {
                 item.unitS = "";
             }
-            let precisionB = this._fillMarket(item.tokenB, appConfig)
+            let precisionB = this._getTokenPrecision(item.tokenB, appConfig)
             item.volumnPrecisionB = precisionB.pricePrecision;
             const tokenBConfig = appConfig.tokenMap[item.tokenB];
             if (tokenBConfig) {
@@ -244,15 +254,15 @@
             }
         }
 
-        _fillMarket(tokenName, appConfig){
+        _getTokenPrecision(tokenName, appConfig){
             let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
             let marketConfig = appConfig.getMarket(tokenName+"-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
-                const tokenxConfig = appConfig.tokenMap[tokenName];
-                if (tokenxConfig) {
-                    volumnPrecision = tokenxConfig.precision;
-                }
+            }
+            const tokenxConfig = appConfig.tokenMap[tokenName];
+            if (tokenxConfig) {
+                volumnPrecision = tokenxConfig.precision;
             }
             return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
         }

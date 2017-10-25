@@ -24,6 +24,8 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <div class="vertical layout">
             <div class="horizontal layout">
                 <div class="asks flex">
@@ -81,7 +83,7 @@
                 </div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </div>
     </template>
     <script>
@@ -102,8 +104,16 @@
                 market: {
                     type: String,
                     computed: '_computeMarketId(tokenx, tokeny)'
+                },
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         _computeMarketId(tokenx, tokeny) {

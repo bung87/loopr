@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
                             <trade-table name="trades" display-mode="market" token="{{id}}" market="[[id]]"></trade-table>
-                            <order-table name="orders" token="{{id}}"></order-table>
+                            <order-table name="orders" market="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <trade-table filter-mine name="mytrades" display-mode="order"></trade-table>
                                 <order-table filter-mine name="myorders"></order-table>
