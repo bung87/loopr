@@ -79,7 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </looper-page>
     </template>
     <script>
-    class PageMarkets extends Polymer.Element {
+    class PageMarkets extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'page-markets'; }
 
         static get properties() {
@@ -101,6 +101,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _process(result) {
+
             if (result) {
                 return _.map(result, function(i) {
                     var item = i;

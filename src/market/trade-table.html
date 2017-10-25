@@ -8,7 +8,7 @@
         }
 
         div.long-hash {
-            width: 80px;
+            width: 55px;
         }
 
         .red {
@@ -18,13 +18,17 @@
         .green {
             color: var(--app-green-color);
         }
+
+        vaadin-grid-column {
+            min-width: 10px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
-            <vaadin-grid-column hidden$="[[hiddenRing]]" width="50px">
+            <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
                 <template class="header">
                     <div class="left-aligned">Ring</div>
                 </template>
@@ -32,11 +36,11 @@
                     <div class="left-aligned">
                         <a href="[[item.ringLink]]">
                             <div class="long-hash">[[item.ringHash]]</div>
-                        </a>
+                        </a>#[[item.ringIndex]]
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="50px">
+            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="20px">
                 <template class="header">Order</template>
                 <template>
                     <div class="left-aligned">
@@ -46,16 +50,11 @@
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenIndex]]" width="20px">
-                <template class="header">Index</template>
-                <template>[[item.ringIndex]]</template>
-            </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Type</template>
                 <template><span class$="[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
             </vaadin-grid-column>
-
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="95px">
                 <template class="header">
                     <template is="dom-if" if="[[_showInMarket()]]">
                         Amount([[unitS]])
@@ -64,7 +63,9 @@
                         Sold
                     </template>
                 </template>
-                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number>
+                </template>
             </vaadin-grid-column>
             <vaadin-grid-column hidden$="[[hiddenPrice]]" width="80px">
                 <template class="header">Price</template>
@@ -72,7 +73,7 @@
                     <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="120px">
+            <vaadin-grid-column width="95px">
                 <template class="header">
                     <template is="dom-if" if="[[_showInMarket()]]">
                         Size([[unitB]])
@@ -81,21 +82,23 @@
                         Bought
                     </template>
                 </template>
-                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number>
+                </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column width="95px">
                 <template class="header">Lrc-Fee</template>
                 <template>
                     <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column width="95px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
-             </vaadin-grid-column>
-            <vaadin-grid-column hidden$="[[hiddenTime]]" width="100px">
+            </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
                 <template class="header">Time</template>
                 <template>
                     <time-str seconds="[[item.timestamp]]"></time-str>
@@ -106,7 +109,7 @@
         </vaadin-grid>
     </template>
     <script>
-    class TradeTable extends Polymer.Element {
+    class TradeTable extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'trade-table';
         }
@@ -116,7 +119,7 @@
         }
 
         /**
-        *  subType: oneof:[order, ring, market, history-trades]
+         *  subType: oneof:[order, ring, market, history-trades]
          * market: lrc-eos
          */
         static get properties() {
@@ -141,32 +144,31 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready();
-            if(this.displayMode){
+            if (this.displayMode) {
                 let displayMode = this.displayMode.toLowerCase();
                 this.hiddenPrice = true;
-                if("ring" === displayMode) {
+                if ("ring" === displayMode) {
                     this.hiddenRing = true;
                     this.hiddenTime = true;
                 }
-                if("order" === displayMode) {
+                if ("order" === displayMode) {
                     this.hiddenOrder = true;
                 }
-                if("market" === displayMode) {
-                    this.hiddenIndex = true;
+                if ("market" === displayMode) {
                     this.hiddenPrice = false;
                 }
-                if("history-ring" === displayMode) {
+                if ("history-ring" === displayMode) {
                     this.hiddenOrder = true;
                 }
-                if("history-trades" === displayMode) {
+                if ("history-trades" === displayMode) {
                     //this.hiddenRing = true;
                 }
             }
         }
 
-        _showInMarket(){
+        _showInMarket() {
             return this.market;
         }
 
@@ -174,27 +176,27 @@
             return settingsRelay;
         }
 
-        _computOrderItem(appConfig, item){
+        _computeOrderItem(appConfig, item){
             if(item && appConfig){
                 item.pricePrecision = appConfig.marketConfig.defaultPricePrecision;
                 item.volumnPrecisionS = appConfig.marketConfig.defaultVolumePrecision;
                 item.volumnPrecisionB = appConfig.marketConfig.defaultVolumePrecision;
-                item.ringLink = "#/ring/"+item.ringHash;
-                item.orderLink = "#/order/"+item.orderHash;
-                item.txLink = "https://etherscan.io/tx/"+item.txHash;
-                if(this.market){
-                    let marketConfig = appConfig.getMarket(this.market);
-                    if(null != marketConfig){
+                item.ringLink = "#/ring/" + item.ringHash;
+                item.orderLink = "#/order/" + item.orderHash;
+                item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                if (this.market) {
+                    let marketConfig = this.getMarket(this.market);
+                    if (null != marketConfig) {
                         this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
                         this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
                         item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
                         item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
                         this._computePrecisionInMarket(item, marketConfig, appConfig);
                     } else {
-                        this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
+                        this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: { msg: "not found market:" + this.market } }));
                     }
                 } else {
-                    item.buyOrSell = item.tokenS +"⇢"+item.tokenB;
+                    item.buyOrSell = item.tokenS + "⇢" + item.tokenB;
                     this._computePrecision(item, appConfig)
                 }
                 item.fillAmountS = Number(item.fillAmountS);
@@ -210,10 +212,13 @@
             }
         }
 
-        _computePrecisionInMarket(item, marketConfig, appConfig){
+        _computePrecisionInMarket(item, marketConfig, appConfig) {
             const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
-            if(item.tokenB === marketConfig.tokenx){
-                let tempS = item.tokenS, tempB = item.tokenB, tempAmountS = item.fillAmountS, tempAmountB = item.fillAmountB;
+            if (item.tokenB === marketConfig.tokenx) {
+                let tempS = item.tokenS,
+                    tempB = item.tokenB,
+                    tempAmountS = item.fillAmountS,
+                    tempAmountB = item.fillAmountB;
                 item.tokenS = tempB;
                 item.fillAmountS = tempAmountB;
                 item.tokenB = tempS;
@@ -256,7 +261,7 @@
 
         _getTokenPrecision(tokenName, appConfig){
             let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-            let marketConfig = appConfig.getMarket(tokenName+"-WETH");
+            let marketConfig = this.getMarket(tokenName+"-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
             }
@@ -264,12 +269,12 @@
             if (tokenxConfig) {
                 volumnPrecision = tokenxConfig.precision;
             }
-            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
+            return { pricePrecision: pricePrecision, volumnPrecision: volumnPrecision }
         }
 
-        _computeOrders(appConfig, resp){
-            if(resp && appConfig){
-                return _.map(resp.result.data, o => this._computOrderItem(appConfig, o));
+        _computeOrders(appConfig, resp) {
+            if (resp && appConfig) {
+                return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
             }
         }
 

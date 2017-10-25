@@ -85,7 +85,7 @@
         </vaadin-grid>
     </template>
     <script>
-    class OrderTable extends Polymer.Element {
+    class OrderTable extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'order-table';
         }
@@ -116,7 +116,7 @@
 
         _computeItem(appConfig, order){
             if(this.market){
-                let marketConfig = appConfig.getMarket(this.market);
+                let marketConfig = this.getMarket(this.market);
                 if(null != marketConfig){
                     order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
                     order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
@@ -141,7 +141,7 @@
 
         _getTokenPrecision(tokenName, appConfig){
             let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-            let marketConfig = appConfig.getMarket(tokenName+"-WETH");
+            let marketConfig = this.getMarket(tokenName+"-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
             }

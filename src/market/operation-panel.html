@@ -1,68 +1,68 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <!-- <link rel="import" href="../../bower_components/paper-button/paper-button.html"> -->
-
 <dom-module id="operation-panel" fit>
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment paper-material-styles"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-                --paper-tab-content-unselected: {
-                    background-color: white;
-                    color: var(--app-text-color-light);
-                } --paper-tab-ink: transparent;
-                /*--paper-tabs-selection-bar-color: transparent;*/
-            }
-
-            paper-tab[name="sell"] {
-                color: var(--app-red-color);
-            }
-
-            paper-tab[name="buy"] {
-                color: var(--app-green-color);
-            }
-
-            .container {
-                @apply --layout-horizontal;
-                @apply --layout-justified;
-                @apply --layout-start;
-                padding: 32px;
-                min-height: 120px;
-            }
-
-            .seperator {
-                margin-top: 30px;
+         :host {
+            display: block;
+            --paper-tab-content-unselected: {
+                background-color: white;
                 color: var(--app-text-color-light);
             }
+            --paper-tab-ink: transparent;
+            /*--paper-tabs-selection-bar-color: transparent;*/
+        }
 
-            vaadin-text-field {
-                min-width: 210px;
-                height: 80px;
-            }
+        paper-tab[name="sell"] {
+            color: var(--app-red-color);
+        }
 
-            paper-button {
-                height: 36px;
-                width: 210px;
-                margin-top: 22px;
-            }
+        paper-tab[name="buy"] {
+            color: var(--app-green-color);
+        }
 
-            .sell paper-button {
-                background-color: var(--paper-red-500);
-                color: white;
-            }
+        .container {
+            @apply --layout-horizontal;
+            @apply --layout-justified;
+            @apply --layout-start;
+            padding: 32px;
+            min-height: 120px;
+        }
 
-            .sell paper-button:hover {
-                background-color: var(--paper-red-700);
-            }
+        .seperator {
+            margin-top: 30px;
+            color: var(--app-text-color-light);
+        }
 
-            .buy paper-button {
-                background-color: var(--paper-green-500);
-                color: white;
-            }
+        vaadin-text-field {
+            min-width: 210px;
+            height: 80px;
+        }
 
-            .buy paper-button:hover {
-                background-color: var(--paper-green-700);
-            }
+        paper-button {
+            height: 36px;
+            width: 210px;
+            margin-top: 22px;
+        }
+
+        .sell paper-button {
+            background-color: var(--paper-red-500);
+            color: white;
+        }
+
+        .sell paper-button:hover {
+            background-color: var(--paper-red-700);
+        }
+
+        .buy paper-button {
+            background-color: var(--paper-green-500);
+            color: white;
+        }
+
+        .buy paper-button:hover {
+            background-color: var(--paper-green-700);
+        }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
@@ -71,19 +71,15 @@
         </paper-tabs>
         <iron-pages selected="{{sellOrBuy}}" attr-for-selected="name">
             <div name="sell" class="sell container">
-                <vaadin-text-field label="[[tokens.symbol]] Quantity" value="{{sellAmount}}"
-                                   pattern="[[_numPatten(tokens.config.precision)]]"
-                                   error-message="sellAmountErfdaf fd fdsa fdsafdsa f fror">
+                <vaadin-text-field label="[[tokens.symbol]] Quantity" value="{{sellAmount}}" pattern="[[_numPatten(tokens.config.precision)]]" error-message="sellAmountErfdaf fd fdsa fdsafdsa f fror">
                     <div slot="suffix">[[tokens.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">&times;</div>
-                <vaadin-text-field label="[[tokens.symbol]]/[[tokenb.symbol]] Price" value="{{sellPrice}}"
-                                   error-message="[[sellPriceError]]">
+                <vaadin-text-field label="[[tokens.symbol]]/[[tokenb.symbol]] Price" value="{{sellPrice}}" error-message="[[sellPriceError]]">
                     <div slot="suffix">[[tokens.config.unit]]/[[tokenb.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">=</div>
-                <vaadin-text-field disabled label="[[tokenb.symbol]] Total" value="{{sellTotal}}"
-                                   error-message="[[sellTotalError]]">
+                <vaadin-text-field disabled label="[[tokenb.symbol]] Total" value="{{sellTotal}}" error-message="[[sellTotalError]]">
                     <div slot="suffix">[[tokenb.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">&nbsp;</div>
@@ -91,19 +87,15 @@
             </div>
             <!-- ----- -->
             <div name="buy" class="buy container">
-                <vaadin-text-field label="[[tokens.symbol]] Quantity" value="{{buyAmount}}"
-                                   pattern="[[_numPatten(tokens.config.precision)]]"
-                                   error-message="buyAmountErfdaf fd fdsa fdsafdsa f fror">
+                <vaadin-text-field label="[[tokens.symbol]] Quantity" value="{{buyAmount}}" pattern="[[_numPatten(tokens.config.precision)]]" error-message="buyAmountErfdaf fd fdsa fdsafdsa f fror">
                     <div slot="suffix">[[tokens.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">&times;</div>
-                <vaadin-text-field label="[[tokens.symbol]]/[[tokenb.symbol]] Price" value="{{buyPrice}}"
-                                   error-message="[[buyPriceError]]">
+                <vaadin-text-field label="[[tokens.symbol]]/[[tokenb.symbol]] Price" value="{{buyPrice}}" error-message="[[buyPriceError]]">
                     <div slot="suffix">[[tokens.config.unit]]/[[tokenb.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">=</div>
-                <vaadin-text-field disabled label="[[tokenb.symbol]] Total" value="{{buyTotal}}"
-                                   error-message="[[buyTotalError]]">
+                <vaadin-text-field disabled label="[[tokenb.symbol]] Total" value="{{buyTotal}}" error-message="[[buyTotalError]]">
                     <div slot="suffix">[[tokenb.config.unit]]</div>
                 </vaadin-text-field>
                 <div class="seperator">&nbsp;</div>
@@ -113,187 +105,186 @@
         </iron-pages>
     </template>
     <script>
+    const Order = require('order');
 
-        const Order = require('order');
-
-        class OperationPanel extends Polymer.Element {
-            static get is() {
-                return 'operation-panel';
-            }
-
-            static get properties() {
-                return {
-                    tokens: {
-                        type: Object,
-                        value: {
-                            symbol: "LRC",
-                            config: {
-                                "name": "Loopring Token",
-                                "digits": 18,
-                                "contract": "0xef68e7c694f40c8202821edf525de3782458639f",
-                                "unit": "LRC",
-                                "website": "https://loopring.org",
-                                "precision": 8,
-                                "allowance": 1000,
-                                "allowanceWarn": 50
-                            }
-                        }
-                    },
-                    tokenb: {
-                        type: Object,
-                        value: {
-                            symbol: "ETH",
-                            config: {
-                                "name": "Ether",
-                                "digits": 18,
-                                "contract": "0xef68e7c694f40c8202821edf525de3782458639f",
-                                "unit": "ETH",
-                                "website": "https://ethereum.org",
-                                "precision": 8,
-                                "allowance": 1000,
-                                "allowanceWarn": 500
-                            }
-                        }
-                    },
-                    sellOrBuy: {
-                        type: String,
-                        value: "buy"
-                    },
-                    buyAmount: {
-                        type: Number,
-                        value: 0
-                    },
-                    buyPrice: {
-                        type: Number,
-                        value: 0
-                    },
-                    buyTotal: {
-                        type: Number,
-                        computed: '_multiply(buyAmount, buyPrice)'
-                    },
-                    sellAmount: {
-                        type: Number,
-                        value: 0
-                    },
-                    sellPrice: {
-                        type: Number,
-                        value: 0
-                    },
-                    sellTotal: {
-                        type: Number,
-                        computed: '_multiply(sellAmount, sellPrice)'
-                    }
-                };
-            }
-
-            _numPatten(precision) {
-                return "\\d+(\\.\\d{0," + precision + "})?";
-            }
-
-            _multiply(amount, price) {
-                return (amount * price).toPrecision(this.tokenb.config.precision);
-            }
-
-           async placeBuyOrder() {
-                if (!this.wallet) {
-//                    this.dispatchEvent(new CustomEvent('notification', {
-//                        bubbles: true,
-//                        composed: true,
-//                        detail: "please set your wallet first"
-//                    }));
-//                    return;
-                    this.wallet = {
-                        address: '0xD091341B21758C34AedC95FD27699197dA71b782',
-                        privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
-                    };
-                }
-
-
-                let data = {};
-                data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
-                data.owner = this.wallet.address;
-                data.tokenS =this.tokens.config.contract;
-                data.tokenB = this.tokenb.config.contract;
-                data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
-                data.amountB = '0x' + (Number(this.sellTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
-                data.timestamp = new Date().getTime();
-                data.ttl = 10 * 24 * 3600;
-                data.salt = 10;
-                data.lrcFee = 10;
-                data.buyNoMoreThanAmountB = true;
-                data.marginSplitPercentage = 50;
-                const order = new Order(data);
-                const signed = order.sign(this.wallet.privateKey);
-                const body = {
-                    jsonrpc: '2.0',
-                    method: 'loopring_submitOrder',
-                    params: signed,
-                    id: 22
-                };
-                const para = JSON.stringify(body);
-              const res =  await fetch('http://10.137.107.63:3000', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: para
-                }).then(r => r.json());
-
-              console.log(JSON.stringify(res));
-
-            }
-
-           async placeSellOrder(){
-
-               if (!this.wallet) {
-//                    this.dispatchEvent(new CustomEvent('notification', {
-//                        bubbles: true,
-//                        composed: true,
-//                        detail: "please set your wallet first"
-//                    }));
-//                    return;
-                   this.wallet = {
-                       address: '0xD091341B21758C34AedC95FD27699197dA71b782',
-                       privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
-                   };
-               }
-
-
-               let data = {};
-               data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
-               data.owner = this.wallet.address;
-               data.tokenS = this.tokenb.config.contract;
-               data.tokenB = this.tokens.config.contract;
-               data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
-               data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
-               data.timestamp = new Date().getTime();
-               data.ttl = 10 * 24 * 3600;
-               data.salt = 10;
-               data.lrcFee = 10;
-               data.buyNoMoreThanAmountB = true;
-               data.marginSplitPercentage = 50;
-               const order = new Order(data);
-               const signed = order.sign(this.wallet.privateKey);
-               const body = {
-                   jsonrpc: '2.0',
-                   method: 'loopring_submitOrder',
-                   params: signed,
-                   id: 22
-               };
-               const para = JSON.stringify(body);
-               const res =  await fetch('http://10.137.107.63:3000', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json'
-                   },
-                   body: para
-               }).then(r => r.json());
-
-               console.log(JSON.stringify(res));
-
-            }
+    class OperationPanel extends AppConfigMixin(Polymer.Element) {
+        static get is() {
+            return 'operation-panel';
         }
 
-        window.customElements.define(OperationPanel.is, OperationPanel);
+        static get properties() {
+            return {
+                tokens: {
+                    type: Object,
+                    value: {
+                        symbol: "LRC",
+                        config: {
+                            "name": "Loopring Token",
+                            "digits": 18,
+                            "contract": "0xef68e7c694f40c8202821edf525de3782458639f",
+                            "unit": "LRC",
+                            "website": "https://loopring.org",
+                            "precision": 8,
+                            "allowance": 1000,
+                            "allowanceWarn": 50
+                        }
+                    }
+                },
+                tokenb: {
+                    type: Object,
+                    value: {
+                        symbol: "ETH",
+                        config: {
+                            "name": "Ether",
+                            "digits": 18,
+                            "contract": "0xef68e7c694f40c8202821edf525de3782458639f",
+                            "unit": "ETH",
+                            "website": "https://ethereum.org",
+                            "precision": 8,
+                            "allowance": 1000,
+                            "allowanceWarn": 500
+                        }
+                    }
+                },
+                sellOrBuy: {
+                    type: String,
+                    value: "buy"
+                },
+                buyAmount: {
+                    type: Number,
+                    value: 0
+                },
+                buyPrice: {
+                    type: Number,
+                    value: 0
+                },
+                buyTotal: {
+                    type: Number,
+                    computed: '_multiply(buyAmount, buyPrice)'
+                },
+                sellAmount: {
+                    type: Number,
+                    value: 0
+                },
+                sellPrice: {
+                    type: Number,
+                    value: 0
+                },
+                sellTotal: {
+                    type: Number,
+                    computed: '_multiply(sellAmount, sellPrice)'
+                }
+            };
+        }
+
+        _numPatten(precision) {
+            return "\\d+(\\.\\d{0," + precision + "})?";
+        }
+
+        _multiply(amount, price) {
+            return (amount * price).toPrecision(this.tokenb.config.precision);
+        }
+
+        async placeBuyOrder() {
+            if (!this.wallet) {
+                //                    this.dispatchEvent(new CustomEvent('notification', {
+                //                        bubbles: true,
+                //                        composed: true,
+                //                        detail: "please set your wallet first"
+                //                    }));
+                //                    return;
+                this.wallet = {
+                    address: '0xD091341B21758C34AedC95FD27699197dA71b782',
+                    privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
+                };
+            }
+
+
+            let data = {};
+            data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
+            data.owner = this.wallet.address;
+            data.tokenS = this.tokens.config.contract;
+            data.tokenB = this.tokenb.config.contract;
+            data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
+            data.amountB = '0x' + (Number(this.sellTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
+            data.timestamp = new Date().getTime();
+            data.ttl = 10 * 24 * 3600;
+            data.salt = 10;
+            data.lrcFee = 10;
+            data.buyNoMoreThanAmountB = true;
+            data.marginSplitPercentage = 50;
+            const order = new Order(data);
+            const signed = order.sign(this.wallet.privateKey);
+            const body = {
+                jsonrpc: '2.0',
+                method: 'loopring_submitOrder',
+                params: signed,
+                id: 22
+            };
+            const para = JSON.stringify(body);
+            const res = await fetch('http://10.137.107.63:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: para
+            }).then(r => r.json());
+
+            console.log(JSON.stringify(res));
+
+        }
+
+        async placeSellOrder() {
+
+            if (!this.wallet) {
+                //                    this.dispatchEvent(new CustomEvent('notification', {
+                //                        bubbles: true,
+                //                        composed: true,
+                //                        detail: "please set your wallet first"
+                //                    }));
+                //                    return;
+                this.wallet = {
+                    address: '0xD091341B21758C34AedC95FD27699197dA71b782',
+                    privateKey: '0x5990ed8f3168badf71ca8110983454a0926784ea001211d0bf792cd3740523cc'
+                };
+            }
+
+
+            let data = {};
+            data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
+            data.owner = this.wallet.address;
+            data.tokenS = this.tokenb.config.contract;
+            data.tokenB = this.tokens.config.contract;
+            data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.config.digits)).toString(16);
+            data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.config.digits)).toString(16);
+            data.timestamp = new Date().getTime();
+            data.ttl = 10 * 24 * 3600;
+            data.salt = 10;
+            data.lrcFee = 10;
+            data.buyNoMoreThanAmountB = true;
+            data.marginSplitPercentage = 50;
+            const order = new Order(data);
+            const signed = order.sign(this.wallet.privateKey);
+            const body = {
+                jsonrpc: '2.0',
+                method: 'loopring_submitOrder',
+                params: signed,
+                id: 22
+            };
+            const para = JSON.stringify(body);
+            const res = await fetch('http://10.137.107.63:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: para
+            }).then(r => r.json());
+
+            console.log(JSON.stringify(res));
+
+        }
+    }
+
+    window.customElements.define(OperationPanel.is, OperationPanel);
     </script>
 </dom-module>

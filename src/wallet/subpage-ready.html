@@ -27,16 +27,25 @@
             padding-right: 4px;
         }
 
+        .sections {
+            padding-top: 0;
+        }
+
         .summary {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 1em;
+            font-weight: 500;
             text-transform: uppercase;
+            height: 32px;
+            padding-top: 8px;
         }
 
-        .summary>div {
-            padding: 8px;
-        }
 
+        .summary >div {
+            color:white;
+            background-color: var(--paper-grey-700);
+            padding: 2px 16px;
+            border-radius: 12px;
+        }
         .long-name {
             color: var(--app-text-color-light);
             padding-left: 4px;
@@ -52,8 +61,8 @@
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>
-                <div class="summary horizontal center center-justified layout">
-                    <div>Wallet Total Value:</div>
+                <div class="summary horizontal end center-justified layout">
+                    <!-- <div>Wallet Total Value:</div> -->
                     <div>[[totalValue]] [[priceQuote.fiat]]</div>
                 </div>
             </paper-card>
@@ -167,7 +176,7 @@
             </paper-card>
     </template>
     <script>
-    class SubpageReady extends Polymer.Element {
+    class SubpageReady extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-ready'; }
 
         static get properties() {
@@ -196,8 +205,8 @@
                     if (!tokenConfig) { return null; }
 
                     item.name = tokenConfig.name
-                    item.balanceValue = this.appConfig.toNumber(i.balance, tokenConfig);
-                    item.allowanceValue = this.appConfig.toNumber(i.allowance, tokenConfig);
+                    item.balanceValue = this.toNumber(i.balance, tokenConfig);
+                    item.allowanceValue = this.toNumber(i.allowance, tokenConfig);
                     item.precision = tokenConfig.precision;
                     item.unit = tokenConfig.unit;
                     item.address = tokenConfig.address;

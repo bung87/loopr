@@ -65,7 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/scary-cookie/scary-cookie.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="shared-styles.html">
-<link rel="import" href="utils/external-lib-imports.html">
+<link rel="import" href="external-lib-imports.html">
 <link rel="import" href="utils/pretty-number.html">
 <link rel="import" href="utils/time-str.html">
 <link rel="import" href="utils/global-variable.html">
@@ -335,35 +335,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
-
-                appConfig.getTokenByName = function(tokenName) {
-                    if(tokenName) {
-                        return appConfig.tokenMap[tokenName.toUpperCase()];
-                    }
-                }
-                appConfig.getMarket = function(marketKey) {
-                    if(marketKey){
-                        let marketArr = marketKey.split("-");
-                        if(marketArr.length === 2){
-                            let market = appConfig.marketMap[appConfig.computeMarketId(marketArr[0].toUpperCase(), marketArr[1].toUpperCase())];
-                            if(!market){
-                                return null;
-                            } else {
-                                return market;
-                            }
-                        } else {
-                            console.log("error market: "+marketKey)
-                            return null;
-                        }
-                    } else {
-                        console.log("error market: "+marketKey)
-                        return null;
-                    }
-                }
-
-                appConfig.toNumber = function(str, tokenConfig) {
-                    return (new BigNumber(str)).dividedBy(new BigNumber(10).toPower(tokenConfig.digits)).toNumber();
-                };
 
                 this.$.loading.style.display = "none";
                 this.$.pages.style.display = "inherit";

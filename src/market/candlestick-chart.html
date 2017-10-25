@@ -20,7 +20,7 @@
         </div>
     </template>
     <script>
-    class CandleStickChart extends Polymer.Element {
+    class CandleStickChart extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'candlestick-chart'; }
 
         static get properties() {

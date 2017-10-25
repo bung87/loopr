@@ -19,7 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <order-table id="orders"></order-table>
     </template>
     <script>
-    class SubpageOrders extends Polymer.Element {
+    class SubpageOrders extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-orders'; }
 
         go() {

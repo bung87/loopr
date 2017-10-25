@@ -44,11 +44,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
 
-        .tables {
-            min-height: 400px;
-        }
-
-
         paper-card.operation-panel-container {
             /*padding: 0;*/
         }
@@ -118,11 +113,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 selectedTable: {
                     type: Object,
-                    observer: '_selectedTableChanged'
+                    observer: '_selectionChanged'
                 },
                 selectedChart: {
                     type: Object,
-                    observer: '_selectedChartChanged'
+                    observer: '_selectionChanged'
                 }
             };
         }
@@ -141,18 +136,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return null != this.wallet
         }
 
-        _selectedTableChanged(selectedTable) {
-            if (selectedTable && selectedTable.go) selectedTable.go();
-        }
-
-        _selectedChartChanged(selectedChart) {
-            if (selectedChart && selectedChart.go) selectedChart.go();
+        _selectionChanged(selection) {
+            if (selection && selection.go) selection.go();
         }
 
         go() {
-            console.log("fdsafdsafdasfa")
-            this._selectedTableChanged(this.selectedTable);
-            this._selectedChartChanged(this.selectedChart);
+            this._selectionChanged(this.selectedTable);
+            this._selectionChanged(this.selectedChart);
         }
     }
 
