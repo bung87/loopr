@@ -73,7 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </iron-ajax>
     </template>
     <script>
-    class PageOrder extends Polymer.Element {
+    class PageOrder extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'page-order';
         }
@@ -93,8 +93,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _computeOrder(appConfig, resp){
             if(appConfig && resp) {
                 let data = resp.result;
-                let tokenS = appConfig.getTokenByName(data.orginalOrder.tokenS);
-                let tokenB = appConfig.getTokenByName(data.orginalOrder.tokenB);
+                let tokenS = this.getTokenByName(data.orginalOrder.tokenS);
+                let tokenB = this.getTokenByName(data.orginalOrder.tokenB);
                 let result = {
                     tokenS: tokenS.unit, amountS: Number(data.orginalOrder.amountS), precisionS: tokenS.precision, totalDealedAmountS: Number(data.totalDealedAmountS),
                     tokenB: tokenB.unit, amountB: Number(data.orginalOrder.amountB), precisionB: tokenB.precision, totalDealedAmountB: Number(data.totalDealedAmountB),

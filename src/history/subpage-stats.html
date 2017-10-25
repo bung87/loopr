@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Stats
     </template>
     <script>
-    class SubpageStats extends Polymer.Element {
+    class SubpageStats extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-stats'; }
         static get properties() {
             return {

@@ -85,7 +85,7 @@
         </div>
     </template>
     <script>
-    class OrderBook extends Polymer.Element {
+    class OrderBook extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'order-book';
         }

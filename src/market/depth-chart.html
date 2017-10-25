@@ -18,7 +18,7 @@
         </div>
     </template>
     <script>
-    class DepthChart extends Polymer.Element {
+    class DepthChart extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'depth-chart'; }
 
         static get properties() {

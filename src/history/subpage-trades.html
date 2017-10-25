@@ -25,7 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <trade-table id="trades" display-mode="history-trades" market="[[id]]"></trade-table-market>
     </template>
     <script>
-    class SubpageTrades extends Polymer.Element {
+    class SubpageTrades extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-trades'; }
         static get properties() {
             return {
