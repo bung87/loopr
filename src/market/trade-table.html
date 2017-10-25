@@ -242,20 +242,16 @@
         }
 
         _fillMarket(tokenName, appConfig){
+            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
             let marketConfig = appConfig.getMarket(tokenName+"-WETH");
-            if(null != marketConfig){
-                let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-                if (marketConfig) {
-                    pricePrecision = marketConfig.pricePrecision;
-                    const tokenxConfig = appConfig.tokenMap[tokenName];
-                    if (tokenxConfig) {
-                        volumnPrecision = tokenxConfig.precision;
-                    }
+            if (marketConfig) {
+                pricePrecision = marketConfig.pricePrecision;
+                const tokenxConfig = appConfig.tokenMap[tokenName];
+                if (tokenxConfig) {
+                    volumnPrecision = tokenxConfig.precision;
                 }
-                return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
-            } else {
-                this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+tokenName+"-WETH"} }));
             }
+            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
         }
 
         _computeOrders(appConfig, resp){
