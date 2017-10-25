@@ -212,8 +212,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
-        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="[[relay]]/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
+        <iron-ajax auto id="priceQuoteAjax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
