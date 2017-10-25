@@ -313,6 +313,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
+            this.addEventListener('sourcenotfound', e=> this._showPage404(e.detail));
         }
 
         _computeAppConfig(appConfigRaw) {
@@ -328,7 +329,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
 
-                let tempThis = this;
                 appConfig.getTokenByName = function(tokenName) {
                     if(tokenName) {
                         return appConfig.tokenMap[tokenName.toUpperCase()];
@@ -340,17 +340,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         if(marketArr.length === 2){
                             let market = appConfig.marketMap[appConfig.computeMarketId(marketArr[0].toUpperCase(), marketArr[1].toUpperCase())];
                             if(!market){
-                                tempThis._showPage404()
+                                return null;
                             } else {
                                 return market;
                             }
                         } else {
                             console.log("error market: "+marketKey)
-                            tempThis._showPage404();
+                            return null;
                         }
                     } else {
                         console.log("error market: "+marketKey)
-                        tempThis._showPage404();
+                        return null;
                     }
                 }
 
@@ -422,7 +422,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
 
-        _showPage404() {
+        _showPage404(errorMsg) {
             this.page = '404';
         }
     }

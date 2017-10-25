@@ -174,11 +174,15 @@
                 item.txLink = "https://etherscan.io/tx/"+item.txHash;
                 if(this.market){
                     let marketConfig = appConfig.getMarket(this.market);
-                    this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
-                    this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
-                    item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
-                    item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
-                    this._computePrecisionInMarket(item, marketConfig, appConfig);
+                    if(null != marketConfig){
+                        this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
+                        this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
+                        item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
+                        item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
+                        this._computePrecisionInMarket(item, marketConfig, appConfig);
+                    } else {
+                        this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
+                    }
                 } else {
                     item.buyOrSell = item.tokenS +"⇢"+item.tokenB;
                     this._computePrecision(item, appConfig)
@@ -242,15 +246,19 @@
 
         _fillMarket(tokenName, appConfig){
             let marketConfig = appConfig.getMarket(tokenName+"-WETH");
-            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-            if (marketConfig) {
-                pricePrecision = marketConfig.pricePrecision;
-                const tokenxConfig = appConfig.tokenMap[tokenName];
-                if (tokenxConfig) {
-                    volumnPrecision = tokenxConfig.precision;
+            if(null != marketConfig){
+                let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+                if (marketConfig) {
+                    pricePrecision = marketConfig.pricePrecision;
+                    const tokenxConfig = appConfig.tokenMap[tokenName];
+                    if (tokenxConfig) {
+                        volumnPrecision = tokenxConfig.precision;
+                    }
                 }
+                return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
+            } else {
+                this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+tokenName+"-WETH"} }));
             }
-            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
         }
 
         _computeOrders(appConfig, resp){
