@@ -73,7 +73,7 @@
         </vaadin-grid>
     </template>
     <script>
-    class OrderTable extends Polymer.Element {
+    class OrderTable extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'order-table';
         }
@@ -82,6 +82,11 @@
             return {
                 token: String,
             };
+        }
+
+        ready() {
+            super.ready();
+            super.test();
         }
 
         testBalance(num) {
