@@ -114,7 +114,7 @@
         }
 
         /**
-        *  subType: oneof:[order, ring, market, history-order, history-ring]
+        *  subType: oneof:[order, ring, market, history-trades]
          * market: lrc-eos
          */
         static get properties() {
@@ -154,8 +154,8 @@
                 if("history-ring" === displayMode) {
                     this.hiddenOrder = true;
                 }
-                if("history-order" === displayMode) {
-                    this.hiddenRing = true;
+                if("history-trades" === displayMode) {
+                    //this.hiddenRing = true;
                 }
             }
         }
