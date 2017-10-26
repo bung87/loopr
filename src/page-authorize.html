@@ -42,6 +42,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <looper-page>
       <global-variable key="app-config" value="{{appConfig}}"></global-variable>
       <global-variable key="wallet" value="{{wallet}}"></global-variable>
+      <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+      <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
       <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
       <div class="sections">
         <paper-card>
@@ -56,7 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                           <input value="{{amount::input}}" class="amount">
                         </iron-input>
                       </div>
-                      <vaadin-combo-box id="tokensSelector" items="[[_toTokenNameArray(appConfig.tokens)]]" item-label-path="name" item-value-path="address"></vaadin-combo-box>
+                      <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
                     </div>
                     <div class="horizontal layout center-justified button">
                       <paper-button primary raised on-click="_signToSend">Generate Transaction</paper-button>
@@ -66,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <div class="middle"></div>
                 <div class="right">
                   <div class="vertical layout start-justified">
-                    <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/walletTokens.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
+                    <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
                     <paper-item class="flex">
                       <paper-item-body two-line>
                         <div class="title"> Address</div>
@@ -78,13 +80,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-item class="flex">
                       <paper-item-body two-line>
                         <div class="title"> Balance</div>
-                        <div secondary>[[_outputBalance(selectedToken, data)]]</div>
+                        <div secondary>[[selectedTokenBalance.balance]]</div>
                       </paper-item-body>
                     </paper-item>
                     <paper-item class="flex">
                       <paper-item-body two-line>
                         <div class="title"> Allowance(available/advice)</div>
-                        <div secondary>[[_output(selectedToken, data)]]</div>
+                        <div secondary>[[_showAllowance(selectedTokenBalance)]]</div>
                       </paper-item-body>
                     </paper-item>
                   </div>
@@ -112,169 +114,85 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          token: {
              type: String
          },
-         selectedToken: {
-            type: String,
-            notify: true,
-            observer: "_selected"
+         selectedTokenBalance: {
+             type: Object,
+             computed: '_selectedToken(appConfig, balances, token)'
          },
          amount: {
-            type: Number,
-            notify: true,
-            observer: "_selected"
+            type: Number
+         },
+         balances: {
+             type: Object,
+             computed: '_computeBalances(data)',
+         },
+         tokens: {
+             type: Object,
+             computed: '_computeTokens(appConfig)'
+         },
+         relay: {
+             type: String,
+             computed: '_selectedRelay(settingsRelay)'
          }
       };
     }
 
+    _selectedRelay(settingsRelay){
+        return settingsRelay;
+    }
+
+    _computeTokens(appConfig){
+        if(appConfig){
+            return appConfig.tokens;
+        }
+    }
+
+    _computeBalances(data){
+        if(data){
+            return _.keyBy(data.result.tokens, o => o.token);
+        }
+    }
+
+    _selectedToken(appConfig, balances, token){
+        if(appConfig && balances && token){
+            var combobox = this.$.tokensSelector;
+            combobox.value = token.toUpperCase();
+            return this._getTokenBalance(appConfig, balances, token);
+        }
+    }
+
     ready() {
       super.ready();
-      var combobox = this.$.tokensSelector
-      var context = this
+      var combobox = this.$.tokensSelector;
+      var context = this;
       combobox.addEventListener('value-changed', function() {
-          context.selectedToken = combobox.value;
+          context.token = combobox.value;
       });
-      if(this.token){
-          this._selectedTokenUnit()
-      }
     }
 
-    _output(selectedToken, data){
-        this._fillSelectedAllowance()
-        if(!this.currentToken) return
-        return this.currentToken.availableAllowance+"/"+this.currentToken.defaultAllowance
-    }
-
-    _outputBalance(selectedToken, data){
-        this._fillSelectedAllowance()
-        if(!this.currentToken) return
-        return this.currentToken.balance
-    }
-
-    _selectedTokenUnit(){
-        var tokens = this.appConfig.tokens;
-        let token = null;
-        for (var x in tokens) {
-            if (x == this.token.toUpperCase()) {
-                token = tokens[x];
-            }
+    _getTokenBalance(appConfig, balances, selectedToken){
+        let selected = balances[selectedToken.toUpperCase()];
+        let balance = 0, allowance = 0
+        if(selected) {
+            balance = selected.balance;
+            allowance = selected.allowance
         }
-        if(!token) return;
-        this.selectedToken = token.contract
-        var combobox = this.$.tokensSelector
-        combobox.value = token.contract
-        this._fillSelectedAllowance()
-    }
-
-    _selected(){
-        if(!this.selectedToken || !this.amount) return;
-        this._output(this.data)
-        let tokenConfig = this._findTokenConfig(this.selectedToken);
-        if(!tokenConfig){
-            var detail = { text: "invalid selected token", category: "warning", duration: 8000 }
-            this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+        let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+        if (!tokenConfig) {
             return;
         }
-        if(this.amount < tokenConfig.allowanceWarn){
-            var detail = { text: "input a lower allowance:"+this.amount+" proper for:"+tokenConfig.allowanceWarn+", but you could continue as you wish", category: "warning", duration: 8000 }
-            this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
-            return;
-        }
-        var detail = { text: "ok", category: "info", duration: 8000 }
-        this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
-    }
-
-    _toTokenNameArray(obj) {
-       if(!obj) return;
-       let array = Object.keys(obj).map(function(key) {
-          return {
-             name: key,
-             address: obj[key].contract
-          };
-       });
-       return array.filter(function(item){
-           return item.name != "ETH"
-       });
-    }
-
-    _findTokenConfig(address) {
-       var tokens = this.appConfig.tokens;
-       for (var x in tokens) {
-          var token = tokens[x];
-          if (token.contract == address) {
-             return token;
-          }
-       }
-    }
-
-    _toUpper(name) {
-       return name.toUpperCase()
-    }
-
-    _toLowerSymbol(address) {
-       var token = this._findTokenConfig(address);
-       if (token) {
-          return token.unit.toLowerCase()
-       } else {
-          return "?";
-       }
-    }
-
-    _findSymbol(address) {
-       var token = this._findTokenConfig(address);
-       if (token) {
-          return token.unit
-       } else {
-          return "?";
-       }
-    }
-
-    _fillSelectedAllowance(){
-        if(!this.data || !this.data.result.tokens || !this.selectedToken) return;
-        let a = this
-        let selected = this.data.result.tokens.filter(function(item){
-            return item.contract == a.selectedToken
-        })
-        let balance = 0, contract = "", allowance = 0
-        if(selected && selected.length === 1) {
-            balance = selected[0].balance;
-            contract = selected[0].contract;
-            allowance = selected[0].allowance
-        }
-        let tokenConfig = a._findTokenConfig(this.selectedToken);
-        this.currentToken = {
-            unit: tokenConfig.unit,
-            contract: contract,
-            balance: balance,
-            availableAllowance: allowance,
-            defaultAllowance: tokenConfig.allowanceWarn
+        return {
+           token: selectedToken,
+           unit: tokenConfig.unit,
+           balance: balance,
+           availableAllowance: allowance,
+           defaultAllowance: tokenConfig.allowanceWarn
         }
     }
 
-    _fillAllowanceArray(userAllowanceArray){
-      if(!userAllowanceArray) return;
-      let a = this
-      let newArray = userAllowanceArray.map(function(item){
-          let tokenConfig = a._findTokenConfig(item.contract);
-          if(!tokenConfig) return;
-          if(item.balance <=0) return;
-          return {
-              unit: tokenConfig.unit,
-              contract: item.contract,
-              balance: item.balance,
-              availableAllowance: item.allowance,
-              defaultAllowance: tokenConfig.allowanceWarn
-          }
-      });
-      return newArray;
-    }
-
-    _allowanceWarn(address, allowance) {
-       var token = this._findTokenConfig(address);
-       if (!token) {
-          return false;
-       }
-       if (token.allowanceWarn > 0 && (!allowance || allowance < token.allowanceWarn)) {
-          return true;
-       }
+    _showAllowance(selectedTokenBalance){
+        if(selectedTokenBalance) {
+            return selectedTokenBalance.availableAllowance +"/"+ selectedTokenBalance.defaultAllowance
+        }
     }
 
     _signToSend(){

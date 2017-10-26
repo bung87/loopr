@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <dom-module id="candlestick-chart" fit>
     <template>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <style include="shared-styles">
          :host {
             display: block;
@@ -11,13 +13,14 @@
             min-width: 1000px;
         }
         </style>
-        <iron-ajax auto handle-as="json" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}"></iron-ajax>
         <div class="wrapper">
             <div id="container"></div>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" handle-as="json" url="[[relay]]/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </div>
     </template>
     <script>
-    class CandleStickChart extends Polymer.Element {
+    class CandleStickChart extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'candlestick-chart'; }
 
         static get properties() {
@@ -25,8 +28,16 @@
                 resp: {
                     type: Object,
                     observer: '_respChanged'
+                },
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         _respChanged(resp) {
@@ -124,6 +135,10 @@
                     }
                 }]
             });
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

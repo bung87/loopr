@@ -27,16 +27,26 @@
             padding-right: 4px;
         }
 
+        .sections {
+            padding-top: 0;
+        }
+
         .summary {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 1em;
+            font-weight: 500;
             text-transform: uppercase;
+            height: 28px;
+            padding-top: 8px;
         }
 
-        .summary>div {
-            padding: 8px;
-        }
 
+        .summary >div {
+            color:white;
+            background-color: var(--paper-grey-700);
+            padding: 2px 16px;
+            border-radius: 12px;
+            /*line-height: 20px;*/
+        }
         .long-name {
             color: var(--app-text-color-light);
             padding-left: 4px;
@@ -44,20 +54,22 @@
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <!-- ------ -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>
-                <div class="summary horizontal center center-justified layout">
-                    <div>Wallet Total Value:</div>
+                <div class="summary horizontal end center-justified layout">
+                    <!-- <div>Wallet Total Value:</div> -->
                     <div>[[totalValue]] [[priceQuote.fiat]]</div>
                 </div>
             </paper-card>
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
-                <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
@@ -112,7 +124,7 @@
             </paper-card>
             <paper-card transparent>ERC20 Tokens</paper-card>
             <paper-card tablewrapper>
-                <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
                     <vaadin-grid-column>
                         <template class="header">Name</template>
@@ -165,7 +177,7 @@
             </paper-card>
     </template>
     <script>
-    class SubpageReady extends Polymer.Element {
+    class SubpageReady extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-ready'; }
 
         static get properties() {
@@ -177,8 +189,11 @@
                 erc20Tokens: {
                     type: Array,
                     computed: '_computeBalances(resp)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
-
             };
         }
 
@@ -191,8 +206,8 @@
                     if (!tokenConfig) { return null; }
 
                     item.name = tokenConfig.name
-                    item.balanceValue = this.appConfig.toNumber(i.balance, tokenConfig);
-                    item.allowanceValue = this.appConfig.toNumber(i.allowance, tokenConfig);
+                    item.balanceValue = this.toNumber(i.balance, tokenConfig);
+                    item.allowanceValue = this.toNumber(i.allowance, tokenConfig);
                     item.precision = tokenConfig.precision;
                     item.unit = tokenConfig.unit;
                     item.address = tokenConfig.address;
@@ -215,7 +230,15 @@
             }
         }
 
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
         _isWETH(token) { return token === 'WETH'; }
+
+        go() {
+            this.$.ajax.generateRequest();
+        }
     }
 
     window.customElements.define(SubpageReady.is, SubpageReady);

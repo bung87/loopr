@@ -5,103 +5,121 @@
         <style include="shared-styles">
          :host {
             display: block;
-         }
-         div.long-hash {
-            width: 80px;
-         }
+        }
+
+        div.long-hash {
+            width: 55px;
+        }
+
+        .red {
+            color: var(--app-red-color);
+        }
+
+        .green {
+            color: var(--app-green-color);
+        }
+
+        vaadin-grid-column {
+            min-width: 10px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <template is="dom-if" if="[[_showOrder()]]">
-                <vaadin-grid-column width="40px">
-                    <template class="header">
-                        <div class="left-aligned">Ring</div>
-                    </template>
-                    <template>
-                        <div class="left-aligned">
-                            <a href="[[item.ringLink]]">
-                                <div class="long-hash">[[item.ringHash]]</div>
-                            </a>
-                        </div>
-                    </template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="40px">
-                    <template class="header">
-                        <div class="left-aligned">Tx</div>
-                    </template>
-                    <template>
-                        <div class="left-aligned">
-                            <a href="[[item.txLink]]" target="_blank">
-                                <div class="long-hash">[[item.txHash]]</div>
-                            </a>
-                        </div>
-                    </template>
-                </vaadin-grid-column>
-            </template>
-            <template is="dom-if" if="[[_showRing()]]">
-                <vaadin-grid-column width="40px">
-                    <template class="header">
-                        <div class="left-aligned">Order</div>
-                    </template>
-                    <template>
-                        <div class="left-aligned">
-                            <a href="[[item.orderLink]]">
-                                <div class="long-hash">[[item.orderHash]]</div>
-                            </a>
-                        </div>
-                    </template>
-                </vaadin-grid-column>
-                <vaadin-grid-column width="5px">
-                    <template class="header">Index</template>
-                    <template>[[item.ringIndex]]</template>
-                </vaadin-grid-column>
-            </template>
-            <vaadin-grid-column width="5px">
-                <template class="header">Type</template>
-                <template><span style$="color:[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
-                <template class="header">Amount</template>
-                <template><pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number></template>
-            </vaadin-grid-column>
-            <vaadin-grid-column width="30px">
-                <template class="header">Price</template>
+        <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
+            <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
+                <template class="header">
+                    <div class="left-aligned">Ring</div>
+                </template>
                 <template>
-                    <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]"></pretty-number>
+                    <div class="left-aligned">
+                        <a href="[[item.ringLink]]">
+                            <div class="long-hash">[[item.ringHash]]</div>
+                        </a>#[[item.ringIndex]]
+                    </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
-                <template class="header">Size</template>
-                <template><pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number></template>
+            <vaadin-grid-column hidden$="[[hiddenOrder]]" width="20px">
+                <template class="header">Order</template>
+                <template>
+                    <div class="left-aligned">
+                        <a href="[[item.orderLink]]">
+                            <div class="long-hash">[[item.orderHash]]</div>
+                        </a>
+                    </div>
+                </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="40px">
+            <vaadin-grid-column width="50px">
+                <template class="header">Type</template>
+                <template><span class$="[[item.typeStyle]]"> [[item.buyOrSell]]</span></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="95px">
+                <template class="header">
+                    <template is="dom-if" if="[[_showInMarket()]]">
+                        Amount([[unitS]])
+                    </template>
+                    <template is="dom-if" if="[[!_showInMarket()]]">
+                        Sold
+                    </template>
+                </template>
+                <template>
+                    <pretty-number v="[[item.fillAmountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.unitS]]"></pretty-number>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenPrice]]" width="80px">
+                <template class="header">Price</template>
+                <template>
+                    <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="95px">
+                <template class="header">
+                    <template is="dom-if" if="[[_showInMarket()]]">
+                        Size([[unitB]])
+                    </template>
+                    <template is="dom-if" if="[[!_showInMarket()]]">
+                        Bought
+                    </template>
+                </template>
+                <template>
+                    <pretty-number v="[[item.fillAmountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.unitB]]"></pretty-number>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="95px">
                 <template class="header">Lrc-Fee</template>
-                <template><pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number></template>
+                <template>
+                    <pretty-number v="[[item.feeLrc]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="90px">
+            <vaadin-grid-column width="95px">
                 <template class="header">Margin-Split</template>
                 <template>
                     <pretty-number v="[[item.marginSplit]]" d=[[item.marginSplitPrecision]] postfix="[[item.marginSplitUnit]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
-            <template is="dom-if" if="[[_showOrder()]]">
-                <vaadin-grid-column width="40px">
-                    <template class="header">Time</template>
-                    <template><time-str seconds="[[item.timestamp]]"></time-str></template>
-                </vaadin-grid-column>
-            </template>
+            <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
+                <template class="header">Time</template>
+                <template>
+                    <time-str seconds="[[item.timestamp]]"></time-str>
+                </template>
+            </vaadin-grid-column>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
     </template>
     <script>
-    class TradeTable extends Polymer.Element {
+    class TradeTable extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'trade-table';
         }
 
+        constructor() {
+            super();
+        }
+
         /**
-         * subType: oneof:[order, ring]
+         *  subType: oneof:[order, ring, market, history-trades]
          * market: lrc-eos
          */
         static get properties() {
@@ -109,108 +127,154 @@
                 token: {
                     type: String,
                 },
-                subType: {
+                displayMode: {
+                    type: String
+                },
+                market: {
                     type: String
                 },
                 orders: {
                     type: Object,
-                    computed: '_computeOrders(resp)'
+                    computed: '_computeOrders(appConfig, resp)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
 
-        _showOrder(){
-            if(!this.subType) return false
-            return "order" === this.subType.toLowerCase()
+        ready() {
+            super.ready();
+            if (this.displayMode) {
+                let displayMode = this.displayMode.toLowerCase();
+                this.hiddenPrice = true;
+                if ("ring" === displayMode) {
+                    this.hiddenRing = true;
+                    this.hiddenTime = true;
+                }
+                if ("order" === displayMode) {
+                    this.hiddenOrder = true;
+                }
+                if ("market" === displayMode) {
+                    this.hiddenPrice = false;
+                }
+                if ("history-ring" === displayMode) {
+                    this.hiddenOrder = true;
+                }
+                if ("history-trades" === displayMode) {
+                    //this.hiddenRing = true;
+                }
+            }
         }
 
-        _showRing(){
-            if(!this.subType) return false
-            return "ring" === this.subType.toLowerCase()
+        _showInMarket() {
+            return this.market;
         }
 
-        _computOrderItem(item){
-            item.ringLink = "#/ring/"+item.ringHash
-            item.orderLink = "#/order/"+item.orderHash
-            item.txLink = "https://etherscan.io/tx/"+item.txHash
-            item.buyOrSell = item.tokenS +"⇢"+item.tokenB;
-            let precisionS = this._fillMarket(item.tokenS);
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
+        _computeOrderItem(appConfig, item){
+            if(item && appConfig){
+                item.pricePrecision = appConfig.marketConfig.defaultPricePrecision;
+                item.volumnPrecisionS = appConfig.marketConfig.defaultVolumePrecision;
+                item.volumnPrecisionB = appConfig.marketConfig.defaultVolumePrecision;
+                item.ringLink = "#/ring/" + item.ringHash;
+                item.orderLink = "#/order/" + item.orderHash;
+                item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                if (this.market) {
+                    let marketConfig = this.getMarket(this.market);
+                    if (null != marketConfig) {
+                        this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
+                        this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
+                        item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
+                        item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
+                        this._computePrecisionInMarket(item, marketConfig, appConfig);
+                    } else {
+                        this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: { msg: "not found market:" + this.market } }));
+                    }
+                } else {
+                    item.buyOrSell = item.tokenS + "⇢" + item.tokenB;
+                    this._computePrecision(item, appConfig)
+                }
+                item.fillAmountS = Number(item.fillAmountS);
+                item.fillAmountB = Number(item.fillAmountB);
+                item.fee = Number(item.fee);
+                item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
+                item.feeLrc = Number(item.feeLrc);
+                let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
+                item.marginSplit = Number(item.marginSplit);
+                item.marginSplitUnit = marginSplitToken.unit;
+                item.marginSplitPrecision = marginSplitToken.precision;
+                return item;
+            }
+        }
+
+        _computePrecisionInMarket(item, marketConfig, appConfig) {
+            const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
+            if (item.tokenB === marketConfig.tokenx) {
+                let tempS = item.tokenS,
+                    tempB = item.tokenB,
+                    tempAmountS = item.fillAmountS,
+                    tempAmountB = item.fillAmountB;
+                item.tokenS = tempB;
+                item.fillAmountS = tempAmountB;
+                item.tokenB = tempS;
+                item.fillAmountB = tempAmountS;
+            }
+            item.pricePrecision = marketConfig.pricePrecision;
+            const tokenxConfigS = appConfig.tokenMap[item.tokenS];
+            if (tokenxConfigS) {
+                item.volumnPrecisionS = tokenxConfigS.precision;
+            } else {
+                item.volumnPrecisionS = defaultVolumePrecision;
+            }
+            const tokenxConfigB = appConfig.tokenMap[item.tokenB];
+            if (tokenxConfigB) {
+                item.volumnPrecisionB = tokenxConfigB.precision;
+            } else {
+                item.volumnPrecisionB = defaultVolumePrecision;
+            }
+        }
+
+        _computePrecision(item, appConfig){
+            let precisionS = this._getTokenPrecision(item.tokenS, appConfig);
             item.volumnPrecisionS = precisionS.pricePrecision;
             item.pricePrecision = precisionS.pricePrecision;
-            const tokenSConfig = this.appConfig.tokenMap[item.tokenS.toUpperCase()];
+            const tokenSConfig = appConfig.tokenMap[item.tokenS.toUpperCase()];
             if (tokenSConfig) {
                 item.unitS = tokenSConfig.unit;
             } else {
                 item.unitS = "";
             }
-            let precisionB = this._fillMarket(item.tokenB)
+            let precisionB = this._getTokenPrecision(item.tokenB, appConfig)
             item.volumnPrecisionB = precisionB.pricePrecision;
-            const tokenBConfig = this.appConfig.tokenMap[item.tokenB];
+            const tokenBConfig = appConfig.tokenMap[item.tokenB];
             if (tokenBConfig) {
                 item.unitB = tokenBConfig.unit;
             } else {
                 item.unitB = "";
             }
-
-            item.fillAmountS = this._tranHextoNum(item.fillAmountS)
-            item.fillAmountB = this._tranHextoNum(item.fillAmountB)
-            item.fee = this._tranHextoNum(item.fee)
-            item.price = this.calPrice(item.fillAmountB,item.fillAmountS)
-
-            item.feeLrc = this._tranHextoNum(item.feeLrc);
-            let marginSplitToken = this.appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
-            item.marginSplit = this._tranHextoNum(item.marginSplit);
-            item.marginSplitUnit = marginSplitToken.unit
-            item.marginSplitPrecision = marginSplitToken.precision;
-            return item
         }
 
-        _fillMarket(tokenName){
-            const defaultPricePrecision = 3;
-            const defaultVolumePrecision = 5;
-            const marketConfig = this.appConfig.marketMap[tokenName.toUpperCase()+"-WETH"];
-            let pricePrecision = defaultPricePrecision, volumnPrecision = defaultVolumePrecision
+        _getTokenPrecision(tokenName, appConfig){
+            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+            let marketConfig = this.getMarket(tokenName+"-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
-                const tokenxConfig = this.appConfig.tokenMap[tokenName];
-                if (tokenxConfig) {
-                    volumnPrecision = tokenxConfig.precision;
-                } else {
-                    volumnPrecision = defaultVolumePrecision;
-                }
             }
-            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
-        }
-
-        _tranHextoNum(hex) {
-            if (hex) {
-                return Number(hex);
+            const tokenxConfig = appConfig.tokenMap[tokenName];
+            if (tokenxConfig) {
+                volumnPrecision = tokenxConfig.precision;
             }
-            return '-1';
+            return { pricePrecision: pricePrecision, volumnPrecision: volumnPrecision }
         }
 
-        _computeOrders(resp){
-            if(!resp || !resp.result) return
-            return _.map(resp.result.data, o => this._computOrderItem(o));
-        }
-
-        _findTokenConfig(address) {
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                var token = tokens[x];
-                if (token.contract == address) {
-                    return token;
-                }
-            }
-        }
-
-        _findSymbol(address) {
-            if(!address) return
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit
-            } else {
-                return "?";
+        _computeOrders(appConfig, resp) {
+            if (resp && appConfig) {
+                return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
             }
         }
 
@@ -220,13 +284,17 @@
             }
             return 0;
         }
-        typeStyle(isBuy) {
 
+        typeStyle(isBuy) {
             return isBuy ? 'var(--app-green-color)' : 'var(--app-red-color)';
         }
 
         getType(isBuy) {
             return isBuy ? 'Buy' : 'Sell';
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

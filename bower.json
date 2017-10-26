@@ -41,7 +41,6 @@
     "vaadin-text-field": "vaadin/vaadin-text-field#^1.1.0",
     "vaadin-checkbox": "vaadin/vaadin-checkbox#^1.0.0",
     "vaadin-button": "vaadin/vaadin-button#^1.0.4",
-    "vaadin-progress-bar": "vaadin/vaadin-progress-bar#^1.0.0-alpha4",
     "highstock": "highstock-release#^6.0.1",
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
@@ -62,8 +61,7 @@
     "paper-styles": "^2.0.0",
     "iron-resizable-behavior": "^v2.0.0",
     "iron-a11y-keys-behavior": "^v2.0.0",
-    "lodash": "^4.17.4",
-    "bignumber.js": "^4.1.0"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"

@@ -57,16 +57,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-date-picker.html">
 <link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
-<link rel="import" href="../bower_components/vaadin-progress-bar/vaadin-progress-bar.html">
 <link rel="import" href="../bower_components/vaadin-checkbox/vaadin-checkbox.html">
 <link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
 <link rel="import" href="../bower_components/vaadin-radio-button/vaadin-radio-button.html">
 <link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../bower_components/progress-bar/progress-bar.html">
+<link rel="import" href="../bower_components/scary-cookie/scary-cookie.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="shared-styles.html">
-<link rel="import" href="utils/external-lib-imports.html">
+<link rel="import" href="external-lib-imports.html">
 <link rel="import" href="utils/pretty-number.html">
 <link rel="import" href="utils/time-str.html">
 <link rel="import" href="utils/global-variable.html">
@@ -120,10 +119,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             --paper-tabs-selection-bar-color: var(--app-primary-color);
             --paper-tab-ink: transparent;
-            --paper-tab-content: {}
+            --paper-tab-content: {
+                color: var(--app-primary-color);
+            }
 
             --paper-tab-content-unselected: {
-                color: var(--app-text-color-light);
+                color: var(--app-text-color);
             }
         }
 
@@ -219,6 +220,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -252,7 +255,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-spinner-lite alt="Loading configuration..." active class="thick"></paper-spinner-lite>
                     <div>Loading configuration...</div>
                 </div>
-                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" fallback-selection="404" role="main">
+                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet"></page-wallet>
@@ -260,7 +263,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage={{pageId}}></page-history>
                     <page-convert name="convert" id={{pageId}}></page-convert>
-                    <page-authorize name="authorize" id={{pageId}}></page-authorize>
+                    <page-authorize name="authorize" token={{pageId}}></page-authorize>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
                     <page-settings name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
@@ -303,6 +306,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
+                },
+                selectedPage: {
+                    type: Object,
+                    observer: '_selectedPageChanged'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(appConfigRaw)'
                 }
             };
         }
@@ -311,6 +322,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
+            this.addEventListener('sourcenotfound', e=> this._showPage404(e.detail));
         }
 
         _computeAppConfig(appConfigRaw) {
@@ -324,10 +336,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
                 appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-
-                appConfig.toNumber = function(str, tokenConfig) {
-                    return (new BigNumber(str)).dividedBy(new BigNumber(10).toPower(tokenConfig.digits)).toNumber();
-                };
+                appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
 
                 this.$.loading.style.display = "none";
                 this.$.pages.style.display = "inherit";
@@ -360,6 +369,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
+        _selectedRelay(appConfigRaw){
+            if(appConfigRaw){
+                if(!this.settingsRelay){ //get value stored in cookie or set first relay in config
+                    this.settingsRelay = appConfigRaw.relays[0].value;
+                }
+            }
+        }
+
         static get observers() {
             return [
                 '_routePageChanged(routeData.page)',
@@ -385,12 +402,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 true);
         }
 
+        _selectedPageChanged(page) {
+            if (page && page.go) page.go();
+        }
         _routeIdChanged(pageId) {
             this.pageId = pageId || '';
         }
 
 
-        _showPage404() {
+        _showPage404(errorMsg) {
             this.page = '404';
         }
     }

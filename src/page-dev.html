@@ -46,6 +46,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <paper-button raised on-click="signToSend">signToSend</paper-button>
                         <paper-button raised on-click="signToSendWithTwo">signToSend(With 2 Trans)</paper-button>
                         <paper-button raised on-click="setWallet">setWallet</paper-button>
+                        <paper-button raised on-click="deleteWallet">deleteWallet</paper-button>
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
@@ -91,6 +92,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } else {
                 this.wallet = { address: "addresssssssssssssssssssssssssss" };
             }
+        }
+
+        deleteWallet(){
+            this.wallet = null;
         }
     }
 

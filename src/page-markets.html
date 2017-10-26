@@ -24,16 +24,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: var(--app-red-color);
         }
         </style>
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
-        </iron-ajax>
         <looper-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <looper-toolbar slot="secondary-toolbar" active-tab="markets">
             </looper-toolbar>
             <div class="sections">
-                <paper-card tablewrapper>
-                    <!-- <progress-bar  class="fast"></progress-bar> -->
-                    <paper-progress indeterminate disabled$="[[!loading]]" class="blue"></paper-progress>
+                <paper-card>
                     <vaadin-grid aria-label="Markets" items="[[tickers]]">
                         <vaadin-grid-column>
                             <template class="header">Market</template>
@@ -55,22 +53,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <vaadin-grid-column width="50px">
                             <template class="header">24Hr Volume</template>
                             <template>
-                                <pretty-number v="[[item.vol]]" d=[[item.volumnPrecision]]>
+                                <pretty-number v="[[item.vol]]" d=[[item.volumnPrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Bid</template>
                             <template>
-                                <pretty-number v="[[item.buy]]" d=[[item.pricePrecision]]>
+                                <pretty-number v="[[item.buy]]" d=[[item.pricePrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                         <vaadin-grid-column width="50px">
                             <template class="header">Ask</template>
                             <template>
-                                <pretty-number v="[[item.sell]]" d=[[item.pricePrecision]]>
+                                <pretty-number v="[[item.sell]]" d=[[item.pricePrecision]]></pretty-number>
                             </template>
                         </vaadin-grid-column>
                     </vaadin-grid>
+                    <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+                    <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
+                    </iron-ajax>
                 </paper-card>
                 <div class="footer-spacer flex"></div>
                 <looper-footer></looper-footer>
@@ -78,7 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </looper-page>
     </template>
     <script>
-    class PageMarkets extends Polymer.Element {
+    class PageMarkets extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'page-markets'; }
 
         static get properties() {
@@ -87,11 +88,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tickers: {
                     type: Object,
                     computed: '_process(resp.result)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
 
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
         _process(result) {
+
             if (result) {
                 return _.map(result, function(i) {
                     var item = i;
@@ -125,6 +135,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return item;
                 }.bind(this));
             }
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 

@@ -79,10 +79,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             @apply(--layout-center-justified);
             margin-top: 20px;
         }
+        .input{
+            margin-bottom: var(--valo-space-xs);
+        }
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"></simple-toolbar>
             <div class="sections">
                 <paper-card>
@@ -91,28 +96,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="line">
                                 Send To:
                             </div>
-                            <div class="line">
-                                <iron-input bind-value="{{bindValue}}">
-                                    <input value="{{value::input}}">
+                            <div class="horizontal layout start-justified">
+                                <iron-input>
+                                    <input>
                                 </iron-input>
                             </div>
                             <div class="line">
                                 Amount to Send:
                             </div>
-                            <div class="line">
-                                <div>
-                                    <iron-input bind-value="{{bindValue}}">
-                                        <input value="{{value::input}}" class="amount">
+                            <div class="horizontal layout start-justified">
+                                <div class="vertical layout end-justified input">
+                                    <iron-input>
+                                        <input class="amount">
                                     </iron-input>
                                 </div>
-                                <vaadin-combo-box id="tokensSelector" items="[[_toTokenNameArray(appConfig.tokens)]]" item-label-path="name" item-value-path="address"></vaadin-combo-box>
+                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
                             </div>
                             <div class="line">
                                 Gas Limit:
                             </div>
-                            <div class="line">
-                                <iron-input bind-value="{{bindValue}}">
-                                    <input value="{{value::input}}">
+                            <div class="horizontal layout start-justified">
+                                <iron-input>
+                                    <input>
                                 </iron-input>
                             </div>
                             <div class="line">
@@ -122,9 +127,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <div class="line">
                                     Data:
                                 </div>
-                                <div class="line">
-                                    <iron-input bind-value="{{bindValue}}">
-                                        <input value="{{value::input}}">
+                                <div class="horizontal layout start-justified">
+                                    <iron-input>
+                                        <input>
                                     </iron-input>
                                 </div>
                             </div>
@@ -145,8 +150,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item-body two-line>
                                     <div class="title"> [[_toUpper(token)]] Balance</div>
                                     <div secondary>
-                                        <iron-ajax url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/walletTokens.json" last-response="{{tokens}}" auto></iron-ajax>
-                                        [[_showTokenBalance(token, tokens.result.tokens)]]
+                                        <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}" auto></iron-ajax>
+                                        [[_showTokenBalance(selectedTokenBalance)]]
                                     </div>
                                 </paper-item-body>
                             </paper-item>
@@ -165,79 +170,88 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get properties() {
             return {
                 token: {
-                    type: String,
-                    notify: true,
-                    observer: "_selectedTokenUnit"
+                    type: String
                 },
-                selectedTokenAddr: {
-                    type: String,
-                    notify: true,
-                    observer: "_changeToken"
+                tokens: {
+                    type: Object,
+                    computed: '_computeTokens(rawBalances)'
                 },
+                balances: {
+                    type: Object,
+                    computed: '_computeBalances(rawBalances)',
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
+                },
+                selectedTokenBalance: {
+                    type: Object,
+                    computed: '_selectedToken(appConfig, balances, token)'
+                },
+            }
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
+        _computeTokens(rawBalances){
+            if(rawBalances){
+                return _.map(rawBalances.result.tokens);
+            }
+        }
+
+        _computeBalances(data){
+            if(data){
+                return _.keyBy(data.result.tokens, o => o.token);
+            }
+        }
+
+        _selectedToken(appConfig, balances, token){
+            if(appConfig && balances && token){
+                var combobox = this.$.tokensSelector;
+                combobox.value = token.toUpperCase();
+                return this._getTokenBalance(appConfig, balances, token);
+            }
+        }
+
+        _getTokenBalance(appConfig, balances, selectedToken){
+            let selected = balances[selectedToken.toUpperCase()];
+            let balance = 0, allowance = 0
+            if(selected) {
+                balance = selected.balance;
+                allowance = selected.allowance
+            }
+            let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+            if (!tokenConfig) {
+                return;
+            }
+            return {
+               token: selectedToken,
+               unit: tokenConfig.unit,
+               balance: balance,
+               availableAllowance: allowance,
+               defaultAllowance: tokenConfig.allowanceWarn
+            }
+        }
+
+        _showTokenBalance(selectedTokenBalance) {
+            if(selectedTokenBalance) {
+                return selectedTokenBalance.balance;
             }
         }
 
         ready() {
-            if(!this.wallet){
-                window.location.href = "#/wallet"
-                return
-            }
+//            if(!this.wallet){
+//                window.location.href = "#/wallet"
+//                return
+//            }
             super.ready();
             var combobox = this.$.tokensSelector
             var context = this
             combobox.addEventListener('value-changed', function() {
-                context.selectedTokenAddr = combobox.value;
-                context.token = context._findSymbol(combobox.value)
+                context.token = combobox.value
             });
-            if(this.token){
-                //this._selectedTokenUnit()
-            }
-        }
-
-        _selectedTokenUnit(){
-            if(!this.token) return;
-            var tokens = this.appConfig.tokens;
-            let token = null;
-            for (var x in tokens) {
-                if (x == this.token.toUpperCase()) {
-                    token = tokens[x];
-                }
-            }
-            if(!token) return;
-            this.selectedTokenAddr = token.contract
-            var combobox = this.$.tokensSelector
-            combobox.value = token.contract
-        }
-
-        _toUpper(name){
-            if(!name) return "Token";
-            return name.toUpperCase()
-        }
-
-        _showTokenBalance(token, tokens){
-            if(!token || !tokens) return 0;
-            let upper = token.toUpperCase()
-            let tokenConfig = this._findByUnit(upper)
-            if(!tokenConfig) return 0;
-            let tokenItem = null
-            for (var x in tokens) {
-                if (tokens[x].contract === tokenConfig.contract) {
-                    tokenItem = tokens[x];
-
-                }
-            }
-            if(!tokenItem) return 0;
-            return tokenItem.balance
-        }
-
-        _findByUnit(unit) {
-            let upper = unit.toUpperCase()
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                if (x == upper) {
-                    return tokens[x];;
-                }
-            }
         }
 
         handleClick() {
@@ -246,48 +260,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 extData.style.display = 'none';
             } else {
                 extData.style.display = 'block';
-            }
-        }
-
-        _toTokenNameArray(obj) {
-            if(!obj) return;
-            let array = Object.keys(obj).map(function(key) {
-                return {
-                    name: key,
-                    address: obj[key].contract
-                };
-            });
-            return array.filter(function(item){
-                return item.name != "ETH"
-            });
-        }
-
-        _findTokenConfig(address) {
-            var tokens = this.appConfig.tokens;
-            for (var x in tokens) {
-                var token = tokens[x];
-                if (token.contract == address) {
-                    return token;
-                }
-            }
-        }
-
-        _toLowerSymbol(address) {
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit.toLowerCase()
-            } else {
-                return "";
-            }
-        }
-
-        _findSymbol(address) {
-            console.log(address)
-            var token = this._findTokenConfig(address);
-            if (token) {
-                return token.unit
-            } else {
-                return "";
             }
         }
 

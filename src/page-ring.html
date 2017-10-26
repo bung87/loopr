@@ -17,7 +17,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <iron-ajax auto url="//raw.githubusercontent.com/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Ring" id="[[id]]" back-link="/#/history/rings"></simple-toolbar>
             <div class="sections">
@@ -81,10 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </div>
                     </div>
                 </paper-card>
-                <paper-card transparent>Recent Fills</paper-card>
+                <paper-card transparent>Recent Trades</paper-card>
                 <paper-card>
                     <div class="card-content">
-                        <trade-table sub-type="ring" market="[[id]]"></trade-table>
+                        <trade-table display-mode="ring" market="[[id]]"></trade-table>
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
@@ -106,7 +109,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     observer: '_update',
                 },
                 ring: Object,
+                relay: {
+                    type: Object,
+                    computed: '_selectedRelay(settingsRelay)'
+                }
             };
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
         }
 
         tranHextoNum(hex) {
