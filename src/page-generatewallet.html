@@ -108,6 +108,8 @@
                         </paper-button>
                     </div>
                 </paper-card>
+                <div class="footer-spacer"></div>
+                <looper-footer></looper-footer>
             </div>
         </looper-page>
     </template>
@@ -193,7 +195,7 @@
 
         proceedClicked() {
             this.unlock = 'hidden';
-             window.location = "/#/unlockwallet";
+            window.location = "/#/unlockwallet";
         }
 
         downloadKeystore(e) {
