@@ -121,7 +121,7 @@
                     order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
                     order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
                 } else {
-                    this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
+                    this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
                 }
             }
             let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);

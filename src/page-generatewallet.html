@@ -1,19 +1,10 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-
 <dom-module id="page-generatewallet">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
          :host {
             display: block;
-            --paper-card-actions: {
-                background-color: var(--paper-grey-50);
-            }
-            ;
-            --paper-card-header-text: {
-                font-size: 18px;
-                color: var(--app-text-color-light);
-            }
         }
 
         .input-wrapper {
@@ -22,27 +13,13 @@
         }
 
         iron-input input {
-            width: 400px;
+            width: 224px;
         }
 
         #visibleBtn {
             height: 39px;
             width: 39px;
             background-color: var(--google-grey-300);
-        }
-
-        .card-actions {
-            text-align: center;
-        }
-
-        .card-actions paper-button {
-            min-width: 360px;
-            /*margin:8px 0 8px 0;*/
-            /*color: var(--app-primary-color-dark);*/
-        }
-
-        .card-actions paper-button:hover {
-            color: var(--app-primary-color-dark);
         }
 
         .warning iron-icon {
@@ -216,7 +193,7 @@
 
         proceedClicked() {
             this.unlock = 'hidden';
-            this.dispatchEvent(new CustomEvent('reset-wallet', { bubbles: true, composed: true }));
+             window.location = "/#/unlockwallet";
         }
 
         downloadKeystore(e) {

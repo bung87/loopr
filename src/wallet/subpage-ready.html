@@ -39,14 +39,14 @@
             padding-top: 8px;
         }
 
-
-        .summary >div {
-            color:white;
+        .summary>div {
+            color: white;
             background-color: var(--paper-grey-700);
             padding: 2px 16px;
             border-radius: 12px;
             /*line-height: 20px;*/
         }
+
         .long-name {
             color: var(--app-text-color-light);
             padding-left: 4px;
@@ -71,10 +71,15 @@
             <paper-card tablewrapper>
                 <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
-                    <vaadin-grid-column>
+                    <vaadin-grid-column width="30px">
+                        <template class="header">Symbol</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]<span class="long-name">[[item.name]]</span></template>
+                            <div class="horiziontal layout">[[item.name]]</template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -95,7 +100,7 @@
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="80px">
-                        <template class="header">Loopring Allowance</template>
+                        <template class="header">Allowance</template>
                         <template>
                             <div class="allowance">
                                 <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
@@ -126,10 +131,15 @@
             <paper-card tablewrapper>
                 <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
-                    <vaadin-grid-column>
+                    <vaadin-grid-column width="30px">
+                        <template class="header">Symbol</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]<span class="long-name">[[item.name]]</span></template>
+                            <div class="horiziontal layout">[[item.name]]</template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -150,7 +160,7 @@
                         </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="80px">
-                        <template class="header">Loopring Allowance</template>
+                        <template class="header">Allowance</template>
                         <template>
                             <div class="allowance">
                                 <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
@@ -230,7 +240,7 @@
             }
         }
 
-        _selectedRelay(settingsRelay){
+        _selectedRelay(settingsRelay) {
             return settingsRelay;
         }
 
