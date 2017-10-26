@@ -193,7 +193,7 @@
 
         proceedClicked() {
             this.unlock = 'hidden';
-            this.dispatchEvent(new CustomEvent('reset-wallet', { bubbles: true, composed: true }));
+             window.location = "/#/unlockwallet";
         }
 
         downloadKeystore(e) {
