@@ -48,6 +48,16 @@
                     </a>
                 </template>
             </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenIndex]]" width="10px">
+                <template class="header">
+                    <div class="left-aligned">Index</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        [[item.ringIndex]]
+                    </div>
+                </template>
+            </vaadin-grid-column>
             <vaadin-grid-column hidden$="[[hiddenOrder]]" width="20px">
                 <template class="header">Order</template>
                 <template>
@@ -158,9 +168,11 @@
                 let displayMode = this.displayMode.toLowerCase();
                 this.hiddenPrice = true;
                 this.hiddenBlockNum = true;
+                this.hiddenIndex = true;
                 if ("ring" === displayMode) {
                     this.hiddenRing = true;
                     this.hiddenTime = true;
+                    this.hiddenIndex = false;
                 }
                 if ("order" === displayMode) {
                     this.hiddenOrder = true;

@@ -20,6 +20,10 @@
             .green {
                 color: var(--app-green-color);
             }
+
+            div.long-hash {
+                width: 120px;
+            }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -123,6 +127,8 @@
                 } else {
                     this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
                 }
+            } else {
+                order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
             }
             let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);
             order.tokenB = order.orginalOrder.tokenB.toUpperCase();
