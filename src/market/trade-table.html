@@ -200,7 +200,7 @@
                         item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
                         this._computePrecisionInMarket(item, marketConfig, appConfig);
                     } else {
-                        this.dispatchEvent(new CustomEvent('sourcenotfound', { bubbles: true, composed: true, detail: { msg: "not found market:" + this.market } }));
+                        this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: { msg: "not found market:" + this.market } }));
                     }
                 } else {
                     item.buyOrSell = item.tokenS + "⇢" + item.tokenB;

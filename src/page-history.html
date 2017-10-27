@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="history/subpage-stats.html">
 <dom-module id="page-history">
     <template>
-        <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
          :host {
             display: block;
@@ -52,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-tabs>
                 </paper-card>
                 <paper-card>
-                    <iron-pages id="pages" selected="{{selectedTab}}"  selected-item="{{selectedPage}}" attr-for-selected="name">
+                    <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
                         <subpage-trades name="trades"></subpage-trades>
                         <subpage-rings name="rings"></subpage-rings>
                         <subpage-orders name="orders"></subpage-orders>

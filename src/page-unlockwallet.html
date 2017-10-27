@@ -3,70 +3,57 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
+         :host {
+            display: block;
+        }
 
-                --paper-card-actions: {
-                    background-color: var(--paper-grey-50);
-                } --paper-card-header-text: {
-                font-size: 18px;
-                color:: var(--app-text-color-light);
-            }
-            }
+        .input-wrapper {
+            padding-top: 24px;
+            padding-bottom: 24px;
+        }
 
-            .input-wrapper {
-                padding-top: 24px;
-                padding-bottom: 24px;
-            }
+        .card-warning {
+            text-align: center;
+            height: 56px;
+            background-color: var(--paper-red-400);
+            color: white;
+        }
 
-            .card-actions {
-                text-align: center;
-            }
+        iron-input input {
+            width: 262px;
+        }
 
-            .card-warning {
-                text-align: center;
-                height: 56px;
-                background-color: var(--paper-red-400);
-                color: white;
-            }
+        #fileInput {
+            visibility: hidden;
+        }
 
-            iron-input input {
-                width: 280px;
-            }
+        div.visible {
+            visibility: visible;
+        }
 
-            #fileInput {
-                visibility: hidden;
-            }
+        div.hidden {
+            visibility: hidden;
+        }
 
-            div.visible {
-                visibility: visible;
-            }
-
-            div.hidden {
-                visibility: hidden;
-            }
-
-            div.top {
-                padding-top: 60px;
-            }
+        div.top {
+            padding-top: 60px;
+        }
         </style>
-        <input id="fileInput" type="file"/>
+        <input id="fileInput" type="file" />
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <looper-page>
-            <simple-toolbar slot="secondary-toolbar" title="Wallet" id="Unlock My Wallet"
-                            back-link="#/wallet"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Wallet" id="Unlock My Wallet" back-link="#/wallet"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <div class="sections">
                 <paper-card>
                     <div class="card-content">
                         <div class="vertical center layout ">
-                            <div secondary-text> Choose the wallet file to unlock. Your file will never be sent over the
-                                network to anyone
+                            <div secondary-text> Choose the wallet file to unlock. Your file will never be sent over the network to anyone
                             </div>
                             <div class="input-wrapper horizontal layout center-justified top">
                                 <paper-button noink primary on-click="chooseFile" id="downloadButton">
                                     <iron-icon icon="folder-open"></iron-icon>
-                                    Select Keystore File (UTC / JSON)
+                                    Select Keystore File
                                 </paper-button>
                             </div>
                             <div class$="[[isPassWordRequiredClass(passwordRequired)]]">
@@ -86,113 +73,115 @@
                         </div>
                     </div>
                     <div class$="input-wrapper horizontal layout center-justified [[decryptReadyClass(walletContent,passwordRequired,password)]]">
-                        <paper-button primary on-click="unlockClicked">Go ahead and unlock my wallet.</paper-button>
+                        <paper-button noink primary on-click="unlockClicked">Unlock my wallet</paper-button>
                     </div>
                 </paper-card>
+                <div class="footer-spacer"></div>
+                <looper-footer></looper-footer>
             </div>
         </looper-page>
     </template>
     <script>
-        const keystore = require('keystore');
-        const privateKeyWallet = require('privateKey');
+    const keystore = require('keystore');
+    const privateKeyWallet = require('privateKey');
 
-        class PageUnlockWallet extends Polymer.Element {
-            static get is() {
-                return 'page-unlockwallet';
+    class PageUnlockWallet extends Polymer.Element {
+        static get is() {
+            return 'page-unlockwallet';
+        }
+
+        static get properties() {
+            return {
+                walletContent: {
+                    type: String,
+                    notify: true,
+                },
+                passwordRequired: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                },
+            };
+        }
+
+        static get observers() {
+            return ['isPassWordRequired(walletContent)', 'decryptErrorExisted(password)'];
+        }
+
+        ready() {
+            super.ready();
+            this.$.fileInput.addEventListener('change', this.readFile.bind(this), false);
+        }
+
+        chooseFile() {
+            this.$.fileInput.click();
+        }
+
+        readFile(e) {
+            this.decryptError = '';
+            const file = e.target.files[0];
+            if (!file) {
+                return;
             }
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function(e) {
+                this.walletContent = e.target.result;
 
-            static get properties() {
-                return {
-                    walletContent: {
-                        type: String,
-                        notify: true,
-                    },
-                    passwordRequired: {
-                        type: Boolean,
-                        value: false,
-                        notify: true,
-                    },
-                };
-            }
+            }.bind(this);
+        }
 
-            static get observers() {
-                return ['isPassWordRequired(walletContent)', 'decryptErrorExisted(password)'];
-            }
+        isPassWordRequired(walletContent) {
+            this.passwordRequired = walletContent && keystore.isKeystorePassRequired(walletContent);
+        }
 
-            ready() {
-                super.ready();
-                this.$.fileInput.addEventListener('change', this.readFile.bind(this), false);
-            }
+        decryptErrorExisted(password) {
+            this.decryptError = '';
+        }
 
-            chooseFile() {
-                this.$.fileInput.click();
-            }
+        isPassWordRequiredClass(required) {
+            return required ? 'visible' : 'hidden';
+        }
 
-            readFile(e) {
-                this.decryptError = '';
-                const file = e.target.files[0];
-                if (!file) {
-                    return;
-                }
-                const reader = new FileReader();
-                reader.readAsText(file);
-                reader.onload = function (e) {
-                    this.walletContent = e.target.result;
+        decryptErrorExistedClass(decryptError) {
+            return decryptError ? 'visible center card-warning' : 'hidden ';
+        }
 
-                }.bind(this);
-            }
+        decryptReadyClass(walletContent, passwordRequired, password) {
 
-            isPassWordRequired(walletContent) {
-                this.passwordRequired = walletContent && keystore.isKeystorePassRequired(walletContent);
-            }
-
-            decryptErrorExisted(password) {
-                this.decryptError = '';
-            }
-
-            isPassWordRequiredClass(required) {
-                return required ? 'visible' : 'hidden';
-            }
-
-            decryptErrorExistedClass(decryptError) {
-                return decryptError ? 'visible center card-warning' : 'hidden ';
-            }
-
-            decryptReadyClass(walletContent, passwordRequired, password) {
-
-                if (!walletContent || walletContent === '') {
-                    return 'hidden';
-                }
-
-                if (!passwordRequired) {
-                    return 'visible';
-                }
-
-                if (password) {
-                    return 'visible';
-                }
+            if (!walletContent || walletContent === '') {
                 return 'hidden';
             }
 
-            unlockClicked() {
-                try {
-                    this.decryptError = '';
-                    const privateKey = keystore.decryptKeystoreToPkey(this.walletContent, this.password);
-                    const pkyWallet = new privateKeyWallet();
-                    pkyWallet.setPrivateKey(privateKey);
-                    this.wallet = {address: pkyWallet.getAddress(), privateKey: '0x' + privateKey.toString('hex')};
-                    this.dispatchEvent(new CustomEvent('notification', {
-                        bubbles: true,
-                        composed: true,
-                        detail: "Unclok Wallet Successfully!"
-                    }));
-                } catch (e) {
-                    this.decryptError = e.message;
-                }
+            if (!passwordRequired) {
+                return 'visible';
             }
 
+            if (password) {
+                return 'visible';
+            }
+            return 'hidden';
         }
 
-        window.customElements.define(PageUnlockWallet.is, PageUnlockWallet);
+        unlockClicked() {
+            try {
+                this.decryptError = '';
+                const privateKey = keystore.decryptKeystoreToPkey(this.walletContent, this.password);
+                const pkyWallet = new privateKeyWallet();
+                pkyWallet.setPrivateKey(privateKey);
+                this.wallet = { address: pkyWallet.getAddress(), privateKey: '0x' + privateKey.toString('hex') };
+                this.dispatchEvent(new CustomEvent('notification', {
+                    bubbles: true,
+                    composed: true,
+                    detail: "Unclok Wallet Successfully!"
+                }));
+            } catch (e) {
+                this.decryptError = e.message;
+            }
+        }
+
+    }
+
+    window.customElements.define(PageUnlockWallet.is, PageUnlockWallet);
     </script>
 </dom-module>
