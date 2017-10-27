@@ -16,27 +16,67 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
       .container {
-        width: 800px;
+          @apply(--layout-horizontal);
+          @apply(--layout-center-justified);
       }
+
       .left {
-        width: 300px;
+          @apply(--layout-vertical);
       }
-      .middle {
-        width: 50px;
+
+      .split {
+          width: 10%;
       }
+
       .right {
-        width: 300px;
+          @apply(--layout-vertical);
       }
-      .button {
-        padding-top: 20px;
+
+      .line {
+          @apply(--layout-horizontal);
+          @apply(--layout-start-justified);
       }
+
       .amount {
-        width: 100px;
-        height: 34px;
-        padding-bottom: 0px;
+          @apply(--layout-vertical);
+          @apply(--layout-flex);
       }
-      .input{
-        margin-bottom: var(--valo-space-xs);
+
+      .warn {
+          font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", Ubuntu, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+          -webkit-font-smoothing: antialiased;
+          font-size: 13px;
+          line-height: 1.25;
+          color: hsla(214, 27%, 26%, 0.71);
+          margin-top: 0.7em;
+          transition: 0.4s max-height;
+          max-height: 5em;
+      }
+
+      .warningIcon {
+          color: var(--paper-amber-700);
+          height: 16px;
+      }
+
+      .showWarn {
+          visibility:visible;
+      }
+
+      .hiddenWarn {
+          visibility:hidden;
+      }
+
+      .title {
+          margin-top: 20px;
+      }
+
+      .line vaadin-combo-box, vaadin-text-field, paper-button {
+          width: 100%;
+          height: 34px;
+      }
+
+      .hidden {
+          display: none;
       }
     </style>
     <looper-page>
@@ -47,25 +87,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
       <div class="sections">
         <paper-card>
-          <div class="horizontal layout center-justified">
             <div class="container">
-              <div class="horizontal layout center-justified">
                 <div class="left">
-                  <div class="vertical layout start-justified">
-                    <div class="horizontal layout start-justified">
-                      <div class="vertical layout end-justified input">
-                        <iron-input bind-value="{{bindValue}}">
-                          <input value="{{amount::input}}" class="amount">
-                        </iron-input>
-                      </div>
-                      <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
+                    <div class="line title">Token</div>
+                    <div class="line">
+                        <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
                     </div>
-                    <div class="horizontal layout center-justified button">
-                      <paper-button primary raised on-click="_signToSend">Generate Transaction</paper-button>
+                    <div class="line title">Amount</div>
+                    <div class="line">
+                        <div class="amount">
+                            <vaadin-text-field value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                <div slot="suffix">[[selectedTokenBalance.unit]]</div>
+                            </vaadin-text-field>
+                            <div class$="horizontal layout start-justified warn [[showAmountWarn]]"><iron-icon class="warningIcon" icon="warning"></iron-icon>[[amountWarnMessage]]</div>
+                        </div>
                     </div>
-                  </div>
+                    <div class="line title">Gas Limit</div>
+                    <div class="line">
+                        <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                        </vaadin-text-field>
+                    </div>
+                    <div class="line title">Contract Address Authorize to</div>
+                    <div class="line">
+                        <vaadin-text-field id="authorizeToAddress" readonly>
+                        </vaadin-text-field>
+                    </div>
+                    <div class="line title">
+                        <a href="#" on-click="handleClick">+Advanced: Add Data</a>
+                    </div>
+                    <div class="hidden" id="hiddenExtData">
+                        <div class="line title">
+                            Data:
+                        </div>
+                        <div class="line">
+                            <vaadin-text-field id="additionalData" value="{{additionalData}}" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
+                            </vaadin-text-field>
+                        </div>
+                    </div>
+                    <div class="line title">
+                      <paper-button primary on-click="_signToSend" id="send">Generate Transaction</paper-button>
+                    </div>
                 </div>
-                <div class="middle"></div>
+                <div class="split"></div>
                 <div class="right">
                   <div class="vertical layout start-justified">
                     <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
@@ -85,15 +148,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-item>
                     <paper-item class="flex">
                       <paper-item-body two-line>
-                        <div class="title"> Allowance(available/advice)</div>
-                        <div secondary>[[_showAllowance(selectedTokenBalance)]]</div>
+                        <div class="title"> Allowance Available</div>
+                        <div secondary>[[selectedTokenBalance.availableAllowance]]</div>
                       </paper-item-body>
                     </paper-item>
                   </div>
                 </div>
-              </div>
             </div>
-          </div>
         </paper-card>
       </div>
       <div class="footer-spacer"></div>
@@ -101,14 +162,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </looper-page>
   </template>
   <script>
+
   class PageAuthorize extends Polymer.Element {
     static get is() { return 'page-authorize'; }
 
-      /**
-       * token : parent input parameter, lrc...
-       * selectedToken: current selected token contract address
-       * amount: current input amount
-       */
+    /**
+    * token : parent input parameter, lrc...
+    * selectedToken: current selected token contract address
+    * amount: current input amount
+    */
     static get properties() {
       return {
          token: {
@@ -132,8 +194,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          relay: {
              type: String,
              computed: '_selectedRelay(settingsRelay)'
+         },
+         valid: {
+             type: Boolean,
+             computed: '_showOrHidden(amount, gasLimit, additionalData)'
+         },
+         gasLimit: {
+             type: Number,
+             value: 1000
+         },
+         showAmountWarn: {
+             type: String,
+             value: "hidden"
+         },
+         amountWarnMessage: {
+             type: String,
+             value: "",
+             computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
          }
       };
+    }
+
+    _showAmountWarnMessage(amount, selectedTokenBalance) {
+        if(selectedTokenBalance){
+            if(this._isNum(amount)){
+                let num = Number(amount);
+                if(selectedTokenBalance.defaultAllowance > num){
+                    return this._showAmountWarn(selectedTokenBalance)
+                } else {
+                    return this._hiddenAmountWarn();
+                }
+            } else {
+                return this._hiddenAmountWarn();
+            }
+        } else {
+            return this._hiddenAmountWarn();
+        }
+    }
+
+    _showAmountWarn(selectedTokenBalance){
+        this.showAmountWarn = "showWarn";
+        return "we suggest you to set above "+selectedTokenBalance.defaultAllowance;
+    }
+
+    _hiddenAmountWarn(){
+        this.showAmountWarn = "hiddenWarn";
+        return "";
     }
 
     _selectedRelay(settingsRelay){
@@ -154,6 +260,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _selectedToken(appConfig, balances, token){
         if(appConfig && balances && token){
+            this.$.authorizeToAddress.value = appConfig.contractAddress;
             var combobox = this.$.tokensSelector;
             combobox.value = token.toUpperCase();
             return this._getTokenBalance(appConfig, balances, token);
@@ -185,7 +292,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
            unit: tokenConfig.unit,
            balance: balance,
            availableAllowance: allowance,
-           defaultAllowance: tokenConfig.allowanceWarn
+           defaultAllowance: tokenConfig.allowanceWarn,
+           precision: tokenConfig.precision
         }
     }
 
@@ -193,6 +301,75 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if(selectedTokenBalance) {
             return selectedTokenBalance.availableAllowance +"/"+ selectedTokenBalance.defaultAllowance
         }
+    }
+
+    handleClick() {
+        var extData = this.$.hiddenExtData;
+        if (extData.style.display == 'block') {
+            extData.style.display = 'none';
+        } else {
+            extData.style.display = 'block';
+            this.$.additionalData.value = "";
+        }
+    }
+
+    _showOrHidden(amount, gasLimit, additionalData) {
+        let validator = new Validator();
+        if(!amount || !gasLimit){
+            this._buttonDisable();
+            return false;
+        }
+        if(this._isNum(amount) && this._isNum(gasLimit)){
+            if(additionalData){
+                if(this._isNum(additionalData)){
+                    this._buttonAvailable();
+                    return true;
+                } else {
+                    this._buttonDisable();
+                    return false;
+                }
+            } else {
+                this._buttonAvailable();
+                return true;
+            }
+        } else {
+            this._buttonDisable();
+            return false;
+        }
+    }
+
+    _buttonAvailable(){
+        this.$.send.disabled = false;
+        this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+    }
+
+    _buttonDisable(){
+        this.$.send.disabled = true;
+        this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+    }
+
+    _numPatten(precision) {
+        return "^[0-9]+(.[0-9]{1,"+precision+"})?$";
+    }
+
+    _isNum(num, precision) {
+        return num.toString().match(this._numPatten(precision));
+    }
+
+    _numError(num, precision) {
+        return "input number value with max "+precision+" precision"
+    }
+
+    _integerPatten(){
+        return "^[0-9]*$";
+    }
+
+    _isInteger(intVal){
+        return intVal.toString().match(this._integerPatten())
+    }
+
+    _integerError(int) {
+        return "input valid integer value"
     }
 
     _signToSend(){

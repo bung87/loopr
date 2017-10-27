@@ -16,9 +16,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 display: block;
             }
             div.long-hash {
-                width: 80px;
+                width: 120px;
             }
         </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
@@ -33,6 +34,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </a>
                     </div>
                 </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="10px">
+                <template class="header">Size</template>
+                <template>[[item.tradeAmount]]</template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -60,7 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">
-                    <div class="left-aligned">Transaction Hash</div>
+                    <div class="left-aligned">Transaction</div>
                 </template>
                 <template>
                     <div class="left-aligned">
@@ -70,9 +75,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </template>
             </vaadin-grid-column>
+            <vaadin-grid-column width="45px">
+                <template class="header">Lrc-Fee</template>
+                <template>
+                    <pretty-number v="[[item.totalLrcFee]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                </template>
+            </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Block Num</template>
                 <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="50px">
+                <template class="header">Time</template>
+                <template><time-str seconds="[[item.timestamp]]"></time-str></template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>

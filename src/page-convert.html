@@ -22,27 +22,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             margin: 50px;
         }
 
-        .choseLine {
+        .line {
             @apply(--layout-horizontal);
             @apply(--layout-center-justified);
-            #width: 500px;
-            #background-color: mediumvioletred;
         }
 
-        .side {
+        .inputContainer {
             @apply(--layout-vertical);
-            width: 220px;
+            @apply(--layout-center-justified);
+            width: 40%;
+            margin-top: 20px;
         }
 
-        .lable {
-            color: rgb(158, 158, 158);
-            font-size: 12px;
-            text-align: left;
-            transform: scale(0.75) translate(0px, -28px);
-            transform-origin: left top 0px;
-            transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-            user-select: none;
-            width: 240px;
+        .inputLine {
+            @apply(--layout-horizontal);
+            @apply(--layout-start-justified);
+        }
+
+        .title {
+            margin-top: 20px;
+        }
+
+        .inputLine vaadin-text-field {
+            width: 100%;
+            height: 34px;
         }
 
         .tokenImage {
@@ -73,7 +76,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .swap iron-icon {
             width: 60px;
             height: 60px;
-            fill: #ff6500;
+            fill: #7986cb;
         }
 
         .buttonLine {
@@ -89,56 +92,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             -webkit-font-smoothing: antialiased;
         }
         </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
-                        <div class="choseLine">
-                            <div class="side">
-                                <div>
-                                    <label class="lable">
-                                        Convert
-                                    </label>
+                        <div class="line">
+                            <div class="left">
+                                <div class="tokenImage">
+                                    <iron-icon id="fromIcon" src="[[_tokenIcon(fromToken)]]"></iron-icon>
                                 </div>
-                                <div>
-                                    <div class="left">
-                                        <div class="tokenImage">
-                                            <iron-icon src="[[leftTokenIcon]]"></iron-icon>
-                                        </div>
-                                        <div class="tokenName">[[leftTokenName]]</div>
-                                    </div>
-                                </div>
+                                <div class="tokenName">[[fromToken]]</div>
                             </div>
                             <div class="swap">
                                 <a href="#" on-click="swap">
-                                    <iron-icon icon="icons:swap-horiz"></iron-icon>
+                                    <iron-icon icon="icons:forward"></iron-icon>
                                 </a>
                             </div>
-                            <div class="side">
-                                <div>
-                                    <label class="lable">
-                                        To
-                                    </label>
+                            <div class="right">
+                                <div class="tokenImage">
+                                    <iron-icon id="toIcon" src="[[_tokenIcon(toToken)]]"></iron-icon>
                                 </div>
-                                <div>
-                                    <div class="right">
-                                        <div class="tokenImage">
-                                            <iron-icon src="[[rightTokenIcon]]"></iron-icon>
-                                        </div>
-                                        <div class="tokenName">[[rightTokenName]]</div>
-                                    </div>
+                                <div class="tokenName">[[toToken]]</div>
+                            </div>
+                        </div>
+                        <div class="line">
+                            <div class="inputContainer">
+                                <div class="inputLine title">Amount To Convert</div>
+                                <div class="inputLine">
+                                    <vaadin-text-field value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
+                                        <div slot="suffix">[[fromToken]]</div>
+                                    </vaadin-text-field>
+                                </div>
+                                <div class="inputLine title">Gas Limit</div>
+                                <div class="inputLine">
+                                    <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                    </vaadin-text-field>
                                 </div>
                             </div>
                         </div>
-                        <div class="choseLine">
-                            <paper-input always-float-label label="Amount to convert">
-                                <div slot="suffix">[[leftTokenName]]</div>
-                            </paper-input>
-                        </div>
                         <div class="buttonLine">
-                            <paper-button primary raised on-click="signToSend">Generate Transaction</paper-button>
+                            <paper-button primary raised on-click="signToSend" id="send">Generate Transaction</paper-button>
                         </div>
                     </div>
                 </paper-card>
@@ -152,19 +151,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-convert'; }
         static get properties() {
             return {
-                id: String,
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
+                },
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
                 },
+                balances: {
+                    type: Object,
+                    computed: '_computeBalances(data)',
+                },
+                fromToken: {
+                    type: String,
+                    value: 'ETH'
+                },
+                toToken: {
+                    type: String,
+                    value: 'WETH',
+                    computed: '_computeSwap(fromToken)'
+                },
+                amount: {
+                    type: Number
+                },
+                gasLimit: {
+                    type: Number,
+                    value: 1000
+                },
+                fromTokenBalance: {
+                    type: Object,
+                    computed: '_selectedToken(appConfig, balances, fromToken)'
+                },
+                valid: {
+                     type: Boolean,
+                     computed: '_formValid(amount, gasLimit)'
+                 }
             };
         }
         constructor() {
             super();
-            this.configData = {
-                ETH: { name: 'ETH', icon: 'images/token/ether.png' },
-                WETH: { name: 'WETH', icon: 'images/token/ether_erc20.png' }
+            let tokenConfig = {
+                ETH: 'images/token/ether.png',
+                WETH: 'images/token/ether_erc20.png'
             }
+            this.tokenConfig = tokenConfig;
         }
 
         ready() {
@@ -175,16 +206,107 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //                return;
 //            }
             super.ready();
-            this.leftTokenName = this.configData.ETH.name;
-            this.leftTokenIcon = this.configData.ETH.icon;
-            this.rightTokenName = this.configData.WETH.name;
-            this.rightTokenIcon = this.configData.WETH.icon;
-            if (this.id.toLowerCase() == "weth") {
-                this.leftTokenName = this.configData.WETH.name;
-                this.leftTokenIcon = this.configData.WETH.icon;
-                this.rightTokenName = this.configData.ETH.name;
-                this.rightTokenIcon = this.configData.ETH.icon;
+        }
+
+        _selectedRelay(settingsRelay){
+            return settingsRelay;
+        }
+
+        _selectedToken(appConfig, balances, fromToken){
+            if(appConfig && balances && fromToken){
+                return this._getTokenBalance(appConfig, balances, fromToken);
             }
+        }
+
+        _getTokenBalance(appConfig, balances, selectedToken){
+            let selected = balances[selectedToken.toUpperCase()];
+            let balance = 0, allowance = 0
+            if(selected) {
+                balance = selected.balance;
+                allowance = selected.allowance
+            }
+            let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+            if (!tokenConfig) {
+                return;
+            }
+            return {
+               token: selectedToken,
+               unit: tokenConfig.unit,
+               balance: balance,
+               availableAllowance: allowance,
+               defaultAllowance: tokenConfig.allowanceWarn,
+               precision: tokenConfig.precision
+            }
+        }
+
+        _computeBalances(data){
+            if(data){
+                return _.keyBy(data.result.tokens, o => o.token);
+            }
+        }
+
+        _formValid(amount, gasLimit){
+            if(!amount || !gasLimit){
+                this._buttonDisable();
+                return false;
+            }
+            if(this._isNum(amount) && this._isNum(gasLimit)){
+                this._buttonAvailable();
+                return true;
+            } else {
+                this._buttonDisable();
+                return false;
+            }
+        }
+
+        _buttonAvailable(){
+            this.$.send.disabled = false;
+            this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+        }
+
+        _buttonDisable(){
+            this.$.send.disabled = true;
+            this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+        }
+
+        _computeSwap(fromToken){
+            if(fromToken) {
+                if("ETH" === fromToken.toUpperCase()){
+                    return "WETH";
+                } else {
+                    return "ETH";
+                }
+            }
+        }
+
+        _tokenIcon(token){
+            if(token){
+                return this.tokenConfig[token];
+            }
+        }
+
+        _numPatten(precision) {
+            return "^[0-9]+(.[0-9]{1,"+precision+"})?$";
+        }
+
+        _isNum(num, precision) {
+            return num.toString().match(this._numPatten(precision));
+        }
+
+        _numError(num, precision) {
+            return "input number value with max "+precision+" precision"
+        }
+
+        _integerPatten(){
+            return "^[0-9]*$";
+        }
+
+        _isInteger(intVal){
+            return intVal.toString().match(this._integerPatten())
+        }
+
+        _integerError(int) {
+            return "input valid integer value"
         }
 
         _walletChanged(wallet) {
@@ -194,21 +316,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         signToSend() {
-            var detail = { raw: "raw message" };
+            var detail = { raws: [{"raw":"cancle datas", "subTitle":"Cancel Older Authorization"}, {"raw":"authorize datas", "subTitle":"Authorization"}] };
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
         }
+
         swap() {
-            if ('ETH' == this.leftTokenName) {
-                this.leftTokenName = this.configData.WETH.name;
-                this.leftTokenIcon = this.configData.WETH.icon;
-                this.rightTokenName = this.configData.ETH.name;
-                this.rightTokenIcon = this.configData.ETH.icon;
-            } else {
-                this.leftTokenName = this.configData.ETH.name;
-                this.leftTokenIcon = this.configData.ETH.icon;
-                this.rightTokenName = this.configData.WETH.name;
-                this.rightTokenIcon = this.configData.WETH.icon;
-            }
+            let tempFrom = this.fromToken;
+            this.fromToken = this.toToken;
+            this.toToken = tempFrom;
         }
     }
 

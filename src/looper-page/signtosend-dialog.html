@@ -44,23 +44,27 @@
         <ethereum-signer id="signer"></ethereum-signer>
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog" entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <template is="dom-repeat" items="[[detail.raws]]">
-                <template is="dom-if" if="{{_hasSubTitle(item)}}">
-                    <h2>[[item.subTitle]]</h2>
-                </template>
                 <template is="dom-if" if="{{_noSubTitle(item)}}">
                   <h2>Sign Transaction</h2>
                 </template>
-                <div class="content horizontal center layout">
-                    <div class="part raw vertical layout flex">
-                        <div class="title">Raw transaction:</div>
-                        <div class="wrapper raw">
-                            <iron-autogrow-textarea value={{item.raw}} readonly="true"></iron-autogrow-textarea>
-                        </div>
+                <div class="content vertical layout">
+                    <div class="horizontal start-justified layout">
+                        <template is="dom-if" if="{{_hasSubTitle(item)}}">
+                            <h3>[[item.subTitle]]</h3>
+                        </template>
                     </div>
-                    <div class="part  vertical layout flex">
-                        <div class="title">Signed transaction:</div>
-                        <div class="wrapper signed">
-                            <iron-autogrow-textarea value={{_sign(item.raw)}} readonly="true"></iron-autogrow-textarea>
+                    <div class="horizontal center layout">
+                        <div class="part raw vertical layout flex">
+                            <div class="title">Raw transaction:</div>
+                            <div class="wrapper raw">
+                                <iron-autogrow-textarea value={{item.raw}} readonly="true"></iron-autogrow-textarea>
+                            </div>
+                        </div>
+                        <div class="part  vertical layout flex">
+                            <div class="title">Signed transaction:</div>
+                            <div class="wrapper signed">
+                                <iron-autogrow-textarea value={{_sign(item.raw)}} readonly="true"></iron-autogrow-textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
