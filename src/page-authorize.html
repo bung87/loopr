@@ -59,11 +59,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .showWarn {
-          visibility:visible;
+          #visibility:visible;
+          display: block;
       }
 
       .hiddenWarn {
-          visibility:hidden;
+          #visibility:hidden;
+          display: none;
       }
 
       .title {
@@ -77,6 +79,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .hidden {
           display: none;
+      }
+
+      .gray {
+        color: #dbdbdb;
       }
     </style>
     <looper-page>
@@ -99,7 +105,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <vaadin-text-field value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
                                 <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                             </vaadin-text-field>
-                            <div class$="horizontal layout start-justified warn [[showAmountWarn]]"><iron-icon class="warningIcon" icon="warning"></iron-icon>[[amountWarnMessage]]</div>
+                            <div class$="horizontal layout start-justified warn [[showAmountWarn]]"><iron-icon class$="warningIcon [[showAmountWarn]]" icon="warning"></iron-icon>[[amountWarnMessage]]</div>
                         </div>
                     </div>
                     <div class="line title">Gas Limit</div>
