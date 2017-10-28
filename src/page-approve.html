@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<dom-module id="page-authorize">
+<dom-module id="page-approve">
   <template>
     <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
     <style include="shared-styles">
@@ -169,8 +169,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
   <script>
 
-  class PageAuthorize extends Polymer.Element {
-    static get is() { return 'page-authorize'; }
+  class PageApprove extends Polymer.Element {
+    static get is() { return 'page-approve'; }
 
     /**
     * token : parent input parameter, lrc...
@@ -394,6 +394,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
     }
   }
-  window.customElements.define(PageAuthorize.is, PageAuthorize);
+  window.customElements.define(PageApprove.is, PageApprove);
   </script>
 </dom-module>
