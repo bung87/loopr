@@ -16,14 +16,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 display: block;
             }
             div.long-hash {
-                width: 120px;
+                width: 130px;
             }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
-            <vaadin-grid-column width="50px">
+            <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Hash</div>
                 </template>
@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template class="header">Size</template>
                 <template>[[item.tradeAmount]]</template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
+            <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Miner</div>
                 </template>
@@ -51,7 +51,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
+            <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Fee Recepient</div>
                 </template>
@@ -63,7 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
+            <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Transaction</div>
                 </template>
@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template class="header">Block Num</template>
                 <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
             </vaadin-grid-column>
-            <vaadin-grid-column width="50px">
+            <vaadin-grid-column width="60px">
                 <template class="header">Time</template>
                 <template><time-str seconds="[[item.timestamp]]"></time-str></template>
             </vaadin-grid-column>

@@ -77,6 +77,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           height: 34px;
       }
 
+      .button {
+          margin-top: 30px;
+      }
+
       .hidden {
           display: none;
       }
@@ -84,6 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .gray {
         color: #dbdbdb;
       }
+
     </style>
     <looper-page>
       <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -113,13 +118,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
                         </vaadin-text-field>
                     </div>
-                    <div class="line title">Contract Address Authorize to</div>
+                    <div class="line title">Contract Address to Authorize</div>
                     <div class="line">
                         <vaadin-text-field id="authorizeToAddress" readonly>
                         </vaadin-text-field>
                     </div>
                     <div class="line title">
-                        <a href="#" on-click="handleClick">+Advanced: Add Data</a>
+                        <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
                     </div>
                     <div class="hidden" id="hiddenExtData">
                         <div class="line title">
@@ -130,7 +135,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </vaadin-text-field>
                         </div>
                     </div>
-                    <div class="line title">
+                    <div class="line button">
                       <paper-button primary on-click="_signToSend" id="send">Generate Transaction</paper-button>
                     </div>
                 </div>
@@ -163,7 +168,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
         </paper-card>
       </div>
-      <div class="footer-spacer"></div>
       <looper-footer></looper-footer>
     </looper-page>
   </template>
