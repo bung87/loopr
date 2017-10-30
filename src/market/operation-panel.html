@@ -81,7 +81,7 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-relay" value="[[relayHost]]"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-
+        <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
             <paper-tab name="sell">Sell</paper-tab>
@@ -165,8 +165,10 @@
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokenbAllowance,tokenb)]]">
                             <a href="/#/approve/[[tokenb.token]]"> set allowance to
-                                [[tokenb.allowanceWarn]] </a>
+                                [[tokenb.allowanceWarn]] </a> <br>
                         </template>
+
+                        Current Loopring Order Fee is [[settingsLrcFee]] ‰
                     </div>
 
                 </div>
