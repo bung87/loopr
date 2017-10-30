@@ -178,7 +178,6 @@
     </template>
     <script>
         const Order = require('order');
-        const Relay = require('relay');
 
         class OperationPanel extends AppConfigMixin(Polymer.Element) {
             static get is() {
@@ -422,9 +421,7 @@
 
                 if (wallet && tokens) {
                     const address = wallet.address;
-
-                    const tokensAddress = '0xEF68e7C694F40c8202821eDF525dE3782458639f';
-//                    const tokensAddress = tokens.address;
+                    const tokensAddress = tokens.address;
                     const tokenbAddress = tokenb.address;
                     const spender = '0x6CaCE0528324A8afC2b157CebA3cDd2a27c4E21f';
                     const relay = new Relay('http://127.0.0.1:8545');
@@ -436,7 +433,6 @@
                     const tokenbBalance = await relay.getTokenBalance(tokenbAddress, address);
 
                     const tokenbAllowance = await relay.getTokenAllowance(tokenbAddress, address, spender);
-
 
                     this.tokensAllowance = tokensAllowance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
 

@@ -1,51 +1,56 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<script type="text/javascript" src="../../bower_components/async/dist/async.js"></script>
+
 <dom-module id="signtosend-dialog">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        paper-dialog {}
+            paper-dialog {
+            }
 
-        iron-autogrow-textarea {
-            width: 340px;
-            height: 120px;
-            -webkit-appearance: none;
-            color: white;
-            font-size: 14px;
-            border: none;
-        }
+            iron-autogrow-textarea {
+                width: 340px;
+                height: 120px;
+                -webkit-appearance: none;
+                color: white;
+                font-size: 14px;
+                border: none;
+            }
 
-        .wrapper {
-            background-color: var(--paper-grey-700);
-            padding: 8px;
-        }
+            .wrapper {
+                background-color: var(--paper-grey-700);
+                padding: 8px;
+            }
 
-        .signed.wrapper {
-            background-color: var(--app-primary-color-dark);
-            background-color: var(--app-primary-color-dark);
-        }
+            .signed.wrapper {
+                background-color: var(--app-primary-color-dark);
+                background-color: var(--app-primary-color-dark);
+            }
 
-        .title {
-            color: var(--app-text-color-light);
-            margin-bottom: 8px;
-        }
+            .title {
+                color: var(--app-text-color-light);
+                margin-bottom: 8px;
+            }
 
-        .content {
-            padding: 16px;
-        }
+            .content {
+                padding: 16px;
+            }
 
-        .part {
-          padding: 8px;
-        }
+            .part {
+                padding: 8px;
+            }
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
-        <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog" entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
+                      entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <template is="dom-repeat" items="[[detail.raws]]">
                 <template is="dom-if" if="{{_noSubTitle(item)}}">
-                  <h2>Sign Transaction</h2>
+                    <h2>Sign Transaction</h2>
                 </template>
                 <div class="content vertical layout">
                     <div class="horizontal start-justified layout">
@@ -63,7 +68,8 @@
                         <div class="part  vertical layout flex">
                             <div class="title">Signed transaction:</div>
                             <div class="wrapper signed">
-                                <iron-autogrow-textarea value={{_sign(item.raw)}} readonly="true"></iron-autogrow-textarea>
+                                <iron-autogrow-textarea value={{item.signed}}
+                                                        readonly="true"></iron-autogrow-textarea>
                             </div>
                         </div>
                     </div>
@@ -71,13 +77,17 @@
             </template>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button dialog-confirm autofocus>Send Transaction</paper-button>
+                <paper-button dialog-confirm autofocus on-click="sendTx">Send Transaction</paper-button>
             </div>
         </paper-dialog>
     </template>
-    <script>
+    <script type="text/javascript">
+
         class SigntosendDialog extends Polymer.Element {
-            static get is() { return 'signtosend-dialog'; }
+            static get is() {
+                return 'signtosend-dialog';
+            }
+
             /**
              * detail:[
              *  {"raw":"raw datas", "subTitle":"Cancel Older Authorization"},
@@ -92,24 +102,61 @@
                 };
             }
 
-            _noSubTitle(item){
+            _noSubTitle(item) {
                 return !item.subTitle || item.subTitle === ""
             }
 
-            _hasSubTitle(item){
+            _hasSubTitle(item) {
                 return item.subTitle != ""
             }
 
-            _sign(raw){
-                return raw + "fdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fd";
+            async show(detail) {
+
+                const relay = new Relay('http://127.0.0.1:8545');
+                let nonce = await relay.getTransactionCount(this.wallet.address);
+
+                const rawTxs = _.map(detail.raws, function (raw) {
+                    const rawTx = JSON.parse(raw.raw);
+                    rawTx.nonce = nonce;
+                    nonce = '0x' + (Number(nonce) + 1).toString(16);
+
+                    raw.raw = JSON.stringify(rawTx);
+                    return raw;
+                });
+
+                async.map(rawTxs, async function (rawTx) {
+                    const tx = await this.$.signer.sign(JSON.parse(rawTx.raw));
+                    return {
+                        raw: JSON.stringify(tx.tx),
+                        signed: tx.signedTx,
+                        subTitle: rawTx.subTitle
+                    };
+                }.bind(this), function (err, result) {
+
+                    if (err) {
+                        console.log(err.message)
+                    } else {
+                        detail.raws = result;
+                        this.detail = detail;
+                        this.$.dialog.toggle()
+                    }
+                }.bind(this));
             }
 
-            show(detail) {
-              this.detail = detail;
-              this.$.signer.sign(detail);
-              this.signed = detail.raw + "fdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdja  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fdfdjafldjafkl;djsaklfjdsal;f  fd";
+            sendTx() {
+                const relay = new Relay('http://127.0.0.1:8545');
 
-              this.$.dialog.toggle();
+                async.forEach(this.detail.raws, async function (raw) {
+                    const result = await relay.sendSignedTx(raw.signed);
+                    console.log(result)
+                }, function (err) {
+                    var detail = {text: err.message, category: "error", duration: 2000};
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                }.bind(this))
             }
         }
 

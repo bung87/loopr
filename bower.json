@@ -52,7 +52,8 @@
     "iron-label": "PolymerElements/iron-label#^2.0.0",
     "moment": "^2.19.1",
     "lodash": "^4.17.4",
-    "paper-slider": "PolymerElements/paper-slider#^2.0.2"
+    "paper-slider": "PolymerElements/paper-slider#^2.0.2",
+    "async": "^2.5.0"
   },
   "resolutions": {
     "polymer": "^2.0.0",

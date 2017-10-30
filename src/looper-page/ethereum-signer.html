@@ -1,18 +1,26 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <dom-module id="ethereum-signer" fit>
+    <template>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+    </template>
     <script>
-    class EthreumSigner extends Polymer.Element {
-        static get is() { return 'ethereum-signer'; }
+        const Relay = require('relay');
 
-        static get properties() {
-            return {};
+        class EthreumSigner extends Polymer.Element {
+            static get is() {
+                return 'ethereum-signer';
+            }
+
+            static get properties() {
+                return {};
+            }
+
+            async sign(raw) {
+                const relay = new Relay('http://127.0.0.1:8545');
+                return await relay.generateTx(raw, this.wallet.privateKey);
+            }
         }
 
-        sign(raw) {
-            return raw;
-        }
-    }
-
-    window.customElements.define(EthreumSigner.is, EthreumSigner);
+        window.customElements.define(EthreumSigner.is, EthreumSigner);
     </script>
 </dom-module>

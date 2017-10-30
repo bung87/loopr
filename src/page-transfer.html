@@ -12,52 +12,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        .container {
-            @apply(--layout-horizontal);
-            @apply(--layout-center-justified);
-        }
+            .container {
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+            }
 
-        .left {
-            @apply(--layout-vertical);
-        }
+            .left {
+                @apply(--layout-vertical);
+            }
 
-        .split {
-            width: 10%;
-        }
+            .split {
+                width: 10%;
+            }
 
-        .right {
-            @apply(--layout-vertical);
-        }
+            .right {
+                @apply(--layout-vertical);
+            }
 
-        iron-list {
-            flex: 1 1 auto;
-        }
+            iron-list {
+                flex: 1 1 auto;
+            }
 
-        .hidden {
-            display: none;
-        }
+            .hidden {
+                display: none;
+            }
 
-        .line {
-            @apply(--layout-horizontal);
-            @apply(--layout-start-justified);
-        }
+            .line {
+                @apply(--layout-horizontal);
+                @apply(--layout-start-justified);
+            }
 
-        .title {
-            margin-top: 20px;
-        }
+            .title {
+                margin-top: 20px;
+            }
 
-        .button {
-            margin-top: 30px;
-        }
+            .button {
+                margin-top: 30px;
+            }
 
-        .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field {
-            width: 100%;
-            height: 34px;
-        }
+            .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field {
+                width: 100%;
+                height: 34px;
+            }
 
         </style>
         <looper-page>
@@ -74,19 +74,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 Token:
                             </div>
                             <div class="line">
-                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
+                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
+                                                  item-value-path="token"></vaadin-combo-box>
                             </div>
                             <div class="line title">
                                 Send To:
                             </div>
                             <div class="line">
-                                <address-text-field value="{{address}}" error-message="invalid ETH address"></address-text-field>
+                                <address-text-field value="{{address}}"
+                                                    error-message="invalid ETH address"></address-text-field>
                             </div>
                             <div class="line title">
                                 Amount to Send:
                             </div>
                             <div class="line">
-                                <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                <vaadin-text-field id="amount" value="{{amount}}"
+                                                   placeholder="[[selectedTokenBalance.balance]]"
+                                                   pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                   error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
                                     <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                 </vaadin-text-field>
                             </div>
@@ -94,7 +99,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 Gas Limit:
                             </div>
                             <div class="line">
-                                <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]"
+                                                   error-message="[[_integerError()]]">
                                 </vaadin-text-field>
                             </div>
                             <div class="line title">
@@ -105,12 +111,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     Data:
                                 </div>
                                 <div class="line">
-                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
+                                    <vaadin-text-field id="additionalData" value="{{additionalData}}"
+                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                       error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
                                     </vaadin-text-field>
                                 </div>
                             </div>
                             <div class="line button">
-                                <paper-button primary on-click="signToSend" id="send">Generate Transaction</paper-button>
+                                <paper-button primary on-click="signToSend" id="send">Generate Transaction
+                                </paper-button>
                             </div>
                         </div>
                         <div class="split"></div>
@@ -127,7 +136,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item-body two-line>
                                     <div class="title"> Balance</div>
                                     <div secondary>
-                                        <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}" auto></iron-ajax>
+                                        <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
+                                                   last-response="{{rawBalances}}" auto></iron-ajax>
                                         [[_showTokenBalance(selectedTokenBalance)]]
                                     </div>
                                 </paper-item-body>
@@ -141,188 +151,206 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </looper-page>
     </template>
     <script>
-    class PageTransfer extends Polymer.Element {
-        static get is() { return 'page-transfer'; }
 
-        static get properties() {
-            return {
-                token: {
-                    type: String
-                },
-                tokens: {
-                    type: Object,
-                    computed: '_computeTokens(rawBalances)'
-                },
-                balances: {
-                    type: Object,
-                    computed: '_computeBalances(rawBalances)',
-                },
-                relay: {
-                    type: String,
-                    computed: '_selectedRelay(settingsRelay)'
-                },
-                selectedTokenBalance: {
-                    type: Object,
-                    computed: '_selectedToken(appConfig, balances, token)'
-                },
-                gasLimit: {
-                    type: Number,
-                    value: 1000
-                },
-                valid: {
-                    type: Boolean,
-                    computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
+
+        class PageTransfer extends Polymer.Element {
+            static get is() {
+                return 'page-transfer';
+            }
+
+            static get properties() {
+                return {
+                    token: {
+                        type: String
+                    },
+                    tokens: {
+                        type: Object,
+                        computed: '_computeTokens(rawBalances)'
+                    },
+                    balances: {
+                        type: Object,
+                        computed: '_computeBalances(rawBalances)',
+                    },
+                    relay: {
+                        type: String,
+                        computed: '_selectedRelay(settingsRelay)'
+                    },
+                    selectedTokenBalance: {
+                        type: Object,
+                        computed: '_selectedToken(appConfig, balances, token)'
+                    },
+                    gasLimit: {
+                        type: Number,
+                        value: 1000
+                    },
+                    valid: {
+                        type: Boolean,
+                        computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
+                    }
                 }
             }
-        }
 
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
+            _selectedRelay(settingsRelay) {
+                return settingsRelay;
+            }
 
-        _computeTokens(rawBalances){
-            if(rawBalances){
-                return _.map(rawBalances.result.tokens);
+            _computeTokens(rawBalances) {
+                if (rawBalances) {
+                    return _.map(rawBalances.result.tokens);
+                }
             }
-        }
 
-        _computeBalances(rawBalances){
-            if(rawBalances){
-                return _.keyBy(rawBalances.result.tokens, o => o.token);
+            _computeBalances(rawBalances) {
+                if (rawBalances) {
+                    return _.keyBy(rawBalances.result.tokens, o => o.token);
+                }
             }
-        }
 
-        _selectedToken(appConfig, balances, token){
-            if(appConfig && balances && token){
-                var combobox = this.$.tokensSelector;
-                combobox.value = token.toUpperCase();
-                return this._getTokenBalance(appConfig, balances, token);
+            _selectedToken(appConfig, balances, token) {
+                if (appConfig && balances && token) {
+                    var combobox = this.$.tokensSelector;
+                    combobox.value = token.toUpperCase();
+                    return this._getTokenBalance(appConfig, balances, token);
+                }
             }
-        }
 
-        _getTokenBalance(appConfig, balances, selectedToken){
-            let selected = balances[selectedToken.toUpperCase()];
-            let balance = 0, allowance = 0
-            if(selected) {
-                balance = selected.balance;
-                allowance = selected.allowance
+            _getTokenBalance(appConfig, balances, selectedToken) {
+                let selected = balances[selectedToken.toUpperCase()];
+                let balance = 0, allowance = 0
+                if (selected) {
+                    balance = selected.balance;
+                    allowance = selected.allowance
+                }
+                let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+                if (!tokenConfig) {
+                    return;
+                }
+                return {
+                    token: selectedToken,
+                    unit: tokenConfig.unit,
+                    balance: balance,
+                    availableAllowance: allowance,
+                    defaultAllowance: tokenConfig.allowanceWarn,
+                    precision: tokenConfig.precision,
+                    digits : tokenConfig.digits,
+                    address: tokenConfig.address
+                }
             }
-            let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
-            if (!tokenConfig) {
-                return;
-            }
-            return {
-               token: selectedToken,
-               unit: tokenConfig.unit,
-               balance: balance,
-               availableAllowance: allowance,
-               defaultAllowance: tokenConfig.allowanceWarn,
-               precision: tokenConfig.precision
-            }
-        }
 
-        _showTokenBalance(selectedTokenBalance) {
-            if(selectedTokenBalance) {
-                return selectedTokenBalance.balance;
+            _showTokenBalance(selectedTokenBalance) {
+                if (selectedTokenBalance) {
+                    return selectedTokenBalance.balance;
+                }
             }
-        }
 
-        ready() {
+            ready() {
 //            if(!this.wallet){
 //                window.location.href = "#/wallet"
 //                return
 //            }
-            super.ready();
-            var combobox = this.$.tokensSelector
-            var context = this
-            combobox.addEventListener('value-changed', function() {
-                context.token = combobox.value
-            });
-        }
+                super.ready();
+                var combobox = this.$.tokensSelector
+                var context = this
+                combobox.addEventListener('value-changed', function () {
+                    context.token = combobox.value
+                });
+            }
 
-        handleClick() {
-            var extData = this.$.hiddenExtData;
-            if (extData.style.display == 'block') {
-                extData.style.display = 'none';
-            } else {
-                extData.style.display = 'block';
-                this.$.additionalData.value = "";
+            handleClick() {
+                var extData = this.$.hiddenExtData;
+                if (extData.style.display == 'block') {
+                    extData.style.display = 'none';
+                } else {
+                    extData.style.display = 'block';
+                    this.$.additionalData.value = "";
+                }
             }
-        }
 
-        _showOrHidden(address, amount, gasLimit, additionalData) {
-            let validator = new Validator();
-            if(!address || !amount || !gasLimit){
-                this._buttonDisable();
-                return false;
-            }
-            if(!validator.isValidETHAddress(address)){
-                this._buttonDisable();
-                return false;
-            }
-            console.log(address+" "+amount+" "+gasLimit)
-            if(this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)){
-                if(additionalData){
-                    if(this._isNum(additionalData)){
-                        this._buttonAvailable();
+            _showOrHidden(address, amount, gasLimit, additionalData) {
+                let validator = new Validator();
+                if (!address || !amount || !gasLimit) {
+                    this._buttonDisable();
+                    return false;
+                }
+                if (!validator.isValidETHAddress(address)) {
+                    this._buttonDisable();
+                    return false;
+                }
+                console.log(address + " " + amount + " " + gasLimit)
+                if (this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
+                    if (additionalData) {
+                        if (this._isNum(additionalData)) {
+                            this._buttonAvailable();
+                        } else {
+                            this._buttonDisable();
+                        }
                     } else {
-                        this._buttonDisable();
+                        this._buttonAvailable();
                     }
                 } else {
-                    this._buttonAvailable();
+                    this._buttonDisable();
                 }
-            } else {
-                this._buttonDisable();
+            }
+
+            _buttonAvailable() {
+                this.$.send.disabled = false;
+                this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+            }
+
+            _buttonDisable() {
+                this.$.send.disabled = true;
+                this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+            }
+
+            _numPatten(precision) {
+                return "^[0-9]+(.[0-9]{1," + precision + "})?$";
+            }
+
+            _isNum(num, precision) {
+                return num.toString().match(this._numPatten(precision));
+            }
+
+            _numError(num, precision) {
+                return "input number value with max " + precision + " precision"
+            }
+
+            _integerPatten() {
+                return "^[0-9]*$";
+            }
+
+            _isInteger(intVal) {
+                return intVal.toString().match(this._integerPatten())
+            }
+
+            _integerError(int) {
+                return "input valid integer value"
+            }
+
+            _addressPatten() {
+                return new Validator().isValidETHAddress(address);
+            }
+
+            _addressError(address) {
+                return "please input valid address"
+            }
+
+
+            async signToSend() {
+
+                const tx = {};
+                if(this.selectedTokenBalance.token === 'ETH'){
+                    tx.gasPrice = '0x3b9aca00';
+                    tx.gasLimit = '0x'+ this.gasLimit.toString(16);
+                    tx.to = this.address;
+                    tx.value = '0x' + Number(this.amount).toString(16);
+                    tx.data = this.additionalData || '0x';
+                }
+
+                var detail = { raws: [{"raw":JSON.stringify(tx), "subTitle":"transfer ETH"},{"raw":JSON.stringify(tx), "subTitle":"transfer ETH"}]};
+                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }
         }
 
-        _buttonAvailable(){
-            this.$.send.disabled = false;
-            this.$.send.style.backgroundColor = 'var(--app-primary-color)';
-        }
-
-        _buttonDisable(){
-            this.$.send.disabled = true;
-            this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
-        }
-
-        _numPatten(precision) {
-            return "^[0-9]+(.[0-9]{1,"+precision+"})?$";
-        }
-
-        _isNum(num, precision) {
-            return num.toString().match(this._numPatten(precision));
-        }
-
-        _numError(num, precision) {
-            return "input number value with max "+precision+" precision"
-        }
-
-        _integerPatten(){
-            return "^[0-9]*$";
-        }
-
-        _isInteger(intVal){
-            return intVal.toString().match(this._integerPatten())
-        }
-
-        _integerError(int) {
-            return "input valid integer value"
-        }
-
-        _addressPatten() {
-            return new Validator().isValidETHAddress(address);
-        }
-
-        _addressError(address){
-            return "please input valid address"
-        }
-
-        signToSend() {
-            var detail = { raw: "raw message" };
-            this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
-        }
-    }
-    window.customElements.define(PageTransfer.is, PageTransfer);
+        window.customElements.define(PageTransfer.is, PageTransfer);
     </script>
 </dom-module>
