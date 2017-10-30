@@ -18,34 +18,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        .sections paper-card {
-            /*margin-bottom: 16px;*/
-            /*padding: 0 16px;*/
-            padding-top: 16px;
-        }
+            .sections paper-card {
+                /*margin-bottom: 16px;*/
+                /*padding: 0 16px;*/
+                padding-top: 16px;
+            }
 
-        #charts {
-            padding-bottom: 0;
-            margin-bottom: 32px;
-        }
+            #charts {
+                padding-bottom: 0;
+                margin-bottom: 32px;
+            }
+
+            paper-tabs {
+                margin-bottom: 8px;
+            }
+
+            paper-card.operation-panel-container {
+                /*padding: 0;*/
+            }
+
+            a.walletlink {
+                text-decoration: none;
+            }
+
+            div.walletlink {
+
+                font-size: 1.5em;
+                text-align: center;
+            }
+
+            div.hidden {
+                visibility: hidden;
+            }
 
 
-        paper-tabs {
-            margin-bottom: 8px;
-        }
-
-
-        paper-card.operation-panel-container {
-            /*padding: 0;*/
-        }
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
-            <simple-toolbar slot="secondary-toolbar" title="Market" id="[[marketId()]]" back-link="#/markets"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Market" id="[[marketId()]]"
+                            back-link="#/markets"></simple-toolbar>
             <div class="sections">
                 <paper-card id="charts">
                     <div class="vertical layout">
@@ -53,14 +68,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-tab name="candle">Candle Chart</paper-tab>
                             <paper-tab name="depth">Depth Chart</paper-tab>
                         </paper-tabs>
-                        <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}" attr-for-selected="name">
+                        <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}"
+                                    attr-for-selected="name">
                             <candlestick-chart name="candle"></candlestick-chart>
                             <depth-chart name="depth"></depth-chart>
                         </iron-pages>
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
-                    <operation-panel></operation-panel>
+                    <template is="dom-if" if="[[_isUnlocked(wallet)]]">
+                        <operation-panel market="{{id}}"></operation-panel>
+                    </template>
+
+                    <div class$="walletlink [[isUnlockedClass(wallet)]]">
+                        <a href="/#/wallet" class="walletlink"> Please Set Your Wallet First ... </a>
+                    </div>
                 </paper-card>
                 <paper-card>
                     <order-book id="orderbook" tokenx="LRC" tokeny="WETH"></order-book>
@@ -75,8 +97,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-tab name="mytrades">My Trades</paper-tab>
                             </template>
                         </paper-tabs>
-                        <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" token="{{id}}" market="[[id]]"></trade-table>
+                        <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}"
+                                    attr-for-selected="name">
+                            <trade-table name="trades" display-mode="market" token="{{id}}"
+                                         market="[[id]]"></trade-table>
                             <order-table name="orders" market="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <trade-table filter-mine name="mytrades" display-mode="order"></trade-table>
@@ -91,56 +115,62 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </looper-page>
     </template>
     <script>
-    class PageMarket extends Polymer.Element {
-        static get is() {
-            return 'page-market';
-        }
-        static get properties() {
-            return {
-                id: String,
-                chartSelection: {
-                    type: String,
-                    value: "depth",
-                },
-                dataSelection: {
-                    type: String,
-                    value: "orders"
-                },
-                selectedTable: {
-                    type: Object,
-                    observer: '_selectionChanged'
-                },
-                selectedChart: {
-                    type: Object,
-                    observer: '_selectionChanged'
-                }
-            };
+        class PageMarket extends Polymer.Element {
+            static get is() {
+                return 'page-market';
+            }
+
+            static get properties() {
+                return {
+                    id: String,
+                    chartSelection: {
+                        type: String,
+                        value: "depth",
+                    },
+                    dataSelection: {
+                        type: String,
+                        value: "orders"
+                    },
+                    selectedTable: {
+                        type: Object,
+                        observer: '_selectionChanged'
+                    },
+                    selectedChart: {
+                        type: Object,
+                        observer: '_selectionChanged'
+                    },
+                };
+            }
+
+            ready() {
+                super.ready()
+                console.log("market:" + this.id)
+            }
+
+            marketId() {
+                if (this.id) return this.id.toUpperCase();
+            }
+
+            _isUnlocked(wallet) {
+                console.log(wallet);
+                return null !== this.wallet;
+            }
+
+            isUnlockedClass(wallet) {
+                return !wallet ? '' : 'hidden ';
+            }
+
+            _selectionChanged(selection) {
+                if (selection && selection.go) selection.go();
+            }
+
+            go() {
+                this._selectionChanged(this.selectedTable);
+                this._selectionChanged(this.selectedChart);
+            }
+
         }
 
-        ready(){
-            super.ready()
-            console.log("market:"+this.id)
-        }
-
-        marketId() {
-            if (this.id) return this.id.toUpperCase();
-        }
-
-        _isUnlocked(wallet) {
-            console.log(wallet)
-            return null != this.wallet
-        }
-
-        _selectionChanged(selection) {
-            if (selection && selection.go) selection.go();
-        }
-
-        go() {
-            this._selectionChanged(this.selectedTable);
-            this._selectionChanged(this.selectedChart);
-        }
-    }
-
-    window.customElements.define(PageMarket.is, PageMarket);
+        window.customElements.define(PageMarket.is, PageMarket);
     </script>
 </dom-module>
