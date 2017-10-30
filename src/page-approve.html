@@ -384,14 +384,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     _signToSend(){
-        if(!this.amount || !this.selectedToken){
+        if(!this.amount || !this.selectedTokenBalance){
             var detail = { text: "input value and select token", category: "warning", duration: 8000 }
-            this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
-            return;
-        }
-        let tokenConfig = this._findTokenConfig(this.selectedToken);
-        if(!tokenConfig){
-            var detail = { text: "invalid selected token", category: "warning", duration: 8000 }
             this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             return;
         }
