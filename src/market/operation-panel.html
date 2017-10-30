@@ -65,8 +65,7 @@
 
             div.balance {
                 padding: 0 32px 2px;
-                font-size: 18px;
-
+                font-size: 14px;
             }
 
             div.common {
@@ -74,14 +73,9 @@
                 color: var(--google-blue-500);
             }
 
-            div.warning {
-                color: var(--google-yellow-500);
-            }
-
             div.error {
                 color: var(--google-red-500);
             }
-
 
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -112,25 +106,26 @@
                         <div slot="suffix">[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">&nbsp;</div>
-                    <paper-button on-click="placeSellOrder">Sell</paper-button>
+                    <paper-button on-click="placeSellOrder" id="sellButton">Sell</paper-button>
                 </div>
-                <div class$="balance [[notificationClaas(sellAmount,tokensBalance,tokensAllowance,tokens)]]">
-                    <p>
-
+                <div class="balance">
+                    <div class="error">
+                        <template is="dom-if" if="[[nonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
+                            your balance or allowance is not enough.
+                        </template>
+                    </div>
+                    <div class="common">
                         <template is="dom-if" if="[[tokensBalance]]">
-                            your balance is [[tokensBalance]] <br>
+                            your balance is [[tokensBalance]];
                         </template>
-
                         <template is="dom-if" if="[[tokensAllowance]]">
-                            your allowance is [[tokensAllowance]] ;
+                            your allowance is [[tokensAllowance]];
                         </template>
-                        <template is="dom-if" if="![[allowanceEnough(tokensAllowance,tokens)]]">
-
-                           <a href="/#/"> set allowance to [[tokens.allowanceWarn]] </a>
-
+                        <template is="dom-if" if="![[isAllowanceWarn(tokensAllowance,tokens)]]">
+                            <a href="/#/approve/[[tokens.token]]"> set allowance to
+                                [[tokens.allowanceWarn]] </a>
                         </template>
-
-                    </p>
+                    </div>
                 </div>
 
             </div>
@@ -153,12 +148,27 @@
                         <div slot="suffix">[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">&nbsp;</div>
-                    <paper-button on-click="placeBuyOrder">Buy</paper-button>
+                    <paper-button on-click="placeBuyOrder" id="buyButton">Buy</paper-button>
                 </div>
-                <div class$="balance [[notificationClaas(buyTotal,tokenbBalance,tokenbAllowance,tokenb)]]">
-                    <p>
-                        [[orderNotification(tokenbBalance,tokenbAllowance,tokenb)]]
-                    </p>
+                <div class="balance">
+                    <div class="error">
+                        <template is="dom-if" if="[[nonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
+                            your balance or allowance is not enough.
+                        </template>
+                    </div>
+                    <div class="common">
+                        <template is="dom-if" if="[[tokenbBalance]]">
+                            your balance is [[tokenbBalance]];
+                        </template>
+                        <template is="dom-if" if="[[tokenbAllowance]]">
+                            your allowance is [[tokenbAllowance]];
+                        </template>
+                        <template is="dom-if" if="![[isAllowanceWarn(tokenbAllowance,tokenb)]]">
+                            <a href="/#/approve/[[tokenb.token]]"> set allowance to
+                                [[tokenb.allowanceWarn]] </a>
+                        </template>
+                    </div>
+
                 </div>
             </div>
             </div>
@@ -210,7 +220,8 @@
                     },
                     sellTotal: {
                         type: Number,
-                        computed: '_multiply(sellAmount, sellPrice)'
+                        computed: '_multiply(sellAmount, sellPrice)',
+
                     },
                     tokensBalance: Number,
                     tokensAllowance: Number,
@@ -221,39 +232,43 @@
 
 
             static get observers() {
-                return ['computeToken(wallet,tokens,tokenb)'];
+                return ['computeToken(wallet,tokens,tokenb)', 'buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
             }
 
+            buyButtonState(buyTotal, tokenbBalance, tokenbAllowance) {
 
-            ready() {
-                super.ready();
-                console.log("operation market:" + this.market)
+                if (buyTotal && tokenbBalance && Number(tokenbBalance) && tokenbAllowance
+                    && Number(tokenbAllowance) && buyTotal <= tokenbBalance && buyTotal <= tokenbAllowance) {
+
+                    this.$.buyButton.disabled = false;
+                    this.$.buyButton.style.backgroundColor = 'var(--paper-green-500)';
+                } else {
+                    this.$.buyButton.disabled = true;
+                    this.$.buyButton.style.backgroundColor = 'var(--paper-grey-500)';
+
+                }
+
+            }
+
+            sellButtonState(sellAmount, tokensBalance, tokensAllowance) {
+
+                if (sellAmount && tokensBalance && Number(tokensBalance) && tokensAllowance
+                    && Number(tokensAllowance) && sellAmount <= tokensBalance && sellAmount <= tokensAllowance) {
+
+                    this.$.sellButton.disabled = false;
+                    this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
+                } else {
+                    this.$.sellButton.disabled = true;
+                    this.$.sellButton.style.backgroundColor = 'var(--paper-grey-500)';
+                }
+
             }
 
             _computeTokenS(market, appConfig) {
-
-
                 if (market && appConfig) {
                     const tokenPair = market.split('-');
                     const tokenx = tokenPair[0];
-                    const result = _.find(appConfig.tokens, {token: tokenx});
-
-                    if (!result) {
-                        console.log('Not Find Such Token' + tokenx);
-
-                        const detail = {
-                            text: 'No Find Such Token: ' + tokenx,
-                            category: 'warning',
-                            duration: 3000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail
-                        }));
-                        return
-                    }
-                    return result
+                    return _.find(appConfig.tokens, {token: tokenx});
                 }
             }
 
@@ -262,25 +277,7 @@
                 if (market && appConfig) {
                     const tokenPair = market.split('-');
                     const tokenx = tokenPair[1];
-                    const result = _.find(appConfig.tokens, {token: tokenx});
-
-                    if (!result) {
-                        console.log('Not Find Such Token' + tokenx);
-                        const detail = {
-                            text: 'No Find Such Token: ' + tokenx,
-                            category: 'warning',
-                            duration: 3000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail
-                        }));
-
-                        return
-                    }
-
-                    return result;
+                    return _.find(appConfig.tokens, {token: tokenx});
                 }
             }
 
@@ -423,10 +420,13 @@
 
                 if (wallet && tokens) {
                     const address = wallet.address;
-                    const tokensAddress = tokens.address;
+
+                    const tokensAddress = '0xEF68e7C694F40c8202821eDF525dE3782458639f';
+//                    const tokensAddress = tokens.address;
                     const tokenbAddress = tokenb.address;
                     const spender = '0x6CaCE0528324A8afC2b157CebA3cDd2a27c4E21f';
                     const relay = new Relay('http://127.0.0.1:8545');
+
                     const tokensBalance = await relay.getTokenBalance(tokensAddress, address);
 
                     const tokensAllowance = await relay.getTokenAllowance(tokensAddress, address, spender);
@@ -435,7 +435,6 @@
 
                     const tokenbAllowance = await relay.getTokenAllowance(tokenbAddress, address, spender);
 
-                    console.log("tokensBalance" + tokensBalance.toString(10));
 
                     this.tokensAllowance = tokensAllowance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
 
@@ -448,60 +447,20 @@
                 }
             };
 
-            orderNotification(tokenBalance, tokenAllowance, token) {
-
-
-                console.log(JSON.stringify(token));
-                let notification = '';
-
-                if (tokenBalance) {
-                    notification = notification + ' Your balance is ' + tokenBalance + '<br>'
-                }
-
-                if (tokenAllowance) {
-
-                    notification = notification + 'your allowance is ' + tokenAllowance + '; ';
-
-                    if (token && tokenAllowance < token.allowanceWarn) {
-
-                        notification = notification + ' we suggest you set your allowance bigger than ' + token.allowanceWarn;
-
-                    }
-
-                }
-
-                return notification;
-
-            }
-
-
-            notificationClaas(amount, tokenBalance, tokenAllowance, token) {
-
-
-                if (tokenAllowance && tokenBalance && amount && (amount > tokenBalance || amount > tokenAllowance)) {
-
-                    return 'error'
-                }
-
-                if (tokenAllowance && token && token.allowanceWarn > tokenAllowance) {
-
-                    return 'warning'
-
-                }
-
-                return 'common'
-
-            }
-
-            allowanceEnough(allowance, token) {
+            isAllowanceWarn(allowance, token) {
                 if (allowance && token) {
                     return allowance >= token.allowanceWarn;
                 }
-
                 return false;
             }
 
+            nonEnough(amount, balance, allowance) {
 
+                if (amount && balance && allowance) {
+                    return amount > balance || amount > allowance
+                }
+                return false;
+            }
         }
 
         window.customElements.define(OperationPanel.is, OperationPanel);
