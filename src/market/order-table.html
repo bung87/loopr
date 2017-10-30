@@ -51,7 +51,7 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
                 <template>
-                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
+                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
@@ -63,14 +63,21 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
                 <template>
-                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
+                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Status</template>
                 <template>
-                    <div class="horizontal end-justified layout">
+                    <div id="progress[[index]]" class="horizontal end-justified layout">
                         <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.processed]]" max="[[item.amountB]]"></paper-progress>
+                        <paper-tooltip for="progress[[index]]" position="left">
+                            <div>
+                                <div>Original: [[item.amountS]]</div>
+                                <div>Filled: [[item.totalDealedAmountS]]</div>
+                                <div>Cancelled: [[item.totalCancelledAmountS]]</div>
+                            </div>
+                        </paper-tooltip>
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -85,8 +92,8 @@
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
     </template>
     <script>
     class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -124,6 +131,20 @@
                 if(null != marketConfig){
                     order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
                     order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
+                    if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
+                        let tempS = order.orginalOrder.tokenS,
+                            tempB = order.orginalOrder.tokenB,
+                            tempAmountS = order.orginalOrder.amountB,
+                            tempAmountB = order.orginalOrder.amountS,
+                            tempDealedAmountS = order.totalDealedAmountS,
+                            tempDealedAmountB = order.totalDealedAmountB;
+                        order.orginalOrder.tokenS = tempB;
+                        order.orginalOrder.amountS = tempAmountB;
+                        order.totalDealedAmountS = tempDealedAmountB;
+                        order.orginalOrder.tokenB = tempS;
+                        order.totalDealedAmountB = tempDealedAmountS;
+                        order.orginalOrder.amountB = tempAmountS;
+                    }
                 } else {
                     this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
                 }
@@ -141,6 +162,8 @@
             order.amountS = this.numberFormat(order.orginalOrder.amountS);
             order.volumnPrecisionS = precisionS.volumnPrecision;
             order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB);
+            order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS);
+            order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS)
             order.processed = this.testBalance(order.amountB);
             return order;
         }
@@ -175,11 +198,11 @@
             return size / 1000000000000000000;
         }
 
-        getPrice(s, b) {
-            if (!s || !b) return 0;
-            const sell = this.numberFormat(s);
-            const buy = this.numberFormat(b);
-            return (sell / buy);
+        getPrice(b, s) {
+            if (b && s && s !== 0) {
+                return (b / s);
+            }
+            return 0;
         }
 
         go() {
