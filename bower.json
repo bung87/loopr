@@ -51,7 +51,8 @@
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "iron-label": "PolymerElements/iron-label#^2.0.0",
     "moment": "^2.19.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "paper-slider": "PolymerElements/paper-slider#^2.0.2"
   },
   "resolutions": {
     "polymer": "^2.0.0",

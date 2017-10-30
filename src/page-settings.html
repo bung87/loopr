@@ -38,6 +38,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         vaadin-combo-box {
             width: 260px;
         }
+
+        .lrcContainer {
+            width: 260px;
+        }
+
+        .lrcSlider {
+            width: 80%;
+        }
+
+        .lrcLable {
+            width: 20%;
+        }
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -48,6 +60,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
+            <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <looper-toolbar slot="secondary-toolbar" active-tab="settings">
             </looper-toolbar>
             <div class="sections">
@@ -65,6 +79,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="item horizontal center layout">
                                 <div class="label">Relay</div>
                                 <vaadin-combo-box id="relay" placeholder="Default Looper Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
+                            </div>
+                            <div class="item horizontal center layout">
+                                <div class="label">Lrc Fee</div>
+                                <div class="lrcContainer horizontal start-justified layout">
+                                    <div class="lrcSlider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
+                                    <div class="lrcLable"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -90,6 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.lang.value = this.settingsLang || "en";
             this.$.currency.value = this.settingsCurrency || "usd";
             this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
+            this.$.lrcFee.value = this.settingsLrcFee;
 
             var _this = this;
 
@@ -106,6 +128,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.relay.addEventListener('value-changed', function() {
                 _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
                 console.log(_this.settingsRelay);
+            });
+
+            this.$.lrcFee.addEventListener('value-changed', function() {
+                _this.settingsLrcFee = _this.$.lrcFee.value;
+                _this.$.feeLabel.textContent = _this.$.lrcFee.value + "‰";
+                console.log(_this.$.lrcFee.value)
             });
         }
     }
