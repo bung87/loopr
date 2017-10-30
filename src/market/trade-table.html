@@ -40,6 +40,24 @@
                     </div>
                 </template>
             </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenBlockNum]]" width="45px">
+                <template class="header">Block</template>
+                <template>
+                    <a class="decorations" href="https://etherscan.io/block/[[item.blockNum]]" target="_blank">
+                        <div class="long-hash">[[item.blockNum]]</div>
+                    </a>
+                </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenIndex]]" width="10px">
+                <template class="header">
+                    <div class="left-aligned">Index</div>
+                </template>
+                <template>
+                    <div class="left-aligned">
+                        [[item.ringIndex]]
+                    </div>
+                </template>
+            </vaadin-grid-column>
             <vaadin-grid-column hidden$="[[hiddenOrder]]" width="20px">
                 <template class="header">Order</template>
                 <template>
@@ -149,9 +167,12 @@
             if (this.displayMode) {
                 let displayMode = this.displayMode.toLowerCase();
                 this.hiddenPrice = true;
+                this.hiddenBlockNum = true;
+                this.hiddenIndex = true;
                 if ("ring" === displayMode) {
                     this.hiddenRing = true;
                     this.hiddenTime = true;
+                    this.hiddenIndex = false;
                 }
                 if ("order" === displayMode) {
                     this.hiddenOrder = true;
@@ -159,11 +180,9 @@
                 if ("market" === displayMode) {
                     this.hiddenPrice = false;
                 }
-                if ("history-ring" === displayMode) {
-                    this.hiddenOrder = true;
-                }
                 if ("history-trades" === displayMode) {
                     //this.hiddenRing = true;
+                    this.hiddenBlockNum = false;
                 }
             }
         }

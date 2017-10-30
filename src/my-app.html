@@ -71,6 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/global-variable.html">
 <link rel="import" href="utils/notification-panel.html">
 <link rel="import" href="utils/market-selector.html">
+<link rel="import" href="utils/address-text-field.html">
 <link rel="import" href="looper-page/looper-toolbar.html">
 <link rel="import" href="looper-page/looper-footer.html">
 <link rel="import" href="looper-page/simple-toolbar.html">
@@ -85,7 +86,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="page-history.html">
 <link rel="lazy-import" href="page-wallet.html">
 <link rel="lazy-import" href="page-transfer">
-<link rel="lazy-import" href="page-authorize">
+<link rel="lazy-import" href="page-approve">
 <link rel="lazy-import" href="page-convert">
 <link rel="lazy-import" href="page-settings">
 <link rel="lazy-import" href="page-doc.html">
@@ -214,8 +215,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
+        <iron-ajax auto url="/src/datas/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
+        <iron-ajax auto id="priceQuoteAjax" url="/src/datas/price-quote.json" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
@@ -262,8 +263,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage={{pageId}}></page-history>
-                    <page-convert name="convert" id={{pageId}}></page-convert>
-                    <page-authorize name="authorize" token={{pageId}}></page-authorize>
+                    <page-convert name="convert" fromToken={{pageId}}></page-convert>
+                    <page-approve name="approve" token={{pageId}}></page-approve>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
                     <page-settings name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
@@ -276,6 +277,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
+    const Validator = require('validator');
     class MyApp extends Polymer.Element {
         static get is() { return 'my-app'; }
 

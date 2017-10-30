@@ -38,4 +38,5 @@ const AppConfigMixin = (superclass) => class extends superclass {
             .dividedBy(new BigNumber(10).toPower(tokenConfig.digits))
             .toNumber();
     };
+
 }

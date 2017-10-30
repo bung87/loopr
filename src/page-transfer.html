@@ -19,29 +19,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .container {
             @apply(--layout-horizontal);
             @apply(--layout-center-justified);
-            margin: 50px;
         }
 
-        .flexleft {
+        .left {
             @apply(--layout-vertical);
-            width: 400px;
         }
 
-        .flexright {
+        .split {
+            width: 10%;
+        }
+
+        .right {
             @apply(--layout-vertical);
-            @apply(--layout-flex);
-            width: 100px;
-            padding-left: 40px;
-            margin-left: 100px;
-        }
-
-        .flexright>.hr {
-            width: 350px;
-        }
-
-        .fontContent {
-            font-family: Georgia, serif;
-            font-size: 0.875em;
         }
 
         iron-list {
@@ -52,36 +41,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: none;
         }
 
-        iron-input>input {
-            width: 350px;
-            height: 34px;
-            padding-bottom: 0px;
-        }
-
-        iron-input>.amount {
-            width: 150px;
-            height: 34px;
-            padding-bottom: 0px;
-        }
-
         .line {
             @apply(--layout-horizontal);
             @apply(--layout-start-justified);
-            margin-top: 10px;
         }
 
-        .line div{
-            height:36px;
-        }
-
-        .lineHoriziontal {
-            @apply(--layout-horizontal);
-            @apply(--layout-center-justified);
+        .title {
             margin-top: 20px;
         }
-        .input{
-            margin-bottom: var(--valo-space-xs);
+
+        .button {
+            margin-top: 30px;
         }
+
+        .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field {
+            width: 100%;
+            height: 34px;
+        }
+
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -92,53 +69,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="sections">
                 <paper-card>
                     <div class="container">
-                        <div class="flexleft">
-                            <div class="line">
-                                Send To:
-                            </div>
-                            <div class="horizontal layout start-justified">
-                                <iron-input>
-                                    <input>
-                                </iron-input>
+                        <div class="left">
+                            <div class="line title">
+                                Token:
                             </div>
                             <div class="line">
-                                Amount to Send:
-                            </div>
-                            <div class="horizontal layout start-justified">
-                                <div class="vertical layout end-justified input">
-                                    <iron-input>
-                                        <input class="amount">
-                                    </iron-input>
-                                </div>
                                 <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
                             </div>
+                            <div class="line title">
+                                Send To:
+                            </div>
                             <div class="line">
+                                <address-text-field value="{{address}}" error-message="invalid ETH address"></address-text-field>
+                            </div>
+                            <div class="line title">
+                                Amount to Send:
+                            </div>
+                            <div class="line">
+                                <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                    <div slot="suffix">[[selectedTokenBalance.unit]]</div>
+                                </vaadin-text-field>
+                            </div>
+                            <div class="line title">
                                 Gas Limit:
                             </div>
-                            <div class="horizontal layout start-justified">
-                                <iron-input>
-                                    <input>
-                                </iron-input>
-                            </div>
                             <div class="line">
-                                <a href="#" on-click="handleClick">+Advanced: Add Data</a>
+                                <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                </vaadin-text-field>
+                            </div>
+                            <div class="line title">
+                                <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
                             </div>
                             <div class="hidden" id="hiddenExtData">
-                                <div class="line">
+                                <div class="line title">
                                     Data:
                                 </div>
-                                <div class="horizontal layout start-justified">
-                                    <iron-input>
-                                        <input>
-                                    </iron-input>
+                                <div class="line">
+                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
+                                    </vaadin-text-field>
                                 </div>
                             </div>
-                            <div class="lineHoriziontal">
-                                <paper-button primary raised on-click="signToSend">Generate Transaction</paper-button>
+                            <div class="line button">
+                                <paper-button primary on-click="signToSend" id="send">Generate Transaction</paper-button>
                             </div>
                         </div>
-                        <div class="flexright">
-                            <paper-item class="flex">
+                        <div class="split"></div>
+                        <div class="right">
+                            <paper-item>
                                 <paper-item-body two-line>
                                     <div class="title"> Account Address</div>
                                     <div secondary>
@@ -146,9 +123,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     </div>
                                 </paper-item-body>
                             </paper-item>
-                            <paper-item class="flex">
+                            <paper-item>
                                 <paper-item-body two-line>
-                                    <div class="title"> [[_toUpper(token)]] Balance</div>
+                                    <div class="title"> Balance</div>
                                     <div secondary>
                                         <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}" auto></iron-ajax>
                                         [[_showTokenBalance(selectedTokenBalance)]]
@@ -188,6 +165,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_selectedToken(appConfig, balances, token)'
                 },
+                gasLimit: {
+                    type: Number,
+                    value: 1000
+                },
+                valid: {
+                    type: Boolean,
+                    computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
+                }
             }
         }
 
@@ -201,9 +186,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _computeBalances(data){
-            if(data){
-                return _.keyBy(data.result.tokens, o => o.token);
+        _computeBalances(rawBalances){
+            if(rawBalances){
+                return _.keyBy(rawBalances.result.tokens, o => o.token);
             }
         }
 
@@ -231,7 +216,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                unit: tokenConfig.unit,
                balance: balance,
                availableAllowance: allowance,
-               defaultAllowance: tokenConfig.allowanceWarn
+               defaultAllowance: tokenConfig.allowanceWarn,
+               precision: tokenConfig.precision
             }
         }
 
@@ -260,7 +246,76 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 extData.style.display = 'none';
             } else {
                 extData.style.display = 'block';
+                this.$.additionalData.value = "";
             }
+        }
+
+        _showOrHidden(address, amount, gasLimit, additionalData) {
+            let validator = new Validator();
+            if(!address || !amount || !gasLimit){
+                this._buttonDisable();
+                return false;
+            }
+            if(!validator.isValidETHAddress(address)){
+                this._buttonDisable();
+                return false;
+            }
+            console.log(address+" "+amount+" "+gasLimit)
+            if(this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)){
+                if(additionalData){
+                    if(this._isNum(additionalData)){
+                        this._buttonAvailable();
+                    } else {
+                        this._buttonDisable();
+                    }
+                } else {
+                    this._buttonAvailable();
+                }
+            } else {
+                this._buttonDisable();
+            }
+        }
+
+        _buttonAvailable(){
+            this.$.send.disabled = false;
+            this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+        }
+
+        _buttonDisable(){
+            this.$.send.disabled = true;
+            this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+        }
+
+        _numPatten(precision) {
+            return "^[0-9]+(.[0-9]{1,"+precision+"})?$";
+        }
+
+        _isNum(num, precision) {
+            return num.toString().match(this._numPatten(precision));
+        }
+
+        _numError(num, precision) {
+            return "input number value with max "+precision+" precision"
+        }
+
+        _integerPatten(){
+            return "^[0-9]*$";
+        }
+
+        _isInteger(intVal){
+            return intVal.toString().match(this._integerPatten())
+        }
+
+        _integerError(int) {
+            return "input valid integer value"
+        }
+
+        _addressPatten() {
+            return new Validator().isValidETHAddress(address);
+        }
+
+        _addressError(address){
+            return "please input valid address"
         }
 
         signToSend() {
