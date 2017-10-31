@@ -1,0 +1,233 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+<dom-module id="wallet-assets" fit>
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+         :host {
+            display: block;
+        }
+
+        .warning {
+            color: var(--paper-amber-700);
+        }
+
+        .allowance {
+            @apply --layout-horizontal;
+            @apply --center-justified-horizontal;
+        }
+
+        .operations {
+            @apply --layout-horizontal;
+        }
+
+        .operations a {
+            text-align: center;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .sections {
+            padding-top: 0;
+        }
+
+        .summary {
+            font-size: 1em;
+            font-weight: 500;
+            text-transform: uppercase;
+            height: 28px;
+            padding-top: 8px;
+        }
+
+        .summary>div {
+            color: white;
+            background-color: var(--paper-grey-700);
+            padding: 2px 16px;
+            border-radius: 12px;
+            /*line-height: 20px;*/
+        }
+
+        .long-name {
+            color: var(--app-text-color-light);
+            padding-left: 4px;
+        }
+        </style>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
+        <!-- ------ -->
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
+        <!-- ------ -->
+        <div class="sections">
+            <paper-card transparent>
+                <div class="summary horizontal end center-justified layout">
+                    <!-- <div>Wallet Total Value:</div> -->
+                    <div>[[totalValue]] [[priceQuote.fiat]]</div>
+                </div>
+            </paper-card>
+            <paper-card transparent>Ether</paper-card>
+            <paper-card tablewrapper>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+                <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
+                    <vaadin-grid-column width="30px">
+                        <template class="header">Symbol</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="50px">
+                        <template class="header">Name</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.name]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">Balance</template>
+                        <template>
+                            <pretty-number v=[[item.balanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="80px">
+                        <template class="header">Allowance</template>
+                        <template>
+                            <div class="allowance">
+                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                                <template is="dom-if" if="[[item.allowanceWarning]]">
+                                    <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
+                                    <paper-tooltip for="warn-[[item.token]]" position="left">
+                                        Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
+                                    </paper-tooltip>
+                                </template>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="100px">
+                        <template class="header"></template>
+                        <template>
+                            <div class="operations">
+                                <a href="#/transfer/[[item.token]]">Transfer</a>
+                                <a href="#/convert">Convert</a>
+                                <template is="dom-if" if="[[_isWETH(item.token)]]">
+                                    <a href="#/approve/[[item.token]]">Approve</a>
+                                </template>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                </vaadin-grid>
+            </paper-card>
+            <paper-card transparent>ERC20 Tokens</paper-card>
+            <paper-card tablewrapper>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+                <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
+                    <vaadin-grid-column width="30px">
+                        <template class="header">Symbol</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.token]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="50px">
+                        <template class="header">Name</template>
+                        <template>
+                            <div class="horiziontal layout">[[item.name]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column>
+                        <template class="header">Balance</template>
+                        <template>
+                            <pretty-number v=[[item.balanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="80px">
+                        <template class="header">Allowance</template>
+                        <template>
+                            <div class="allowance">
+                                <pretty-number v=[[item.allowanceValue]] d=[[item.precision]] postfix="[[item.unit]]"></pretty-number>
+                                <template is="dom-if" if="[[item.allowanceWarning]]">
+                                    <iron-icon id="warn-[[item.token]]" class="warning" icon="warning"></iron-icon>
+                                    <paper-tooltip for="warn-[[item.token]]" position="left">
+                                        Your [[item.token]] allowance for Loopring protocol is lower than our suggested threshold.
+                                    </paper-tooltip>
+                                </template>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="100px">
+                        <template class="header"></template>
+                        <template>
+                            <div class="operations">
+                                <a href="#/transfer/[[item.token]]">Transfer</a>
+                                <a href="#/market/[[item.token]]-WETH">Trade</a>
+                                <a href="#/approve/[[item.token]]">Authorize</a>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                </vaadin-grid>
+            </paper-card>
+        </div>
+    </template>
+    <script>
+    class WalletAssets extends AppConfigMixin(Polymer.Element) {
+        static get is() { return 'wallet-assets'; }
+
+        static get properties() {
+            return {
+                priceQuote: Object,
+                resp: Object,
+                totalValue: Number,
+                etherTokens: Array,
+                erc20Tokens: {
+                    type: Array,
+                    computed: '_computeBalances(resp)'
+                },
+                relay: {
+                    type: String,
+                    computed: '_selectedRelay(settingsRelay)'
+                }
+            };
+        }
+
+        _computeBalances(resp) {
+            if (resp) {
+                var totalValue = 0;
+                const items = _.map(resp.result.tokens, function(i) {
+                    var item = i;
+                    const tokenConfig = this.appConfig.tokenMap[i.token];
+                    if (!tokenConfig) { return null; }
+
+                    item.name = tokenConfig.name
+                    item.balanceValue = this.toNumber(i.balance, tokenConfig);
+                    item.allowanceValue = this.toNumber(i.allowance, tokenConfig);
+                    item.precision = tokenConfig.precision;
+                    item.unit = tokenConfig.unit;
+                    item.address = tokenConfig.address;
+                    item.allowanceWarning = (item.allowanceValue < tokenConfig.allowanceWarn);
+                    item.price = this.priceQuote.getPrice(item.token);
+                    item.total = item.price * item.balanceValue;
+                    totalValue += item.total;
+
+                    return item;
+                }.bind(this));
+
+                this.totalValue = totalValue;
+                this.etherTokens = _.filter(items, function(i) {
+                    return i !== null && (i.token === 'WETH' || i.token === 'ETH');
+                });
+
+                return _.filter(items, function(i) {
+                    return i !== null && i.token !== 'WETH' && i.token !== 'ETH';
+                });
+            }
+        }
+
+        _selectedRelay(settingsRelay) {
+            return settingsRelay;
+        }
+
+        _isWETH(token) { return token === 'WETH'; }
+
+        go() {
+            this.$.ajax.generateRequest();
+        }
+    }
+
+    window.customElements.define(WalletAssets.is, WalletAssets);
+    </script>
+</dom-module>

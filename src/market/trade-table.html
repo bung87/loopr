@@ -164,11 +164,11 @@
 
         ready() {
             super.ready();
+            this.hiddenPrice = true;
+            this.hiddenBlockNum = true;
+            this.hiddenIndex = true;
             if (this.displayMode) {
                 let displayMode = this.displayMode.toLowerCase();
-                this.hiddenPrice = true;
-                this.hiddenBlockNum = true;
-                this.hiddenIndex = true;
                 if ("ring" === displayMode) {
                     this.hiddenRing = true;
                     this.hiddenTime = true;

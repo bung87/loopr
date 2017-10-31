@@ -58,12 +58,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-lang" value="{{settingsLang}}"></scary-cookie>
             <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
             <scary-cookie name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
-            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
             <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
-            <looper-toolbar slot="secondary-toolbar" active-tab="settings">
-            </looper-toolbar>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <div class="sections">
                 <paper-card>
                     <div class="card-content vertical center layout">
@@ -102,7 +100,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         static get properties() {
-            return {};
+            return {
+
+            };
         }
 
 
