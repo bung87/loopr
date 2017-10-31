@@ -43,12 +43,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             width: 260px;
         }
 
-        .lrcSlider {
+        .slider {
             width: 80%;
         }
 
-        .lrcLable {
+        .lable {
             width: 20%;
+            font-size: 10px;
+            @apply(--layout-vertical);
+            @apply(--layout-center-justified);
         }
         </style>
         <looper-page>
@@ -62,6 +65,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <div class="sections">
                 <paper-card>
                     <div class="card-content vertical center layout">
@@ -81,8 +86,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="item horizontal center layout">
                                 <div class="label">Lrc Fee</div>
                                 <div class="lrcContainer horizontal start-justified layout">
-                                    <div class="lrcSlider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
-                                    <div class="lrcLable"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
+                                    <div class="slider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
+                                    <div class="lable"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
+                                </div>
+                            </div>
+                            <div class="item horizontal center layout">
+                                <div class="label">Gas Price</div>
+                                <div class="lrcContainer horizontal start-justified layout">
+                                    <div class="slider"><paper-slider id="gasPrice" pin min="1" max="60" max-markers="15" step="1" value="{{appConfig.defaultGasPrice}}"></paper-slider></paper-slider></div>
+                                    <div class="lable"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
                                 </div>
                             </div>
                         </div>
@@ -112,6 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.currency.value = this.settingsCurrency || "usd";
             this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
             this.$.lrcFee.value = this.settingsLrcFee;
+            this.$.gasPrice.value = this.settingsGasPrice;
 
             var _this = this;
 
@@ -134,6 +147,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _this.settingsLrcFee = _this.$.lrcFee.value;
                 _this.$.feeLabel.textContent = _this.$.lrcFee.value + "‰";
                 console.log(_this.$.lrcFee.value)
+            });
+
+            this.$.gasPrice.addEventListener('value-changed', function() {
+                _this.settingsGasPrice = _this.$.gasPrice.value;
+                _this.$.gasPriceLabel.textContent = _this.$.gasPrice.value + "GWEI";
+                console.log(_this.$.gasPrice.value)
             });
         }
     }

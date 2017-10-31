@@ -90,26 +90,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 color: #dbdbdb;
             }
 
-            .gasLimitSlider {
-                width: 80%;
-            }
-
-            paper-slider {
-                width: 100%;
-            }
-
-            .gasLimitLable {
-                width: 20%;
-            }
-
         </style>
         <looper-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-            <global-variable key="settings-gasLimit" value="{{settingsGasLimit}}"></global-variable>
-            <scary-cookie name="settings-gasLimit" value="{{settingsGasLimit}}"></scary-cookie>
+            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
             <div class="sections">
                 <paper-card>
@@ -136,8 +124,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line title">Gas Limit</div>
                             <div class="line">
-                                <div class="gasLimitSlider"><paper-slider id="gasLimit" pin min="1" max="60" max-markers="15" step="1" value="{{gasLimitShow}}"></paper-slider></div>
-                                <div class="gasLimitLable"><span id="gweiLabel" class="caption">{{gasLimitShow}} GWEI</span></div>
+                                <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                </vaadin-text-field>
                             </div>
                             <div class="line title">Contract Address to Authorize</div>
                             <div class="line">
@@ -240,9 +228,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: Boolean,
                         computed: '_showOrHidden(amount, gasLimit, additionalData)'
                     },
-                    gasLimitShow: {
+                    gasLimit: {
                         type: Number,
-                        computed: '_computeGasLimit(settingsGasLimit)'
+                        computed: '_computeGasLimit(appConfig)'
                     },
                     showAmountWarn: {
                         type: String,
@@ -256,9 +244,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 };
             }
 
-            _computeGasLimit(settingsGasLimit){
-                if(settingsGasLimit){
-                    return settingsGasLimit;
+            _computeGasLimit(appConfig){
+                if(appConfig){
+                    return appConfig.defaultGasLimit;
                 }
             }
 
@@ -323,9 +311,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     window.location.href = "#/approve/"+combobox.value;
                 });
                 this.$.gasLimit.addEventListener('value-changed', function() {
-                    _this.settingsLrcFee = _this.$.gasLimit.value;
-                    _this.settingsGasLimit = _this.$.gasLimit.value;
-                    _this.$.gweiLabel.textContent = _this.$.gasLimit.value + " GWEI";
+                    _this.gasLimit = _this.$.gasLimit.value;
+                    //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
             }
 
