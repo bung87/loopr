@@ -316,7 +316,7 @@
                     }
 
                     let data = {};
-                    data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
+                    data.protocol = this.appConfig.contractAddress;;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
@@ -379,7 +379,7 @@
                     }
 
                     let data = {};
-                    data.protocol = '0xbc887ce07cee5624715f6ff39e1dd6603633c777';
+                    data.protocol = this.appConfig.contractAddress;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
