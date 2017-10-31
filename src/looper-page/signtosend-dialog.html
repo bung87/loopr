@@ -150,7 +150,7 @@
                 async.forEach(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);
 
-                    var detail = { text: result, category: "info", duration: 8000, link: "https://etherscan.io/tx/" + result, linkText: "Link" };
+                    var detail = { text: result, category: "info", duration: 8000, link: "https://etherscan.io/tx/" + result, linkText: result };
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
