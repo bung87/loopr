@@ -59,12 +59,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 height: 34px;
             }
 
+            .gasLimitSlider {
+                width: 80%;
+            }
+
+            paper-slider {
+                width: 100%;
+            }
+
+            .gasLimitLable {
+                width: 20%;
+            }
         </style>
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <global-variable key="settings-gasLimit" value="{{settingsGasLimit}}"></global-variable>
+            <scary-cookie name="settings-gasLimit" value="{{settingsGasLimit}}"></scary-cookie>
             <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"></simple-toolbar>
             <div class="sections">
                 <paper-card>
@@ -99,9 +112,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 Gas Limit:
                             </div>
                             <div class="line">
-                                <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                   error-message="[[_integerError()]]">
-                                </vaadin-text-field>
+                                <div class="gasLimitSlider"><paper-slider id="gasLimit" pin min="1" max="60" max-markers="15" step="1" value="{{gasLimitShow}}"></paper-slider></div>
+                                <div class="gasLimitLable"><span id="gweiLabel" class="caption">{{gasLimitShow}} GWEI</span></div>
                             </div>
                             <div class="line title">
                                 <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
@@ -180,9 +192,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: Object,
                         computed: '_selectedToken(appConfig, balances, token)'
                     },
-                    gasLimit: {
+                    gasLimitShow: {
                         type: Number,
-                       computed: '_computeGasLimit(appConfig)'
+                        computed: '_computeGasLimit(settingsGasLimit)'
                     },
                     valid: {
                         type: Boolean,
@@ -191,9 +203,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computeGasLimit(appConfig){
-                if(appConfig){
-                    return appConfig.defaultGasLimit;
+            _computeGasLimit(settingsGasLimit){
+                if(settingsGasLimit){
+                    return settingsGasLimit;
                 }
             }
 
@@ -257,10 +269,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //            }
                 super.ready();
                 var combobox = this.$.tokensSelector
-                var context = this
+                var _this = this
                 combobox.addEventListener('value-changed', function () {
-                    //context.token = combobox.value;
+                    //context.token = _this.value;
                     window.location.href = "#/transfer/"+combobox.value;
+                });
+                this.$.gasLimit.addEventListener('value-changed', function() {
+                    _this.settingsLrcFee = _this.$.gasLimit.value;
+                    _this.settingsGasLimit = _this.$.gasLimit.value;
+                    _this.$.gweiLabel.textContent = _this.$.gasLimit.value + " GWEI";
                 });
             }
 

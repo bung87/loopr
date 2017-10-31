@@ -226,10 +226,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="settings-gasLimit" value="{{settingsGasLimit}}"></global-variable>
         <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
         <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
         <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
         <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <scary-cookie id="settingsGasLimit" name="settings-gasLimit" value="{{settingsGasLimit}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -309,6 +311,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Number,
                     computed: '_computedLrcFee(appConfig, cookieValues)'
                 },
+                settingsGasLimit: {
+                    type: Number,
+                    computed: '_computedGasLimit(appConfig, cookieValues)'
+                },
                 page: {
                     type: String,
                     reflectToAttribute: true,
@@ -357,6 +363,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if(this.$.settingsLrcFee.value){
                 cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
             }
+            if(this.$.settingsGasLimit.value){
+                cookieValue["settingsGasLimit"] = this.$.settingsGasLimit.value;
+            }
             this.cookieValues = cookieValue;
 
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
@@ -386,6 +395,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _computedLrcFee(appConfig, cookieValues){
             if(appConfig && cookieValues && !cookieValues["settingsLrcFee"]){
                 return appConfig.defaultLrcFeePermillage;
+            }
+        }
+
+        _computedGasLimit(appConfig, cookieValues){
+            if(appConfig && cookieValues && !cookieValues["settingsGasLimit"]){
+                return appConfig.defaultGasLimit;
             }
         }
 
