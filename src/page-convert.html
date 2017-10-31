@@ -30,7 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .inputContainer {
             @apply(--layout-vertical);
             @apply(--layout-center-justified);
-            width: 40%;
+            width: 35%;
             margin-top: 20px;
         }
 
@@ -41,6 +41,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         .title {
             margin-top: 20px;
+            font-weight: 500;
+            color:rgba(0, 0, 0, .54);
+            font-size: 14px;
         }
 
         .inputLine vaadin-text-field {
@@ -83,28 +86,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             @apply(--layout-horizontal);
             @apply(--layout-center-justified);
             margin-top: 50px;
-        }
-
-        paper-button {
-            font-family: 'Roboto', 'Noto', sans-serif;
-            font-weight: normal;
-            font-size: 14px;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .gasLimitSlider {
-            width: 80%;
-        }
-
-        paper-slider {
             width: 100%;
         }
 
-        .gasLimitLable {
-            width: 20%;
-            @apply(--layout-vertical);
-            @apply(--layout-center-justified);
+        paper-button {
+            margin-left: 0px;
+            margin-right: 0px;
+            margin-top: 50px;
+            width: 100%;
         }
+
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -150,10 +141,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
                                     </vaadin-text-field>
                                 </div>
+                                <div class="inputLine">
+                                        <paper-button primary raised on-click="signToSend" id="send">Generate Transaction</paper-button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="buttonLine">
-                            <paper-button primary raised on-click="signToSend" id="send">Generate Transaction</paper-button>
                         </div>
                     </div>
                 </paper-card>
