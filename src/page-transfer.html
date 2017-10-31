@@ -348,13 +348,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             async signToSend() {
 
                 const tx = {};
-                console
                 if(this.selectedTokenBalance.token === 'ETH'){
                     tx.gasPrice = '0x3b9aca00';
                     tx.gasLimit = '0x'+ this.gasLimit.toString(16);
                     tx.to = this.address;
                     tx.value = '0x' + Number(this.amount) *1e18.toString(16);
                     tx.data = this.additionalData || '0x';
+
                 }else {
                     tx.gasPrice = '0x3b9aca00';
                     tx.gasLimit = '0x'+ this.gasLimit.toString(16);
@@ -368,6 +368,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.data = method + params;
                     
                 }
+
+                console.log(tx);
 
                 var detail = { raws: [{"raw":JSON.stringify(tx), "subTitle":"transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));

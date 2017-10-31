@@ -124,7 +124,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line title">Gas Limit</div>
                             <div class="line">
-                                <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
+                                                   error-message="[[_integerError()]]">
                                 </vaadin-text-field>
                             </div>
                             <div class="line title">Contract Address to Authorize</div>
@@ -242,8 +243,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 };
             }
 
-            _computeGasLimit(appConfig){
-                if(appConfig){
+            _computeGasLimit(appConfig) {
+                if (appConfig) {
                     return appConfig.defaultGasLimit;
                 }
             }
@@ -306,9 +307,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var _this = this;
                 combobox.addEventListener('value-changed', function () {
                     //context.token = _this.value;
-                    window.location.href = "#/approve/"+combobox.value;
+                    window.location.href = "#/approve/" + combobox.value;
                 });
-                this.$.gasLimit.addEventListener('value-changed', function() {
+                this.$.gasLimit.addEventListener('value-changed', function () {
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
@@ -427,8 +428,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return;
                 }
 
-                const relay = new Relay(settingsRelay);
+                const relay = new Relay("http://127.0.0.1:8545");
                 const spender = this.appConfig.contractAddress;
+
                 const currentAllowance = await relay.getTokenAllowance(this.selectedTokenBalance.address, this.wallet.address, spender);
 
                 const tx = {};
@@ -437,7 +439,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tx.to = this.selectedTokenBalance.address;
                 tx.value = '0x0';
                 const method = '0x' + ethUtil.sha3('approve(address,uint)').toString('hex').slice(0, 8);
-                if (currentAllowance.toNumber === 0) {
+                if (currentAllowance.toNumber() === 0) {
                     const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
                         ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
                     tx.data = method + params;

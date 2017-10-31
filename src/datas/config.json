@@ -5,7 +5,7 @@
     "defaultLrcFeePermillage":2,
     "defaultGasPrice": 21,
     "defaultGasLimit":21000,
-    "contractAddress": "0x2956356cd2a2bf3202f771f513d14a367b48070",
+    "contractAddress": "0x5e99aA4bfE902aC32f7036d859175D0892368148",
     "tokens": [
         {
             "token": "ETH",
@@ -47,7 +47,7 @@
             "token": "ZRX",
             "name": "0x Token",
             "digits": 18,
-            "address": "rueoafdsafjdsafj",
+            "address": "0x9c7d730432b090e7db5b940b2d8eb65d26b5bb6d",
             "unit": "ZRX",
             "website": "https://0xproject.org",
             "allowance": 1000,
