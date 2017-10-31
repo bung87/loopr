@@ -32,25 +32,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <looper-page>
             <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
-            <div class="sections">
-                <paper-card transparent>
-                    <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-                        <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
-                        <paper-tab name="trades"><a styleless href="/#/wallet/trades">Trades</a></paper-tab>
-                        <paper-tab name="orders"><a styleless href="/#/wallet/orders">Orders</a></paper-tab>
-                    </paper-tabs>
-                </paper-card>
-                <paper-card>
-                    <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                        <subpage-default name="default"></subpage-default>
-                        <wallet-assets name="assets"></wallet-assets>
-                        <wallet-trades name="trades"></wallet-trades>
-                        <wallet-orders name="orders"></wallet-orders>
-                    </iron-pages>
-                </paper-card>
-                <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
-            </div>
+            <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
+                <subpage-default name="default"></subpage-default>
+                <subpage-ready name="ready" subpage="assets"></subpage-ready>
+            </iron-pages>
+            <div class="footer-spacer"></div>
+            <looper-footer></looper-footer>
         </looper-page>
     </template>
     <script>

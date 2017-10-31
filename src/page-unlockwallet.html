@@ -170,10 +170,13 @@
                 const pkyWallet = new privateKeyWallet();
                 pkyWallet.setPrivateKey(privateKey);
                 this.wallet = { address: pkyWallet.getAddress(), privateKey: '0x' + privateKey.toString('hex') };
+
+                const  detail = { text: 'Unclok Wallet Successfully!', category: 'info', duration: 2000 };
+
                 this.dispatchEvent(new CustomEvent('notification', {
                     bubbles: true,
                     composed: true,
-                    detail: "Unclok Wallet Successfully!"
+                    detail
                 }));
             } catch (e) {
                 this.decryptError = e.message;

@@ -50,7 +50,7 @@ function relay(host) {
             body: JSON.stringify(request)
         }).then(res => res.json()).then(res => {
             if (res.error) {
-                throw new Error(res.error);
+                throw new Error(res.error.message);
             }
             return res.result;
         });
@@ -81,7 +81,7 @@ function relay(host) {
             body: JSON.stringify(request)
         }).then(res => res.json()).then(res => {
             if (res.error) {
-                throw new Error(res.error);
+                throw new Error(res.error.message);
             }
             return new BigNumber(Number(validHex(res.result)));
         });
@@ -108,7 +108,7 @@ function relay(host) {
             body: JSON.stringify(request)
         }).then(res => res.json()).then(res => {
             if (res.error) {
-                throw new Error(res.error);
+                throw new Error(res.error.message);
             }
             return validHex(res.result);
         });
@@ -185,12 +185,12 @@ function relay(host) {
     this.getTokenBalance = async function (token, add, tag) {
 
         if (!validataor.isValidETHAddress(add)) {
-            throw new Error('invalid ETH address');
+            throw new Error('invalid ETH address' + add);
         }
 
         if (!validataor.isValidETHAddress(token)) {
 
-            throw new Error('invalid token contract Address');
+            throw new Error('invalid token contract Address ' + token);
         }
         const method = '0x' + ethUtil.sha3('balanceOf(address)').toString('hex').slice(0, 8);
         const value = ethUtil.setLengthLeft(ethUtil.toBuffer(add), 32).toString('hex');
@@ -333,6 +333,32 @@ function relay(host) {
         const tx = await this.generateTx(rawtx, privateKey);
 
         await  this.sendSignedTx(tx.signedTx)
+
+    };
+
+    this.submitLoopringOrder = async function (order) {
+
+
+        request.method = 'loopring_submitOrder';
+        request.params = order;
+        request.id = id();
+
+       return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            if(res.error){
+                throw  new Error(res.error.message)
+            }
+
+            return res.result;
+        });
+
+
+
 
     };
 

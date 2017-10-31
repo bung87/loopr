@@ -12,11 +12,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="wallet-orders">
     <template>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
+            .sections {
+                padding-top: 0;
+            }
         </style>
-        <order-table></order-table>
+        <div class="sections">
+            <paper-card>
+                <order-table></order-table>
+            </paper-card>
+        </div>
     </template>
     <script>
     class WalletOrders extends AppConfigMixin(Polymer.Element) {

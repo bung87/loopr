@@ -9,390 +9,455 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <dom-module id="page-approve">
-  <template>
-    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
-    <style include="shared-styles">
-      :host {
-        display: block;
-      }
-      .container {
-          @apply(--layout-horizontal);
-          @apply(--layout-center-justified);
-      }
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
 
-      .left {
-          @apply(--layout-vertical);
-      }
+            .container {
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+            }
 
-      .split {
-          width: 10%;
-      }
+            .left {
+                @apply(--layout-vertical);
+            }
 
-      .right {
-          @apply(--layout-vertical);
-      }
+            .split {
+                width: 10%;
+            }
 
-      .line {
-          @apply(--layout-horizontal);
-          @apply(--layout-start-justified);
-      }
+            .right {
+                @apply(--layout-vertical);
+            }
 
-      .amount {
-          @apply(--layout-vertical);
-          @apply(--layout-flex);
-      }
+            .line {
+                @apply(--layout-horizontal);
+                @apply(--layout-start-justified);
+            }
 
-      .warn {
-          font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", Ubuntu, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-          -webkit-font-smoothing: antialiased;
-          font-size: 13px;
-          line-height: 1.25;
-          color: hsla(214, 27%, 26%, 0.71);
-          margin-top: 0.7em;
-          transition: 0.4s max-height;
-          max-height: 5em;
-      }
+            .amount {
+                @apply(--layout-vertical);
+                @apply(--layout-flex);
+            }
 
-      .warningIcon {
-          color: var(--paper-amber-700);
-          height: 16px;
-      }
+            .warn {
+                font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", Ubuntu, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                -webkit-font-smoothing: antialiased;
+                font-size: 13px;
+                line-height: 1.25;
+                color: hsla(214, 27%, 26%, 0.71);
+                margin-top: 0.7em;
+                transition: 0.4s max-height;
+                max-height: 5em;
+            }
 
-      .showWarn {
-          #visibility:visible;
-          display: block;
-      }
+            .warningIcon {
+                color: var(--paper-amber-700);
+                height: 16px;
+            }
 
-      .hiddenWarn {
-          #visibility:hidden;
-          display: none;
-      }
+            .showWarn {
+                #visibility: visible;
+                display: block;
+            }
 
-      .title {
-          margin-top: 20px;
-      }
+            .hiddenWarn {
+                #visibility: hidden;
+                display: none;
+            }
 
-      .line vaadin-combo-box, vaadin-text-field, paper-button {
-          width: 100%;
-          height: 34px;
-      }
+            .title {
+                margin-top: 20px;
+            }
 
-      .button {
-          margin-top: 30px;
-      }
+            .line vaadin-combo-box, vaadin-text-field, paper-button {
+                width: 100%;
+                height: 34px;
+            }
 
-      .hidden {
-          display: none;
-      }
+            .button {
+                margin-top: 30px;
+            }
 
-      .gray {
-        color: #dbdbdb;
-      }
+            .hidden {
+                display: none;
+            }
 
-    </style>
-    <looper-page>
-      <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-      <global-variable key="wallet" value="{{wallet}}"></global-variable>
-      <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-      <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-      <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
-      <div class="sections">
-        <paper-card>
-            <div class="container">
-                <div class="left">
-                    <div class="line title">Token</div>
-                    <div class="line">
-                        <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" item-value-path="token"></vaadin-combo-box>
-                    </div>
-                    <div class="line title">Amount</div>
-                    <div class="line">
-                        <div class="amount">
-                            <vaadin-text-field value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
-                                <div slot="suffix">[[selectedTokenBalance.unit]]</div>
-                            </vaadin-text-field>
-                            <div class$="horizontal layout start-justified warn [[showAmountWarn]]"><iron-icon class$="warningIcon [[showAmountWarn]]" icon="warning"></iron-icon>[[amountWarnMessage]]</div>
+            .gray {
+                color: #dbdbdb;
+            }
+
+        </style>
+        <looper-page>
+            <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="wallet" value="{{wallet}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
+            <div class="sections">
+                <paper-card>
+                    <div class="container">
+                        <div class="left">
+                            <div class="line title">Token</div>
+                            <div class="line">
+                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
+                                                  item-value-path="token"></vaadin-combo-box>
+                            </div>
+                            <div class="line title">Amount</div>
+                            <div class="line">
+                                <div class="amount">
+                                    <vaadin-text-field value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]"
+                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                       error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                        <div slot="suffix">[[selectedTokenBalance.unit]]</div>
+                                    </vaadin-text-field>
+                                    <div class$="horizontal layout start-justified warn [[showAmountWarn]]">
+                                        <iron-icon class$="warningIcon [[showAmountWarn]]" icon="warning"></iron-icon>
+                                        [[amountWarnMessage]]
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="line title">Gas Limit</div>
+                            <div class="line">
+                                <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]"
+                                                   error-message="[[_integerError()]]">
+                                </vaadin-text-field>
+                            </div>
+                            <div class="line title">Contract Address to Authorize</div>
+                            <div class="line">
+                                <vaadin-text-field id="authorizeToAddress" readonly>
+                                </vaadin-text-field>
+                            </div>
+                            <div class="line title">
+                                <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
+                            </div>
+                            <div class="hidden" id="hiddenExtData">
+                                <div class="line title">
+                                    Data:
+                                </div>
+                                <div class="line">
+                                    <vaadin-text-field id="additionalData" value="{{additionalData}}"
+                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                       error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
+                                    </vaadin-text-field>
+                                </div>
+                            </div>
+                            <div class="line button">
+                                <paper-button primary on-click="_signToSend" id="send">Generate Transaction
+                                </paper-button>
+                            </div>
+                        </div>
+                        <div class="split"></div>
+                        <div class="right">
+                            <div class="vertical layout start-justified">
+                                <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
+                                           handle-as="json" last-response="{{data}}"
+                                           debounce-duration="300"></iron-ajax>
+                                <paper-item class="flex">
+                                    <paper-item-body two-line>
+                                        <div class="title"> Address</div>
+                                        <div secondary>
+                                            [[wallet.address]]
+                                        </div>
+                                    </paper-item-body>
+                                </paper-item>
+                                <paper-item class="flex">
+                                    <paper-item-body two-line>
+                                        <div class="title"> [[selectedTokenBalance.token]] Balance</div>
+                                        <div secondary>[[selectedTokenBalance.balance]]</div>
+                                    </paper-item-body>
+                                </paper-item>
+                                <paper-item class="flex">
+                                    <paper-item-body two-line>
+                                        <div class="title"> Available [[selectedTokenBalance.token]] Allowance</div>
+                                        <div secondary>[[selectedTokenBalance.availableAllowance]]</div>
+                                    </paper-item-body>
+                                </paper-item>
+                            </div>
                         </div>
                     </div>
-                    <div class="line title">Gas Limit</div>
-                    <div class="line">
-                        <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
-                        </vaadin-text-field>
-                    </div>
-                    <div class="line title">Contract Address to Authorize</div>
-                    <div class="line">
-                        <vaadin-text-field id="authorizeToAddress" readonly>
-                        </vaadin-text-field>
-                    </div>
-                    <div class="line title">
-                        <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
-                    </div>
-                    <div class="hidden" id="hiddenExtData">
-                        <div class="line title">
-                            Data:
-                        </div>
-                        <div class="line">
-                            <vaadin-text-field id="additionalData" value="{{additionalData}}" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
-                            </vaadin-text-field>
-                        </div>
-                    </div>
-                    <div class="line button">
-                      <paper-button primary on-click="_signToSend" id="send">Generate Transaction</paper-button>
-                    </div>
-                </div>
-                <div class="split"></div>
-                <div class="right">
-                  <div class="vertical layout start-justified">
-                    <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
-                    <paper-item class="flex">
-                      <paper-item-body two-line>
-                        <div class="title"> Address</div>
-                        <div secondary>
-                          [[wallet.address]]
-                        </div>
-                      </paper-item-body>
-                    </paper-item>
-                    <paper-item class="flex">
-                      <paper-item-body two-line>
-                        <div class="title"> [[selectedTokenBalance.token]] Balance</div>
-                        <div secondary>[[selectedTokenBalance.balance]]</div>
-                      </paper-item-body>
-                    </paper-item>
-                    <paper-item class="flex">
-                      <paper-item-body two-line>
-                        <div class="title"> Available [[selectedTokenBalance.token]] Allowance </div>
-                        <div secondary>[[selectedTokenBalance.availableAllowance]]</div>
-                      </paper-item-body>
-                    </paper-item>
-                  </div>
-                </div>
+                </paper-card>
+                <div class="footer-spacer"></div>
+                <looper-footer></looper-footer>
             </div>
-        </paper-card>
-        <div class="footer-spacer"></div>
-        <looper-footer></looper-footer>
-      </div>
-    </looper-page>
-  </template>
-  <script>
+        </looper-page>
+    </template>
+    <script>
 
-  class PageApprove extends Polymer.Element {
-    static get is() { return 'page-approve'; }
+        const ethUtil = require('ethereumjs-util');
 
-    /**
-    * token : parent input parameter, lrc...
-    * selectedToken: current selected token contract address
-    * amount: current input amount
-    */
-    static get properties() {
-      return {
-         token: {
-             type: String
-         },
-         selectedTokenBalance: {
-             type: Object,
-             computed: '_selectedToken(appConfig, balances, token)'
-         },
-         amount: {
-            type: Number
-         },
-         balances: {
-             type: Object,
-             computed: '_computeBalances(data)',
-         },
-         tokens: {
-             type: Object,
-             computed: '_computeTokens(appConfig)'
-         },
-         relay: {
-             type: String,
-             computed: '_selectedRelay(settingsRelay)'
-         },
-         valid: {
-             type: Boolean,
-             computed: '_showOrHidden(amount, gasLimit, additionalData)'
-         },
-         gasLimit: {
-             type: Number,
-             value: 1000
-         },
-         showAmountWarn: {
-             type: String,
-             value: "hidden"
-         },
-         amountWarnMessage: {
-             type: String,
-             value: "",
-             computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
-         }
-      };
-    }
+        class PageApprove extends Polymer.Element {
+            static get is() {
+                return 'page-approve';
+            }
 
-    _showAmountWarnMessage(amount, selectedTokenBalance) {
-        if(selectedTokenBalance){
-            if(this._isNum(amount)){
-                let num = Number(amount);
-                if(selectedTokenBalance.defaultAllowance > num){
-                    return this._showAmountWarn(selectedTokenBalance)
+            /**
+             * token : parent input parameter, lrc...
+             * selectedToken: current selected token contract address
+             * amount: current input amount
+             */
+            static get properties() {
+                return {
+                    token: {
+                        type: String
+                    },
+                    selectedTokenBalance: {
+                        type: Object,
+                        computed: '_selectedToken(appConfig, balances, token)'
+                    },
+                    amount: {
+                        type: Number
+                    },
+                    balances: {
+                        type: Object,
+                        computed: '_computeBalances(data)',
+                    },
+                    tokens: {
+                        type: Object,
+                        computed: '_computeTokens(appConfig)'
+                    },
+                    relay: {
+                        type: String,
+                        computed: '_selectedRelay(settingsRelay)'
+                    },
+                    valid: {
+                        type: Boolean,
+                        computed: '_showOrHidden(amount, gasLimit, additionalData)'
+                    },
+                    gasLimit: {
+                        type: Number,
+                        value: 1000
+                    },
+                    showAmountWarn: {
+                        type: String,
+                        value: "hidden"
+                    },
+                    amountWarnMessage: {
+                        type: String,
+                        value: "",
+                        computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
+                    }
+                };
+            }
+
+            _showAmountWarnMessage(amount, selectedTokenBalance) {
+                if (selectedTokenBalance) {
+                    if (this._isNum(amount)) {
+                        let num = Number(amount);
+                        if (selectedTokenBalance.defaultAllowance > num) {
+                            return this._showAmountWarn(selectedTokenBalance)
+                        } else {
+                            return this._hiddenAmountWarn();
+                        }
+                    } else {
+                        return this._hiddenAmountWarn();
+                    }
                 } else {
                     return this._hiddenAmountWarn();
                 }
-            } else {
-                return this._hiddenAmountWarn();
             }
-        } else {
-            return this._hiddenAmountWarn();
-        }
-    }
 
-    _showAmountWarn(selectedTokenBalance){
-        this.showAmountWarn = "showWarn";
-        return "we suggest you to set above "+selectedTokenBalance.defaultAllowance;
-    }
+            _showAmountWarn(selectedTokenBalance) {
+                this.showAmountWarn = "showWarn";
+                return "we suggest you to set above " + selectedTokenBalance.defaultAllowance;
+            }
 
-    _hiddenAmountWarn(){
-        this.showAmountWarn = "hiddenWarn";
-        return "";
-    }
+            _hiddenAmountWarn() {
+                this.showAmountWarn = "hiddenWarn";
+                return "";
+            }
 
-    _selectedRelay(settingsRelay){
-        return settingsRelay;
-    }
+            _selectedRelay(settingsRelay) {
+                return settingsRelay;
+            }
 
-    _computeTokens(appConfig){
-        if(appConfig){
-            return appConfig.tokens;
-        }
-    }
+            _computeTokens(appConfig) {
+                if (appConfig) {
+                    return appConfig.tokens;
+                }
+            }
 
-    _computeBalances(data){
-        if(data){
-            return _.keyBy(data.result.tokens, o => o.token);
-        }
-    }
+            _computeBalances(data) {
+                if (data) {
+                    return _.keyBy(data.result.tokens, o => o.token);
+                }
+            }
 
-    _selectedToken(appConfig, balances, token){
-        if(appConfig && balances && token){
-            this.$.authorizeToAddress.value = appConfig.contractAddress;
-            var combobox = this.$.tokensSelector;
-            combobox.value = token.toUpperCase();
-            return this._getTokenBalance(appConfig, balances, token);
-        }
-    }
+            _selectedToken(appConfig, balances, token) {
+                if (appConfig && balances && token) {
+                    this.$.authorizeToAddress.value = appConfig.contractAddress;
+                    var combobox = this.$.tokensSelector;
+                    combobox.value = token.toUpperCase();
+                    return this._getTokenBalance(appConfig, balances, token);
+                }
+            }
 
-    ready() {
-      super.ready();
-      var combobox = this.$.tokensSelector;
-      var context = this;
-      combobox.addEventListener('value-changed', function() {
-          context.token = combobox.value;
-      });
-    }
+            ready() {
+                super.ready();
+                var combobox = this.$.tokensSelector;
+                var context = this;
+                combobox.addEventListener('value-changed', function () {
+                    context.token = combobox.value;
+                });
+            }
 
-    _getTokenBalance(appConfig, balances, selectedToken){
-        let selected = balances[selectedToken.toUpperCase()];
-        let balance = 0, allowance = 0
-        if(selected) {
-            balance = selected.balance;
-            allowance = selected.allowance
-        }
-        let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
-        if (!tokenConfig) {
-            return;
-        }
-        return {
-           token: selectedToken,
-           unit: tokenConfig.unit,
-           balance: balance,
-           availableAllowance: allowance,
-           defaultAllowance: tokenConfig.allowanceWarn,
-           precision: tokenConfig.precision
-        }
-    }
+            _getTokenBalance(appConfig, balances, selectedToken) {
+                if (appConfig && balances && selectedToken) {
+                    let selected = balances[selectedToken.toUpperCase()];
+                    let balance = 0, allowance = 0;
+                    if (selected) {
+                        balance = selected.balance;
+                        allowance = selected.allowance
+                    }
+                    let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+                    if (!tokenConfig) {
+                        return;
+                    }
+                    return {
+                        token: selectedToken,
+                        unit: tokenConfig.unit,
+                        balance: balance,
+                        availableAllowance: allowance,
+                        defaultAllowance: tokenConfig.allowanceWarn,
+                        precision: tokenConfig.precision,
+                        digits: tokenConfig.digits,
+                        address: tokenConfig.address
+                    }
+                }
+            }
 
-    _showAllowance(selectedTokenBalance){
-        if(selectedTokenBalance) {
-            return selectedTokenBalance.availableAllowance +"/"+ selectedTokenBalance.defaultAllowance
-        }
-    }
+            _showAllowance(selectedTokenBalance) {
+                if (selectedTokenBalance) {
+                    return selectedTokenBalance.availableAllowance + "/" + selectedTokenBalance.defaultAllowance
+                }
+            }
 
-    handleClick() {
-        var extData = this.$.hiddenExtData;
-        if (extData.style.display == 'block') {
-            extData.style.display = 'none';
-        } else {
-            extData.style.display = 'block';
-            this.$.additionalData.value = "";
-        }
-    }
+            handleClick() {
+                var extData = this.$.hiddenExtData;
+                if (extData.style.display == 'block') {
+                    extData.style.display = 'none';
+                } else {
+                    extData.style.display = 'block';
+                    this.$.additionalData.value = "";
+                }
+            }
 
-    _showOrHidden(amount, gasLimit, additionalData) {
-        let validator = new Validator();
-        if(!amount || !gasLimit){
-            this._buttonDisable();
-            return false;
-        }
-        if(this._isNum(amount) && this._isNum(gasLimit)){
-            if(additionalData){
-                if(this._isNum(additionalData)){
-                    this._buttonAvailable();
-                    return true;
+            _showOrHidden(amount, gasLimit, additionalData) {
+                let validator = new Validator();
+                if (!amount || !gasLimit) {
+                    this._buttonDisable();
+                    return false;
+                }
+                if (this._isNum(amount) && this._isNum(gasLimit)) {
+                    if (additionalData) {
+                        if (this._isNum(additionalData)) {
+                            this._buttonAvailable();
+                            return true;
+                        } else {
+                            this._buttonDisable();
+                            return false;
+                        }
+                    } else {
+                        this._buttonAvailable();
+                        return true;
+                    }
                 } else {
                     this._buttonDisable();
                     return false;
                 }
-            } else {
-                this._buttonAvailable();
-                return true;
             }
-        } else {
-            this._buttonDisable();
-            return false;
+
+            _buttonAvailable() {
+                this.$.send.disabled = false;
+                this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+            }
+
+            _buttonDisable() {
+                this.$.send.disabled = true;
+                this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+            }
+
+            _numPatten(precision) {
+                return "^[0-9]+(.[0-9]{1," + precision + "})?$";
+            }
+
+            _isNum(num, precision) {
+                return num.toString().match(this._numPatten(precision));
+            }
+
+            _numError(num, precision) {
+                return "input number value with max " + precision + " precision"
+            }
+
+            _integerPatten() {
+                return "^[0-9]*$";
+            }
+
+            _isInteger(intVal) {
+                return intVal.toString().match(this._integerPatten())
+            }
+
+            _integerError(int) {
+                return "input valid integer value"
+            }
+
+            async _signToSend() {
+
+                let detail = {};
+                if (!this.amount || !this.selectedTokenBalance) {
+                    detail = {text: "input value and select token", category: "warning", duration: 8000}
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                    return;
+                }
+
+                const relay = new Relay('http://127.0.0.1:8545');
+                const spender = this.appConfig.contractAddress;
+                const currentAllowance = await relay.getTokenAllowance(this.selectedTokenBalance.address, this.wallet.address, spender);
+
+                const tx = {};
+                tx.gasPrice = '0x3b9aca00';
+                tx.gasLimit = '0x' + this.gasLimit.toString(16);
+                tx.to = this.selectedTokenBalance.address;
+                tx.value = '0x0';
+                const method = '0x' + ethUtil.sha3('approve(address,uint)').toString('hex').slice(0, 8);
+                if (currentAllowance.toNumber === 0) {
+                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
+                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
+                    tx.data = method + params;
+
+                    detail = {
+                        raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+                    };
+
+                } else {
+
+                    tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
+                        ethUtil.setLengthLeft(ethUtil.toBuffer(0), 32).toString('hex');
+
+                    const cancelRaw = JSON.stringify(tx);
+
+                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
+                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
+                    tx.data = method + params;
+                    detail = {
+                        raws: [{
+                            "raw": cancelRaw,
+                            "subTitle": "Cancel Older Authorization"
+                        }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+                    };
+                }
+
+                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+            }
         }
-    }
 
-    _buttonAvailable(){
-        this.$.send.disabled = false;
-        this.$.send.style.backgroundColor = 'var(--app-primary-color)';
-    }
-
-    _buttonDisable(){
-        this.$.send.disabled = true;
-        this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
-    }
-
-    _numPatten(precision) {
-        return "^[0-9]+(.[0-9]{1,"+precision+"})?$";
-    }
-
-    _isNum(num, precision) {
-        return num.toString().match(this._numPatten(precision));
-    }
-
-    _numError(num, precision) {
-        return "input number value with max "+precision+" precision"
-    }
-
-    _integerPatten(){
-        return "^[0-9]*$";
-    }
-
-    _isInteger(intVal){
-        return intVal.toString().match(this._integerPatten())
-    }
-
-    _integerError(int) {
-        return "input valid integer value"
-    }
-
-    _signToSend(){
-        if(!this.amount || !this.selectedTokenBalance){
-            var detail = { text: "input value and select token", category: "warning", duration: 8000 }
-            this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
-            return;
-        }
-        var detail = { raws: [{"raw":"cancle datas", "subTitle":"Cancel Older Authorization"}, {"raw":"authorize datas", "subTitle":"New Authorization"}] };
-        this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
-    }
-  }
-  window.customElements.define(PageApprove.is, PageApprove);
-  </script>
+        window.customElements.define(PageApprove.is, PageApprove);
+    </script>
 </dom-module>

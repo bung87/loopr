@@ -7,40 +7,40 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+         :host {
+            display: block;
+        }
 
-            paper-tabs {
-                height: 32px;
-                text-transform: none;
-            }
+        .sections {
+            padding-top: 0;
+        }
 
-            @media(min-width:1024px) {
-                .sections {
-                    padding-top: 32px;
-                }
+        @media(min-width:1024px) {
+            .sections {
+                padding-top: 32px;
             }
+        }
+
+        paper-tabs {
+            height: 32px;
+            text-transform: none;
+        }
         </style>
 
         <div class="sections">
             <paper-card transparent>
-                <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+                <paper-tabs selected="{{subpage}}" attr-for-selected="name">
                     <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
                     <paper-tab name="trades"><a styleless href="/#/wallet/trades">Trades</a></paper-tab>
                     <paper-tab name="orders"><a styleless href="/#/wallet/orders">Orders</a></paper-tab>
                 </paper-tabs>
             </paper-card>
-            <paper-card>
-                <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                    <wallet-assets name="assets"></wallet-assets>
-                    <wallet-trades name="trades"></wallet-trades>
-                    <wallet-orders name="orders"></wallet-orders>
-                </iron-pages>
-            </paper-card>
-            <div class="footer-spacer"></div>
+            <iron-pages id="pages" selected="{{subpage}}" attr-for-selected="name">
+                <wallet-assets name="assets"></wallet-assets>
+                <wallet-trades name="trades"></wallet-trades>
+                <wallet-orders name="orders"></wallet-orders>
+            </iron-pages>
         </div>
-
     </template>
     <script>
     class SubpageReady extends AppConfigMixin(Polymer.Element) {
@@ -50,21 +50,16 @@
             return {
                 subpage: {
                     type: String,
-                    reflectToAttribute: true,
-                    // value: "trades"
-                },
-                selectedTab: {
-                    type: String,
-                    computed: '_computeSelected(subpage)'
-                },
-                selectedPage: {
-                    type: Object,
-                    observer: 'go'
+                    reflectToAttribute: true
                 }
             };
         }
 
-        _computeSelected(subpage) {
+        ready(){
+            super.ready();
+        }
+
+        _computeSelected(subpage) {console.log(subpage)
             if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
                 return subpage;
             } else {
@@ -74,7 +69,7 @@
         }
 
         go() {
-            const page = this.$.pages.selectedItem;
+            const page = this.$.pages.selectedItem;console.log(page)
             if (page && page.go) page.go();
         }
     }

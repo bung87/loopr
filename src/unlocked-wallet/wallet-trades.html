@@ -13,16 +13,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
+            .sections {
+                padding-top: 0;
+            }
         </style>
-        </style>
-        <div class="horizontal end layout">
-            <div class="flex"></div>
-            <!-- <market-selector></market-selector> -->
+        <div class="sections">
+            <paper-card>
+                <trade-table id="trades" display-mode="history-trades" market="[[id]]"></trade-table-market>
+            </paper-card>
         </div>
-        <trade-table id="trades" display-mode="history-trades" market="[[id]]"></trade-table-market>
     </template>
     <script>
     class WalletTrades extends AppConfigMixin(Polymer.Element) {

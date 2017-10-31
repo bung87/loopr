@@ -108,7 +108,7 @@
                                 <a href="#/transfer/[[item.token]]">Transfer</a>
                                 <a href="#/convert">Convert</a>
                                 <template is="dom-if" if="[[_isWETH(item.token)]]">
-                                    <a href="#/authorize/[[item.token]]">Approve</a>
+                                    <a href="#/approve/[[item.token]]">Approve</a>
                                 </template>
                             </div>
                         </template>
@@ -155,7 +155,7 @@
                             <div class="operations">
                                 <a href="#/transfer/[[item.token]]">Transfer</a>
                                 <a href="#/market/[[item.token]]-WETH">Trade</a>
-                                <a href="#/authorize/[[item.token]]">Authorize</a>
+                                <a href="#/approve/[[item.token]]">Authorize</a>
                             </div>
                         </template>
                     </vaadin-grid-column>
