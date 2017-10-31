@@ -10,6 +10,7 @@ const _ = require('lodash');
 
 function relay(host) {
 
+
     const txSchema = Joi.object().keys({
         nonce: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
         gasPrice: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
@@ -164,8 +165,6 @@ function relay(host) {
         request.id = id();
         request.method = "eth_sendRawTransaction";
         request.params = [tx];
-
-        console.log(JSON.stringify(request));
 
         return await fetch(host, {
             method: 'POST',
@@ -357,6 +356,12 @@ function relay(host) {
             return res.result;
         });
 
+
+
+
+    };
+
+    this.cancelLoopringOrder = async function () {
 
 
 
