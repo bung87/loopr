@@ -130,7 +130,7 @@
             "label": "Backup Looper Relay"
         },
         {
-            "value": "//127.0.0.1:8081",
+            "value": "http://127.0.0.1:8545",
             "label": "Local Relay"
         }],
     "markets": [
