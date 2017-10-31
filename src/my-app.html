@@ -279,6 +279,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
     const Validator = require('validator');
+    const ethUtil = require('ethereumjs-util');
+    const Relay = require('relay');
+
     class MyApp extends Polymer.Element {
         static get is() { return 'my-app'; }
 
