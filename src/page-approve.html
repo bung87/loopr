@@ -71,6 +71,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             .title {
                 margin-top: 20px;
+                font-weight: 500;
+                color:rgba(0, 0, 0, .54);
+                font-size: 14px;
             }
 
             .line vaadin-combo-box, vaadin-text-field, paper-button {
@@ -79,7 +82,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             .button {
+                width: 100%;
                 margin-top: 30px;
+            }
+
+            paper-button {
+                margin-left: 0px;
+                margin-right: 0px;
             }
 
             .hidden {
@@ -127,11 +136,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
                                 </vaadin-text-field>
                             </div>
-                            <div class="line title">Contract Address to Authorize</div>
-                            <div class="line">
-                                <vaadin-text-field id="authorizeToAddress" readonly>
-                                </vaadin-text-field>
-                            </div>
                             <div class="line title">
                                 <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
                             </div>
@@ -159,10 +163,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            debounce-duration="300"></iron-ajax>
                                 <paper-item class="flex">
                                     <paper-item-body two-line>
-                                        <div class="title"> Address</div>
+                                        <div class="title"> Token Address</div>
                                         <div secondary>
                                             [[wallet.address]]
                                         </div>
+                                    </paper-item-body>
+                                </paper-item>
+                                <paper-item class="flex">
+                                    <paper-item-body two-line>
+                                        <div class="title"> Contract Address to Authorize</div>
+                                        <div secondary>{{authorizeToAddress}}</div>
                                     </paper-item-body>
                                 </paper-item>
                                 <paper-item class="flex">
@@ -293,7 +303,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _selectedToken(appConfig, balances, token) {
                 if (appConfig && balances && token) {
-                    this.$.authorizeToAddress.value = appConfig.contractAddress;
+                    this.authorizeToAddress = appConfig.contractAddress;
                     var combobox = this.$.tokensSelector;
                     combobox.value = token.toUpperCase();
                     return this._getTokenBalance(appConfig, balances, token);
