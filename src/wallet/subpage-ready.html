@@ -64,7 +64,7 @@
             super.ready();
         }
 
-        _computeSelected(subpage) {console.log(subpage)
+        _computeSelected(subpage) {
             if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
                 return subpage;
             } else {
@@ -74,7 +74,7 @@
         }
 
         go() {
-            const page = this.$.pages.selectedItem;console.log(page)
+            const page = this.$.pages.selectedItem;
             if (page && page.go) page.go();
         }
     }
