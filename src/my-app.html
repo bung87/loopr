@@ -222,8 +222,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
+        <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
+        <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
+        <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
+        <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
+        <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -260,7 +266,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
-                    <page-wallet id="walletPage" name="wallet"></page-wallet>
+                    <page-wallet id="walletPage" name="wallet" subpage={{pageId}}></page-wallet>
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage={{pageId}}></page-history>
@@ -284,6 +290,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                cookieValues: {
+                    type: Object
+                },
+                settingsLang: {
+                    type: String,
+                    computed: '_computedLang(appConfig, cookieValues)'
+                },
+                settingsCurrency: {
+                    type: String,
+                    computed: '_computedCurrency(appConfig, cookieValues)'
+                },
+                settingsRelay: {
+                    type: String,
+                    computed: '_computedRelay(appConfig, cookieValues)'
+                },
+                settingsLrcFee: {
+                    type: Number,
+                    computed: '_computedLrcFee(appConfig, cookieValues)'
+                },
                 page: {
                     type: String,
                     reflectToAttribute: true,
@@ -313,20 +338,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 selectedPage: {
                     type: Object,
                     observer: '_selectedPageChanged'
-                },
-                relay: {
-                    type: String,
-                    computed: '_selectedRelay(appConfigRaw)'
                 }
             };
         }
 
         ready() {
             super.ready();
+            let cookieValue = {};
+            if(this.$.settingsRelay.value){
+                cookieValue["settingsRelay"] = this.$.settingsRelay.value;
+            }
+            if(this.$.settingsCurrency.value){
+                cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
+            }
+            if(this.$.settingsLang.value){
+                cookieValue["settingsLang"] = this.$.settingsLang.value;
+            }
+            if(this.$.settingsLrcFee.value){
+                cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
+            }
+            this.cookieValues = cookieValue;
+
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
+        }
+
+        _computedLang(appConfig, cookieValues){
+            if(appConfig && cookieValues && !cookieValues["settingsLang"]){
+                return appConfig.langs[0].value;
+            }
+        }
+
+        _computedCurrency(appConfig, cookieValues){
+            if(appConfig && cookieValues && !cookieValues["settingsCurrency"]){
+                return appConfig.fiat[0].value;
+            }
+        }
+
+        _computedRelay(appConfig, cookieValues){
+            if(appConfig && cookieValues && !cookieValues["settingsRelay"]){
+                return appConfig.relays[0].value;
+            }
+        }
+
+        _computedLrcFee(appConfig, cookieValues){
+            if(appConfig && cookieValues && !cookieValues["settingsLrcFee"]){
+                return appConfig.defaultLrcFeePermillage;
+            }
         }
 
         _computeAppConfig(appConfigRaw) {
@@ -376,14 +436,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             } else {
                 this.$.walletPage.subpage = "default";
-            }
-        }
-
-        _selectedRelay(appConfigRaw) {
-            if (appConfigRaw) {
-                if (!this.settingsRelay) { //get value stored in cookie or set first relay in config
-                    this.settingsRelay = appConfigRaw.relays[0].value;
-                }
             }
         }
 
