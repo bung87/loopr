@@ -440,7 +440,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return;
                 }
 
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay(settingsRelay);
                 const spender = this.appConfig.contractAddress;
                 const currentAllowance = await relay.getTokenAllowance(this.selectedTokenBalance.address, this.wallet.address, spender);
 
