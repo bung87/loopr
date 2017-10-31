@@ -36,13 +36,11 @@
                     <paper-tab name="orders"><a styleless href="/#/wallet/orders">Orders</a></paper-tab>
                 </paper-tabs>
             </paper-card>
-            <paper-card>
-                <iron-pages id="pages" selected="{{subpage}}" attr-for-selected="name">
-                    <wallet-assets name="assets"></wallet-assets>
-                    <wallet-trades name="trades"></wallet-trades>
-                    <wallet-orders name="orders"></wallet-orders>
-                </iron-pages>
-            </paper-card>
+            <iron-pages id="pages" selected="{{subpage}}" attr-for-selected="name">
+                <wallet-assets name="assets"></wallet-assets>
+                <wallet-trades name="trades"></wallet-trades>
+                <wallet-orders name="orders"></wallet-orders>
+            </iron-pages>
         </div>
     </template>
     <script>

@@ -10,7 +10,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="wallet/subpage-default.html">
 <link rel="import" href="wallet/subpage-ready.html">
-<link rel="import" href="unlocked-wallet/wallet-assets.html">
 <dom-module id="page-wallet">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -23,7 +22,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
             <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
-                <!--<wallet-assets name="ready"></wallet-assets>-->
                 <subpage-ready name="ready" subpage="assets"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
@@ -39,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 subpage: {
                     type: String,
-                    value: 'ready'
+                    value: 'default'
                 }
             };
         }
