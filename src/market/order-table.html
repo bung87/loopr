@@ -24,6 +24,16 @@
             div.long-hash {
                 width: 120px;
             }
+
+            .operations {
+                @apply --layout-horizontal;
+            }
+
+            .operations a {
+                text-align: center;
+                padding-left: 4px;
+                padding-right: 4px;
+            }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -91,6 +101,16 @@
                     </div>
                 </template>
             </vaadin-grid-column>
+            <vaadin-grid-column hidden$="[[hiddenCancel]]" width="50px">
+                <template class="header">
+                    <div class="left-aligned">Operations</div>
+                </template>
+                <template>
+                    <div class="operations">
+                        <a href="javascript:void(0)" hash="[[item.orginalOrder.hash]]" on-click="_cancel">Cancel</a>
+                    </div>
+                </template>
+            </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
         <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
@@ -104,6 +124,9 @@
         static get properties() {
             return {
                 market: String,
+                displayMode: {
+                    type: String
+                },
                 relay: {
                     type: Object,
                     computed: '_selectedRelay(settingsRelay)'
@@ -113,6 +136,21 @@
                     computed: '_computeOrders(appConfig, resp)'
                 }
             };
+        }
+
+        ready(){
+            super.ready();
+            this.hiddenCancel = true;
+            if (this.displayMode) {
+                let displayMode = this.displayMode.toLowerCase();
+                if ("wallet-orders" === displayMode) {
+                    this.hiddenCancel = false;
+                }
+            }
+        }
+
+        _cancel(e){
+            console.info(e.target.hash + ' was clicked.');
         }
 
         _selectedRelay(settingsRelay){

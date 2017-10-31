@@ -177,7 +177,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 gasLimit: {
                     type: Number,
-                    value: 1000
+                    computed: '_computeGasLimit(appConfig)'
                 },
                 fromTokenBalance: {
                     type: Object,
@@ -189,6 +189,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                  }
             };
         }
+
         constructor() {
             super();
             let tokenConfig = {
@@ -206,6 +207,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //                return;
 //            }
             super.ready();
+        }
+
+        _computeGasLimit(appConfig){
+            if(appConfig){
+                return appConfig.defaultGasLimit;
+            }
         }
 
         _selectedRelay(settingsRelay){

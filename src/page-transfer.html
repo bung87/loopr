@@ -182,12 +182,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     gasLimit: {
                         type: Number,
-                        value: 1000
+                       computed: '_computeGasLimit(appConfig)'
                     },
                     valid: {
                         type: Boolean,
                         computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
                     }
+                }
+            }
+
+            _computeGasLimit(appConfig){
+                if(appConfig){
+                    return appConfig.defaultGasLimit;
                 }
             }
 
@@ -253,7 +259,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var combobox = this.$.tokensSelector
                 var context = this
                 combobox.addEventListener('value-changed', function () {
-                    context.token = combobox.value
+                    //context.token = combobox.value;
+                    window.location.href = "#/transfer/"+combobox.value;
                 });
             }
 
