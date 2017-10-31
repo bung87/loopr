@@ -21,8 +21,11 @@
                     padding-top: 32px;
                 }
             }
-        </style>
 
+            .sections {
+                padding-top: 0;
+            }
+        </style>
         <div class="sections">
             <paper-card transparent>
                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
@@ -38,9 +41,7 @@
                     <wallet-orders name="orders"></wallet-orders>
                 </iron-pages>
             </paper-card>
-            <div class="footer-spacer"></div>
         </div>
-
     </template>
     <script>
     class SubpageReady extends AppConfigMixin(Polymer.Element) {
@@ -50,8 +51,7 @@
             return {
                 subpage: {
                     type: String,
-                    reflectToAttribute: true,
-                    // value: "trades"
+                    value: "assets"
                 },
                 selectedTab: {
                     type: String,
@@ -64,7 +64,11 @@
             };
         }
 
-        _computeSelected(subpage) {
+        ready(){
+            super.ready();
+        }
+
+        _computeSelected(subpage) {console.log(subpage)
             if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
                 return subpage;
             } else {
@@ -74,7 +78,7 @@
         }
 
         go() {
-            const page = this.$.pages.selectedItem;
+            const page = this.$.pages.selectedItem;console.log(page)
             if (page && page.go) page.go();
         }
     }

@@ -10,9 +10,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="wallet/subpage-default.html">
 <link rel="import" href="wallet/subpage-ready.html">
-<link rel="import" href="unlocked-wallet/wallet-assets.html">
-<link rel="import" href="unlocked-wallet/wallet-trades.html">
-<link rel="import" href="unlocked-wallet/wallet-orders.html">
 <dom-module id="page-wallet">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -20,37 +17,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             :host {
                 display: block;
             }
-            paper-tabs {
-                height: 32px;
-                text-transform: none;
-            }
-            @media(min-width:1024px) {
-                .sections {
-                    padding-top: 32px;
-                }
-            }
         </style>
         <looper-page>
             <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
-            <div class="sections">
-                <paper-card transparent>
-                    <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-                        <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
-                        <paper-tab name="trades"><a styleless href="/#/wallet/trades">Trades</a></paper-tab>
-                        <paper-tab name="orders"><a styleless href="/#/wallet/orders">Orders</a></paper-tab>
-                    </paper-tabs>
-                </paper-card>
-                <paper-card>
-                    <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                        <subpage-default name="default"></subpage-default>
-                        <wallet-assets name="assets"></wallet-assets>
-                        <wallet-trades name="trades"></wallet-trades>
-                        <wallet-orders name="orders"></wallet-orders>
-                    </iron-pages>
-                </paper-card>
-                <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
-            </div>
+            <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
+                <subpage-default name="default"></subpage-default>
+                <subpage-ready name="ready"></subpage-ready>
+            </iron-pages>
+            <div class="footer-spacer"></div>
+            <looper-footer></looper-footer>
         </looper-page>
     </template>
     <script>
@@ -62,16 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 subpage: {
                     type: String,
-                    reflectToAttribute: true,
                     value: "default"
-                },
-                selectedTab: {
-                    type: String,
-                    computed: '_computeSelected(subpage)'
-                },
-                selectedPage: {
-                    type: Object,
-                    observer: 'go'
                 }
             };
         }
@@ -79,15 +45,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ready() {
             super.ready();
             this.addEventListener('reset-wallet', e => this.subpage = 'default');
-        }
-
-        _computeSelected(subpage) {
-            if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
-                return subpage;
-            } else {
-                //TODO: send a 404 error event.
-                return 'assets';
-            }
         }
 
         go() {
