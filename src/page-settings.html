@@ -79,9 +79,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <vaadin-combo-box id="relay" placeholder="Default Looper Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
                             </div>
                             <div class="item horizontal center layout">
-                                <div class="label">Lrc Fee</div>
+                                <div class="label">LRC Fee</div>
                                 <div class="lrcContainer horizontal start-justified layout">
-                                    <div class="lrcSlider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
+                                    <div class="lrcSlider"><paper-slider id="lrcFee" pin max="50" max-markers="10" step="5" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
                                     <div class="lrcLable"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
                                 </div>
                             </div>
