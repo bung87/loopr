@@ -2,6 +2,7 @@
 <dom-module id="ethereum-signer" fit>
     <template>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
     </template>
     <script>
 
@@ -16,7 +17,7 @@
             }
 
             async sign(raw) {
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay(settingsRelay);
                 return await relay.generateTx(raw, this.wallet.privateKey);
             }
         }

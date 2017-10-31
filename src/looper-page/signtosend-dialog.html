@@ -46,6 +46,7 @@
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <template is="dom-repeat" items="[[detail.raws]]">
@@ -112,7 +113,7 @@
 
             async show(detail) {
 
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay(settingsRelay);
                 let nonce = await relay.getTransactionCount(this.wallet.address);
 
                 const rawTxs = _.map(detail.raws, function (raw) {
@@ -144,7 +145,7 @@
             }
 
             sendTx() {
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay(settingsRelay);
 
                 async.forEach(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);

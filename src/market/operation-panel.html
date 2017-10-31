@@ -79,7 +79,7 @@
 
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
-        <global-variable key="settings-relay" value="[[relayHost]]"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
@@ -394,7 +394,7 @@
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 
-                    const relay = new Relay('http://10.137.107.63:3000');
+                    const relay = new Relay(settingsRelay);
                     await relay.submitLoopringOrder(signed)
 
                     const detail = {text: 'submit order successfully', category: "info", duration: 5000};
@@ -423,8 +423,8 @@
                     const address = wallet.address;
                     const tokensAddress = tokens.address;
                     const tokenbAddress = tokenb.address;
-                    const spender = '0x6CaCE0528324A8afC2b157CebA3cDd2a27c4E21f';
-                    const relay = new Relay('http://127.0.0.1:8545');
+                    const spender = this.appConfig.contractAddress;
+                    const relay = new Relay(settingsRelay);
 
                     const tokensBalance = await relay.getTokenBalance(tokensAddress, address);
 
