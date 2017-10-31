@@ -1,0 +1,43 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../market/trade-table.html">
+<dom-module id="wallet-trades">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+         :host {
+            display: block;
+        }
+        </style>
+        </style>
+        <div class="horizontal end layout">
+            <div class="flex"></div>
+            <!-- <market-selector></market-selector> -->
+        </div>
+        <trade-table id="trades" display-mode="history-trades" market="[[id]]"></trade-table-market>
+    </template>
+    <script>
+    class WalletTrades extends AppConfigMixin(Polymer.Element) {
+        static get is() { return 'wallet-trades'; }
+        static get properties() {
+            return {
+                market: String
+            };
+        }
+
+        go() {
+            this.$.trades.go();
+        }
+    }
+
+    window.customElements.define(WalletTrades.is, WalletTrades);
+    </script>
+</dom-module>
