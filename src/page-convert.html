@@ -91,11 +91,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             font-size: 14px;
             -webkit-font-smoothing: antialiased;
         }
+
+        .gasLimitSlider {
+            width: 80%;
+        }
+
+        paper-slider {
+            width: 100%;
+        }
+
+        .gasLimitLable {
+            width: 20%;
+            @apply(--layout-vertical);
+            @apply(--layout-center-justified);
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
         <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet"></simple-toolbar>
@@ -131,7 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 </div>
                                 <div class="inputLine title">Gas Limit</div>
                                 <div class="inputLine">
-                                    <vaadin-text-field value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                    <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
                                     </vaadin-text-field>
                                 </div>
                             </div>
@@ -207,6 +223,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //                return;
 //            }
             super.ready();
+            let _this = this;
+            this.$.gasLimit.addEventListener('value-changed', function() {
+                _this.gasLimit = _this.$.gasLimit.value;
+            });
         }
 
         _computeGasLimit(appConfig){
@@ -323,8 +343,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         signToSend() {
-            var detail = { raws: [{"raw":"cancle datas", "subTitle":"Cancel Older Authorization"}, {"raw":"authorize datas", "subTitle":"Authorization"}] };
-            this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
+            const tx = {};
+            let subTitle;
+            tx.gasPrice = '0x3b9aca00';
+            tx.gasLimit = '0x' + this.gasLimit.toString(16);
+            const WETHConfig = this.appConfig.tokenMap['WETH'];
+            tx.to = WETHConfig.address;
+            if (this.fromToken === 'ETH') {
+
+                tx.value = '0x' + Number(this.amount).toString(16);
+                tx.data = '0x';
+
+                subTitle = 'Convert ETH to  WETH';
+            } else {
+                tx.value = '0x0';
+                const method = '0x' + ethUtil.sha3('withdraw(uint)').toString('hex').slice(0, 8);
+                tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + WETHConfig.digits)), 32).toString('hex');
+                subTitle = 'Convert WETH to  ETH';
+            }
+
+            const detail = {raws: [{raw: JSON.stringify(tx), subTitle}]};
+
+            this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
         }
 
         swap() {

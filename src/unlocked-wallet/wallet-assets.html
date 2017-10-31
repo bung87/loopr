@@ -61,12 +61,6 @@
         <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
         <!-- ------ -->
         <div class="sections">
-            <paper-card transparent>
-                <div class="summary horizontal end center-justified layout">
-                    <!-- <div>Wallet Total Value:</div> -->
-                    <div>[[totalValue]] [[priceQuote.fiat]]</div>
-                </div>
-            </paper-card>
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
                 <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
