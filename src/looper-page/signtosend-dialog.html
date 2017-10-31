@@ -117,8 +117,8 @@
 
                 const rawTxs = _.map(detail.raws, function (raw) {
                     const rawTx = JSON.parse(raw.raw);
-                    rawTx.nonce = nonce;
-                    nonce = '0x' + (Number(nonce) + 1).toString(16);
+                    rawTx.nonce = rawTx.nonce || nonce;
+                    nonce = '0x' + (Number(rawTx.nonce) + 1).toString(16);
 
                     raw.raw = JSON.stringify(rawTx);
                     return raw;
