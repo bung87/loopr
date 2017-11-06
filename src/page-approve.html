@@ -34,6 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             .line {
+                height: 80px;
                 @apply(--layout-horizontal);
                 @apply(--layout-start-justified);
             }
@@ -49,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 13px;
                 line-height: 1.25;
                 color: hsla(214, 27%, 26%, 0.71);
-                margin-top: 0.7em;
+                margin-top: 1.3em;
                 transition: 0.4s max-height;
                 max-height: 5em;
             }
@@ -69,7 +70,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 display: none;
             }
 
-            .title {
+            .advance {
+                height: 30px;
                 margin-top: 20px;
                 font-weight: 500;
                 color:rgba(0, 0, 0, .54);
@@ -112,16 +114,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-card>
                     <div class="container">
                         <div class="left">
-                            <div class="line title">Token</div>
                             <div class="line">
                                 <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
-                                                  item-value-path="token"></vaadin-combo-box>
+                                                  label="Token" item-value-path="token"></vaadin-combo-box>
                             </div>
-                            <div class="line title">Amount</div>
                             <div class="line">
                                 <div class="amount">
                                     <vaadin-text-field value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]"
-                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                       label="Amount" pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                        error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                     </vaadin-text-field>
@@ -131,21 +131,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     </div>
                                 </div>
                             </div>
-                            <div class="line title">Gas Limit</div>
                             <div class="line">
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                   error-message="[[_integerError()]]">
+                                                   label="Gas Limit" error-message="[[_integerError()]]">
                                 </vaadin-text-field>
                             </div>
-                            <div class="line title">
+                            <div class="line advance">
                                 <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
                             </div>
                             <div class="hidden" id="hiddenExtData">
-                                <div class="line title">
-                                    Data:
-                                </div>
                                 <div class="line">
-                                    <vaadin-text-field id="additionalData" value="{{additionalData}}"
+                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
                                                        pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                        error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
                                     </vaadin-text-field>
