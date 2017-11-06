@@ -19,6 +19,9 @@ function Order(data) {
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
 
+    var v;
+    var r;
+    var s;
 
     const orderSchema = Joi.object.keys({
         protocol: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
@@ -34,7 +37,6 @@ function Order(data) {
         buyNoMoreThanAmountB: Joi.boolean(),
         marginSplitPercentage: Joi.number().integer().min(0).max(100),
     }).with('protocol', 'owner', 'tokenS', 'tokenB', 'amountS', 'amountB', 'timestamp', 'ttl', 'salt', 'lrcFee', 'buyNoMoreThanAmountB', 'marginSplitPercentage');
-
 
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
@@ -64,24 +66,52 @@ function Order(data) {
 
         const signature = ethUtil.ecsign(finalHash, privateKey);
 
-        return {
-            protocol,
-            owner,
-            tokenS,
-            tokenB,
-            amountS,
-            amountB,
-            timestamp,
-            ttl,
-            salt,
-            lrcFee,
+
+        this.v = Number(signature.v.toString());
+        this.r = '0x' + signature.r.toString('hex');
+        this.s = '0x' + signature.s.toString('hex');
+
+
+        return this;
+        // return {
+        //     protocol,
+        //     owner,
+        //     tokenS,
+        //     tokenB,
+        //     amountS,
+        //     amountB,
+        //     timestamp,
+        //     ttl,
+        //     salt,
+        //     lrcFee,
+        //     buyNoMoreThanAmountB,
+        //     marginSplitPercentage,
+        //     v: Number(signature.v.toString()),
+        //     r: '0x' + signature.r.toString('hex'),
+        //     s: '0x' + signature.s.toString('hex')
+        // }
+    };
+
+    this.cancel = function (amount, privateKey) {
+
+        if (!this.r || this.v || this.s) {
+
+            this.sign(privateKey);
+        }
+
+        const order = {
+            addresses: [order.owner, order.tokenS, order.tokenB],
+            orderValues: [order.amountS, order.amountB, order.timestamp, order.ttl, order.salt, order.lrcFee],
             buyNoMoreThanAmountB,
             marginSplitPercentage,
-            v: Number(signature.v.toString()),
-            r: '0x' + signature.r.toString('hex'),
-            s: '0x' + signature.s.toString('hex')
-        }
-    };
+            v,
+            r,
+            s
+        };
+
+       const calcelData = signer.generateCancelOrderData(order);
+
+    }
 }
 
 module.exports = Order;

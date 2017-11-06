@@ -40676,7 +40676,6 @@ exports.solSHA3 = function (types, data) {
     return hash;
 };
 
-
 exports.signEthTx = function (tx, privateKey) {
 
     const result = Joi.validate(tx, txSchema);
@@ -40692,6 +40691,15 @@ exports.signEthTx = function (tx, privateKey) {
     return '0x' + ethTx.serialize().toString('hex');
 };
 
+
+exports.generateCancelOrderData = function (order) {
+
+    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'],
+        [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
+    const method = abi.methodID('cancelOrder', ['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32']).toString('hex');
+
+    return '0x' + data + method;
+};
 },{"ethereumjs-abi":26,"ethereumjs-tx":29,"ethereumjs-util":30,"joi":53,"lodash":81}],104:[function(require,module,exports){
 
 },{}],105:[function(require,module,exports){
@@ -54476,6 +54484,7 @@ const signer = require('./signer.js');
 const ethUtil = require('ethereumjs-util');
 const _ = require('lodash');
 const BN = require('bn.js');
+const Joi = require('joi');
 
 function Order(data) {
 
@@ -54491,10 +54500,36 @@ function Order(data) {
     var lrcFee = data.lrcFee;
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
-    
+
+    var v;
+    var r;
+    var s;
+
+    const orderSchema = Joi.object.keys({
+        protocol: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+        owner: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenS: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenB: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+        amountS: Joi.number().integer().min(0),
+        amountB: Joi.number().integer().min(0),
+        timestamp: Joi.number().integer().min(0),
+        ttl: Joi.number().integer().min(0),
+        salt: Joi.number().integer().min(0),
+        lrcFee: Joi.number().integer().min(0),
+        buyNoMoreThanAmountB: Joi.boolean(),
+        marginSplitPercentage: Joi.number().integer().min(0).max(100),
+    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'amountS', 'amountB', 'timestamp', 'ttl', 'salt', 'lrcFee', 'buyNoMoreThanAmountB', 'marginSplitPercentage');
+
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
     this.sign = function (privateKey) {
+
+        const validation = Joi.validate(data, orderSchema);
+
+        if (!validation) {
+            throw new Error('Invalid Loopring Order');
+        }
+
         const hash = signer.solSHA3(orderTypes, [protocol, owner, tokenS, tokenB,
             new BN(Number(amountS).toString(10), 10),
             new BN(Number(amountB).toString(10), 10),
@@ -54504,35 +54539,62 @@ function Order(data) {
             new BN(Number(lrcFee).toString(10), 10),
             buyNoMoreThanAmountB,
             marginSplitPercentage]);
-     console.log('hash: '+ hash.toString('hex'));
+
         const finalHash = ethUtil.hashPersonalMessage(hash);
-console.log(finalHash.toString('hex'));
+
         if (_.isString(privateKey)) {
-            privateKey =ethUtil.toBuffer(privateKey);
+            privateKey = ethUtil.toBuffer(privateKey);
         }
 
         const signature = ethUtil.ecsign(finalHash, privateKey);
 
-        return {
-            protocol,
-            owner,
-            tokenS,
-            tokenB,
-            amountS,
-            amountB,
-            timestamp,
-            ttl,
-            salt,
-            lrcFee,
+
+        this.v = Number(signature.v.toString());
+        this.r = '0x' + signature.r.toString('hex');
+        this.s = '0x' + signature.s.toString('hex');
+
+
+        return this;
+        // return {
+        //     protocol,
+        //     owner,
+        //     tokenS,
+        //     tokenB,
+        //     amountS,
+        //     amountB,
+        //     timestamp,
+        //     ttl,
+        //     salt,
+        //     lrcFee,
+        //     buyNoMoreThanAmountB,
+        //     marginSplitPercentage,
+        //     v: Number(signature.v.toString()),
+        //     r: '0x' + signature.r.toString('hex'),
+        //     s: '0x' + signature.s.toString('hex')
+        // }
+    };
+
+    this.cancel = function (amount, privateKey) {
+
+        if (!this.r || this.v || this.s) {
+
+            this.sign(privateKey);
+        }
+
+        const order = {
+            addresses: [order.owner, order.tokenS, order.tokenB],
+            orderValues: [order.amountS, order.amountB, order.timestamp, order.ttl, order.salt, order.lrcFee],
             buyNoMoreThanAmountB,
             marginSplitPercentage,
-            v: Number(signature.v.toString()),
-            r: '0x' + signature.r.toString('hex'),
-            s: '0x' + signature.s.toString('hex')
-        }
-    };
+            v,
+            r,
+            s
+        };
+
+       const calcelData = signer.generateCancelOrderData(order);
+
+    }
 }
 
 module.exports = Order;
-
-},{"./signer.js":103,"bn.js":2,"ethereumjs-util":30,"lodash":81}]},{},[]);
+},{"./signer.js":103,"bn.js":2,"ethereumjs-util":30,"joi":53,"lodash":81}]},{},[]);

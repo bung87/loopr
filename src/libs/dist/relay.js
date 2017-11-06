@@ -42766,7 +42766,6 @@ exports.decodeCryptojsSalt = function (input) {
     };
 
 }
-
 }).call(this,require("buffer").Buffer)
 },{"buffer":160,"crypto":169}],107:[function(require,module,exports){
 const uts46 = require('idna-uts46');
@@ -42777,7 +42776,6 @@ exports.normalise = function(name){
         throw e;
     }
 }
-
 },{"idna-uts46":47}],108:[function(require,module,exports){
 (function (Buffer){
 const crypto = require('crypto');
@@ -42993,7 +42991,6 @@ exports.isKeystorePassRequired = function (keystore) {
             return false;
     }
 };
-
 }).call(this,require("buffer").Buffer)
 },{"./decrypt.js":106,"buffer":160,"crypto":169,"ethereumjs-util":"ethereumjs-util","scryptsy":86,"uuid/v4":105}],109:[function(require,module,exports){
 const crypto = require('crypto');
@@ -43010,25 +43007,25 @@ function privateKey() {
         publicKey = ethereumUtil.privateToPublic(privateKey);
         address = ethereumUtil.publicToAddress(publicKey);
     };
-  
+
     this.setPrivateKey = function (key) {
         privateKey = key;
         publicKey = ethereumUtil.privateToPublic(privateKey);
         address = ethereumUtil.publicToAddress(publicKey);
     };
-  
+
     this.getAddress = function () {
-        
-        return ethereumUtil.toChecksumAddress("0x"+address.toString('hex'));
+        return ethereumUtil.toChecksumAddress("0x" + address.toString('hex'));
     };
+
 
     this.toKeystore = function (password) {
         return keystore.pkeyToKeystore(privateKey, this.getAddress(), password)
     }
+
 }
 
 module.exports = privateKey;
-
 },{"./keystore.js":108,"crypto":169,"ethereumjs-util":"ethereumjs-util"}],110:[function(require,module,exports){
 const abi = require('ethereumjs-abi');
 const _ = require('lodash');
@@ -43051,7 +43048,6 @@ exports.solSHA3 = function (types, data) {
     return hash;
 };
 
-
 exports.signEthTx = function (tx, privateKey) {
 
     const result = Joi.validate(tx, txSchema);
@@ -43067,6 +43063,15 @@ exports.signEthTx = function (tx, privateKey) {
     return '0x' + ethTx.serialize().toString('hex');
 };
 
+
+exports.generateCancelOrderData = function (order) {
+
+    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'],
+        [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
+    const method = abi.methodID('cancelOrder', ['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32']).toString('hex');
+
+    return '0x' + data + method;
+};
 },{"ethereumjs-abi":26,"ethereumjs-tx":28,"ethereumjs-util":"ethereumjs-util","joi":53,"lodash":79}],111:[function(require,module,exports){
 (function (Buffer){
 const ethereumUtil = require('ethereumjs-util');
@@ -43130,25 +43135,9 @@ function validator() {
             return false;
         }
     };
-
-    function validateEtherAddress(address) {
-        if (address.substring(0, 2) !== '0x') return false;
-        else if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false;
-        else if (
-            /^(0x)?[0-9a-f]{40}$/.test(address) ||
-            /^(0x)?[0-9A-F]{40}$/.test(address)
-        )
-            return true;
-        else return isChecksumAddress(address);
-    }
-
-    function isChecksumAddress(address) {
-        return address === ethereumUtil.toChecksumAddress(address);
-    }
 }
 
 module.exports = validator;
-
 
 }).call(this,require("buffer").Buffer)
 },{"./ens":107,"buffer":160,"ethereumjs-util":"ethereumjs-util"}],112:[function(require,module,exports){
@@ -57604,8 +57593,8 @@ exports.defineProperties = function (self, fields, data) {
 },{"assert":127,"bn.js":3,"buffer":160,"create-hash":6,"ethjs-util":29,"keccak":73,"rlp":84,"secp256k1":87}],"relay":[function(require,module,exports){
 const fetch = require('node-fetch');
 const crypto = require('crypto');
-const Validator = require('./validator');
-const PrivateKey = require('./privateKey');
+const Validator = require('./validator.js');
+const PrivateKey = require('./privateKey.js');
 const ethUtil = require('ethereumjs-util');
 const signer = require('./signer.js');
 const Joi = require('joi');
@@ -57613,6 +57602,7 @@ const BigNumber = require('bignumber.js');
 const _ = require('lodash');
 
 function relay(host) {
+
 
     const txSchema = Joi.object().keys({
         nonce: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
@@ -57769,8 +57759,6 @@ function relay(host) {
         request.method = "eth_sendRawTransaction";
         request.params = [tx];
 
-        console.log(JSON.stringify(request));
-
         return await fetch(host, {
             method: 'POST',
             headers: {
@@ -57864,7 +57852,7 @@ function relay(host) {
             throw new Error('invalid token Contract Address');
         }
 
-        if(_.isNumber(value)){
+        if (_.isNumber(value)) {
 
             value = '0x' + value.toString(16);
         }
@@ -57874,14 +57862,13 @@ function relay(host) {
 
         const data = method + param;
 
-        if(_.isNumber(gasPrice)){
+        if (_.isNumber(gasPrice)) {
             gasPrice = '0x' + gasPrice.toString(16);
         }
 
-        if(_.isNumber(gasLimit)){
+        if (_.isNumber(gasLimit)) {
             gasLimit = '0x' + gasLimit.toString(16);
         }
-
 
 
         const tx = {
@@ -57908,7 +57895,7 @@ function relay(host) {
             throw new Error('invalid token Contract Address');
         }
 
-        if(_.isNumber(value)){
+        if (_.isNumber(value)) {
 
             value = '0x' + value.toString(16);
         }
@@ -57918,11 +57905,11 @@ function relay(host) {
 
         const data = method + params;
 
-        if(_.isNumber(gasPrice)){
+        if (_.isNumber(gasPrice)) {
             gasPrice = '0x' + gasPrice.toString(16);
         }
 
-        if(_.isNumber(gasLimit)){
+        if (_.isNumber(gasLimit)) {
             gasLimit = '0x' + gasLimit.toString(16);
         }
 
@@ -57942,33 +57929,156 @@ function relay(host) {
 
     this.submitLoopringOrder = async function (order) {
 
-
-        request.method = 'loopring_submitOrder';
+        request.method = 'submitOrder';
         request.params = order;
         request.id = id();
 
-       return await fetch(host, {
+        return await fetch(host, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(request)
         }).then(r => r.json()).then(res => {
-            if(res.error){
-                throw  new Error(res.error.message)
-            }
-
-            return res.result;
+            return res;
         });
 
+    };
+
+    this.cancelLoopringOrder = async function (rawTX, privateKey) {
+        const tx = await this.generateTx(rawTX, privateKey);
+        return await this.sendSignedTx(tx.signedTx);
+    };
+
+    this.getOrders = async function (market, address, status, pageIndex, pageSize) {
+
+        request.method = 'getOrders';
+        request.params = {market, address, status, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getDepth = async function (market, pageIndex, pageSize) {
+
+        request.method = 'getDepth';
+        request.params = {market, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+    };
 
 
+    this.getTicker = async function (market) {
 
+        request.method = 'getTicker';
+        request.params = {market};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+    };
+
+
+    this.getFills = async function (market, address, pageIndex, pageSize) {
+
+        request.method = 'getFills';
+        request.params = {market, address, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getCandleTicks = async function (market, interval, size) {
+
+        request.method = 'getCandleTicks';
+        request.params = {market, interval, size};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getRingMined = async function (ringHash, orderHash, miner, pageIndex, pageSize) {
+
+        request.method = 'getRingMined';
+        request.params = {ringHash, orderHash, miner, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+
+    this.getBalances = async function (address) {
+
+        request.method = 'getBalances';
+        request.params = {address};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
     };
 
     function id() {
         return crypto.randomBytes(16).toString('hex');
-    };
+    }
 
     function validHex(data) {
 
@@ -57977,8 +58087,7 @@ function relay(host) {
         }
 
         return data;
-    };
-
+    }
 }
 
 module.exports = relay;
@@ -57986,5 +58095,4 @@ module.exports = relay;
 
 
 
-
-},{"./privateKey":109,"./signer.js":110,"./validator":111,"bignumber.js":1,"crypto":169,"ethereumjs-util":"ethereumjs-util","joi":53,"lodash":79,"node-fetch":82}]},{},[]);
+},{"./privateKey.js":109,"./signer.js":110,"./validator.js":111,"bignumber.js":1,"crypto":169,"ethereumjs-util":"ethereumjs-util","joi":53,"lodash":79,"node-fetch":82}]},{},[]);
