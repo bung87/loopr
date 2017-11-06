@@ -13306,7 +13306,6 @@ exports.decodeCryptojsSalt = function (input) {
     };
 
 }
-
 }).call(this,require("buffer").Buffer)
 },{"buffer":121,"crypto":130}],73:[function(require,module,exports){
 (function (Buffer){
@@ -13523,7 +13522,6 @@ exports.isKeystorePassRequired = function (keystore) {
             return false;
     }
 };
-
 }).call(this,require("buffer").Buffer)
 },{"./decrypt.js":72,"buffer":121,"crypto":130,"ethereumjs-util":24,"scryptsy":53,"uuid/v4":71}],74:[function(require,module,exports){
 var asn1 = exports;
@@ -26552,23 +26550,23 @@ function privateKey() {
         publicKey = ethereumUtil.privateToPublic(privateKey);
         address = ethereumUtil.publicToAddress(publicKey);
     };
-  
+
     this.setPrivateKey = function (key) {
         privateKey = key;
         publicKey = ethereumUtil.privateToPublic(privateKey);
         address = ethereumUtil.publicToAddress(publicKey);
     };
-  
+
     this.getAddress = function () {
-        
-        return ethereumUtil.toChecksumAddress("0x"+address.toString('hex'));
+        return ethereumUtil.toChecksumAddress("0x" + address.toString('hex'));
     };
+
 
     this.toKeystore = function (password) {
         return keystore.pkeyToKeystore(privateKey, this.getAddress(), password)
     }
+
 }
 
 module.exports = privateKey;
-
 },{"./keystore.js":73,"crypto":130,"ethereumjs-util":24}]},{},[]);

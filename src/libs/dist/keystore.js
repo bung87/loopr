@@ -13306,7 +13306,6 @@ exports.decodeCryptojsSalt = function (input) {
     };
 
 }
-
 }).call(this,require("buffer").Buffer)
 },{"buffer":120,"crypto":129}],73:[function(require,module,exports){
 var asn1 = exports;
@@ -26535,6 +26534,5 @@ exports.isKeystorePassRequired = function (keystore) {
             return false;
     }
 };
-
 }).call(this,require("buffer").Buffer)
 },{"./decrypt.js":72,"buffer":120,"crypto":129,"ethereumjs-util":24,"scryptsy":53,"uuid/v4":71}]},{},[]);

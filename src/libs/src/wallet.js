@@ -1,4 +1,4 @@
-const hexUtils = require('./hex-uitls.js')
+const hexUtils = require('./hex-utils.js')
 
 function wallet() {
     this.getAddress = function () {
