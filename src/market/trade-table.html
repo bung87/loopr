@@ -22,6 +22,18 @@
         vaadin-grid-column {
             min-width: 10px;
         }
+
+        prism-pagination a.general {
+                        color: black;
+                        text-decoration: none;
+                        padding: 4px;
+                        border: 1px solid rgba(134, 134, 134, 0.3);
+                        margin-right: 3px;
+                      }
+
+                      prism-pagination a.current {
+                        background-color: rgba(178, 178, 178, 0.5);
+                      }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
@@ -125,6 +137,25 @@
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
+
+        <div>
+        <prism-pagination page="[[currentPage]]" count="[[count]]" range="[[range]]" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page=[[currentPage]]" page-click="linkClick">
+            <template slot="first"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?1">&lt;&lt;</a></template>
+            <template slot="previous"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?2">&lt;</a></template>
+            <template slot="general"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page=[[++currentPage]]">[[text]]</a></template>
+            <template slot="current"><a class$="[[css]]">[[text]]</a></template>
+            <template slot="next"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?4">&gt;</a></template>
+            <template slot="last"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?5">&gt;&gt;</a></template>
+        </prism-pagination>
+        </div>
+
+        <div>
+        <prism-square-pager page="[[currentPage]]" count="[[count]]" range="[[range]]" url="[[url]]" page-click="linkClick"></prism-square-pager>
+        </div>
+
+        <hot-ajax-paging per-page="10" current-page="1" pager-data="{{pagerData}}">
+            <iron-ajax auto id="ajax1" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{data11}}" loading="{{loading}}"></iron-ajax>
+        </hot-ajax-paging>
     </template>
     <script>
     class TradeTable extends AppConfigMixin(Polymer.Element) {
@@ -158,6 +189,18 @@
                 relay: {
                     type: String,
                     computed: '_selectedRelay(settingsRelay)'
+                },
+                currentPage: {
+                    type: Number,
+                    value: 1
+                },
+                count: {
+                    type: Number,
+                    value: 10
+                },
+                range: {
+                    type: Number,
+                    value: 5
                 }
             };
         }
