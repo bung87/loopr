@@ -40694,11 +40694,10 @@ exports.signEthTx = function (tx, privateKey) {
 
 exports.generateCancelOrderData = function (order) {
 
-    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'],
-        [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
+    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'], [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
     const method = abi.methodID('cancelOrder', ['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32']).toString('hex');
 
-    return '0x' + data + method;
+    return '0x' + method + data;
 };
 },{"ethereumjs-abi":26,"ethereumjs-tx":29,"ethereumjs-util":30,"joi":53,"lodash":81}],104:[function(require,module,exports){
 
@@ -54505,11 +54504,11 @@ function Order(data) {
     var r;
     var s;
 
-    const orderSchema = Joi.object.keys({
-        protocol: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        owner: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenS: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenB: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+    const orderSchema = Joi.object().keys({
+        protocol: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        owner: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenS: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenB: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         amountS: Joi.number().integer().min(0),
         amountB: Joi.number().integer().min(0),
         timestamp: Joi.number().integer().min(0),
@@ -54549,29 +54548,27 @@ function Order(data) {
         const signature = ethUtil.ecsign(finalHash, privateKey);
 
 
-        this.v = Number(signature.v.toString());
-        this.r = '0x' + signature.r.toString('hex');
-        this.s = '0x' + signature.s.toString('hex');
+        v = Number(signature.v.toString());
+        r = '0x' + signature.r.toString('hex');
+        s = '0x' + signature.s.toString('hex');
 
-
-        return this;
-        // return {
-        //     protocol,
-        //     owner,
-        //     tokenS,
-        //     tokenB,
-        //     amountS,
-        //     amountB,
-        //     timestamp,
-        //     ttl,
-        //     salt,
-        //     lrcFee,
-        //     buyNoMoreThanAmountB,
-        //     marginSplitPercentage,
-        //     v: Number(signature.v.toString()),
-        //     r: '0x' + signature.r.toString('hex'),
-        //     s: '0x' + signature.s.toString('hex')
-        // }
+        return {
+            protocol,
+            owner,
+            tokenS,
+            tokenB,
+            amountS,
+            amountB,
+            timestamp,
+            ttl,
+            salt,
+            lrcFee,
+            buyNoMoreThanAmountB,
+            marginSplitPercentage,
+            v,
+            r,
+            s
+        }
     };
 
     this.cancel = function (amount, privateKey) {
@@ -54582,17 +54579,16 @@ function Order(data) {
         }
 
         const order = {
-            addresses: [order.owner, order.tokenS, order.tokenB],
-            orderValues: [order.amountS, order.amountB, order.timestamp, order.ttl, order.salt, order.lrcFee],
+            addresses: [owner, tokenS, tokenB],
+            orderValues: [amountS, amountB, timestamp, ttl, salt, lrcFee, amount],
             buyNoMoreThanAmountB,
             marginSplitPercentage,
             v,
             r,
             s
         };
-
-       const calcelData = signer.generateCancelOrderData(order);
-
+        
+        return signer.generateCancelOrderData(order);
     }
 }
 

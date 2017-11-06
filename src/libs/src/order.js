@@ -23,11 +23,11 @@ function Order(data) {
     var r;
     var s;
 
-    const orderSchema = Joi.object.keys({
-        protocol: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        owner: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenS: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenB: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
+    const orderSchema = Joi.object().keys({
+        protocol: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        owner: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenS: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenB: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         amountS: Joi.number().integer().min(0),
         amountB: Joi.number().integer().min(0),
         timestamp: Joi.number().integer().min(0),
@@ -67,29 +67,27 @@ function Order(data) {
         const signature = ethUtil.ecsign(finalHash, privateKey);
 
 
-        this.v = Number(signature.v.toString());
-        this.r = '0x' + signature.r.toString('hex');
-        this.s = '0x' + signature.s.toString('hex');
+        v = Number(signature.v.toString());
+        r = '0x' + signature.r.toString('hex');
+        s = '0x' + signature.s.toString('hex');
 
-
-        return this;
-        // return {
-        //     protocol,
-        //     owner,
-        //     tokenS,
-        //     tokenB,
-        //     amountS,
-        //     amountB,
-        //     timestamp,
-        //     ttl,
-        //     salt,
-        //     lrcFee,
-        //     buyNoMoreThanAmountB,
-        //     marginSplitPercentage,
-        //     v: Number(signature.v.toString()),
-        //     r: '0x' + signature.r.toString('hex'),
-        //     s: '0x' + signature.s.toString('hex')
-        // }
+        return {
+            protocol,
+            owner,
+            tokenS,
+            tokenB,
+            amountS,
+            amountB,
+            timestamp,
+            ttl,
+            salt,
+            lrcFee,
+            buyNoMoreThanAmountB,
+            marginSplitPercentage,
+            v,
+            r,
+            s
+        }
     };
 
     this.cancel = function (amount, privateKey) {
@@ -100,8 +98,8 @@ function Order(data) {
         }
 
         const order = {
-            addresses: [order.owner, order.tokenS, order.tokenB],
-            orderValues: [order.amountS, order.amountB, order.timestamp, order.ttl, order.salt, order.lrcFee],
+            addresses: [owner, tokenS, tokenB],
+            orderValues: [amountS, amountB, timestamp, ttl, salt, lrcFee, amount],
             buyNoMoreThanAmountB,
             marginSplitPercentage,
             v,
@@ -109,8 +107,7 @@ function Order(data) {
             s
         };
 
-       const calcelData = signer.generateCancelOrderData(order);
-
+        return signer.generateCancelOrderData(order);
     }
 }
 
