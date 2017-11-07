@@ -233,6 +233,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <scary-cookie id="settingsGasPrice" name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+        <scary-cookie id="warnedVersion" name="warned-version" value="{{warnedVersion}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -325,7 +326,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_computedGasPrice(appConfig, cookieValues)'
                     },
                     settingsVersion: {
-                        type: String,
+                        type: Number,
                         computed: '_computedVersion(appConfig, cookieValues)'
                     },
                     page: {
@@ -382,6 +383,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (this.$.settingsVersion.value) {
                     cookieValue["settingsVersion"] = this.$.settingsVersion.value;
                 }
+                if (this.$.warnedVersion.value) {
+                    cookieValue["warnedVersion"] = this.$.warnedVersion.value;
+                }
                 this.cookieValues = cookieValue;
 
                 this.addEventListener('notification', e => this.$.notification.display(e.detail));
@@ -392,42 +396,76 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedLang(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsLang"]) {
-                    return appConfig.langs[0].value;
+                    if(cookieValues["settingsLang"]){
+                        return cookieValues["settingsLang"];
+                    } else {
+                        return appConfig.langs[0].value;
+                    }
                 }
             }
 
             _computedCurrency(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsCurrency"]) {
-                    return appConfig.fiat[0].value;
+                    if(cookieValues["settingsCurrency"]){
+                        return cookieValues["settingsCurrency"];
+                    } else {
+                        return appConfig.fiat[0].value;
+                    }
                 }
             }
 
             _computedRelay(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsRelay"]) {
-                    return appConfig.relays[0].value;
+                    if(cookieValues["settingsRelay"]){
+                        return cookieValues["settingsRelay"];
+                    } else {
+                        return appConfig.relays[0].value;
+                    }
                 }
             }
 
             _computedLrcFee(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsLrcFee"]) {
-                    return appConfig.defaultLrcFeePermillage;
+                if (appConfig && cookieValues) {
+                    if(cookieValues["settingsLrcFee"]){
+                        return cookieValues["settingsLrcFee"];
+                    } else {
+                        return appConfig.defaultLrcFeePermillage;
+                    }
                 }
             }
 
             _computedGasPrice(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsGasPrice"]) {
-                    return appConfig.defaultGasPrice;
+                if (appConfig && cookieValues) {
+                    if(cookieValues["settingsGasPrice"]){
+                        return cookieValues["settingsGasPrice"]
+                    } else {
+                        return appConfig.defaultGasPrice;
+                    }
                 }
             }
 
             _computedVersion(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsVersion"]) {
-                    return appConfig.contracts[0].version;
+                if (appConfig && cookieValues) {
+                    let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
+                    if(cookieValues["settingsVersion"]){
+                        let currentVersion = cookieValues["settingsVersion"];
+                        let warnedVersion = cookieValues["warnedVersion"];
+                        if(latestVersion != currentVersion){
+                            if(!warnedVersion || warnedVersion != latestVersion){
+                                var detail = { text: "Your current contract version is "+currentVersion+", latest version "+latestVersion+" is available", category: "warning", duration: 8000 }
+                                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+                                this.warnedVersion = latestVersion;
+                            }
+                        }
+                        return currentVersion;
+                    } else {
+                        return latestVersion;
+                    }
                 }
             }
 
             _computeAppConfig(appConfigRaw) {
-                if (appConfigRaw) {console.log(appConfigRaw)
+                if (appConfigRaw) {
                     var appConfig = appConfigRaw;
                     appConfig.computeMarketId = function (tokenx, tokeny) {
                         return tokenx + "-" + tokeny;
@@ -441,7 +479,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                     appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
                     appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
-                    console.log(appConfig)
 
                     this.$.loading.style.display = "none";
                     this.$.pages.style.display = "inherit";
