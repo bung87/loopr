@@ -89,9 +89,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template class="header">Time</template>
                 <template><time-str seconds="[[item.timestamp]]"></time-str></template>
             </vaadin-grid-column>
-            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
+        <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+        <div class="horizontal end-justified layout ">
+            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3" page-click="linkClick"></prism-square-pager>
+        </div>
     </template>
     <script>
     class SubpageRings extends AppConfigMixin(Polymer.Element) {
@@ -102,8 +105,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 relay: {
                     type: Object,
                     computed: '_selectedRelay(settingsRelay)'
+                },
+                currentPage: {
+                    type: Number,
+                    value: 1
+                },
+                totalPage: {
+                    type: Number,
+                    value: 20
+                },
+                showPage: {
+                    type: String,
+                    value: "hidden"
                 }
             }
+        }
+
+        ready(){
+            super.ready();
+            this._pager();
         }
 
         _selectedRelay(settingsRelay){

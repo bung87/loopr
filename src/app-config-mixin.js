@@ -39,4 +39,31 @@ const AppConfigMixin = (superclass) => class extends superclass {
             .toNumber();
     };
 
+    _pager(){
+        let pager = this.$.pager;
+        if(pager){
+            Array.prototype.forEach.call(pager.shadowRoot.querySelectorAll('a'), (item) => {
+                item.addEventListener('click', this._pageClick.bind(this));
+                item.href = "javascript:void(0)";
+            });
+        }
+    }
+
+    _pageClick(e){
+        let selectedPage = Number(e.target.textContent)
+        if("general first" === e.target.className){
+            this.currentPage = 1;
+        } else if("general previous" === e.target.className){
+            this.currentPage = this.currentPage - 1;
+        } else if("general" === e.target.className){
+            this.currentPage = selectedPage;
+        } else if("general next" === e.target.className){
+            this.currentPage = this.currentPage + 1;
+        } else if("general last" === e.target.className){
+            this.currentPage = this.totalPage;
+        } else {
+            return;
+        }
+        this._pager();
+    }
 }

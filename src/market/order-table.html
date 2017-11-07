@@ -34,6 +34,14 @@
                 padding-left: 4px;
                 padding-right: 4px;
             }
+
+            .hidden {
+                visibility: hidden;
+            }
+
+            .show {
+                visibility: visible;
+            }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -119,8 +127,10 @@
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
-        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json"
-                   last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+        <div class$="[[showPage]] horizontal end-justified layout ">
+            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3" page-click="linkClick"></prism-square-pager>
+        </div>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
     </template>
     <script>
         class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -141,6 +151,18 @@
                     orders: {
                         type: Object,
                         computed: '_computeOrders(appConfig, resp)'
+                    },
+                    currentPage: {
+                        type: Number,
+                        value: 1
+                    },
+                    totalPage: {
+                        type: Number,
+                        value: 20
+                    },
+                    showPage: {
+                        type: String,
+                        value: "hidden"
                     }
                 };
             }
@@ -153,6 +175,16 @@
                     if ("wallet-orders" === displayMode) {
                         this.hiddenCancel = false;
                     }
+                }
+                this._pager();
+                this._showPage();
+            }
+
+            _showPage(){
+                if(this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)){
+                    this.showPage = "show";
+                } else {
+                    this.showPage = "hidden";
                 }
             }
 
