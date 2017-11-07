@@ -82,6 +82,11 @@
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
+        <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
+
+        <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
+                   last-response="{{rawBalances}}" auto></iron-ajax>
+
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
             <paper-tab name="sell">Sell</paper-tab>
@@ -123,8 +128,9 @@
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokensAllowance,tokens)]]">
                             <a href="/#/approve/[[tokens.token]]"> set allowance to
-                                [[tokens.allowanceWarn]] </a>
+                                [[tokens.allowanceWarn]] </a> <br>
                         </template>
+                        Current Loopring Order Fee is [[settingsLrcFee]] ‰
                     </div>
                 </div>
 
@@ -233,7 +239,8 @@
 
 
             static get observers() {
-                return ['computeToken(wallet,tokens,tokenb)', 'buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
+                return ['computeToken(wallet,tokens,tokenb)', 'buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)',
+                    'computeTokens(tokens,tokenb,rawBalances)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
             }
 
             buyButtonState(buyTotal, tokenbBalance, tokenbAllowance) {
@@ -417,33 +424,34 @@
                 }
             }
 
-            async computeToken(wallet, tokens, tokenb) {
 
-                if (wallet && tokens) {
-                    const address = wallet.address;
-                    const tokensAddress = tokens.address;
-                    const tokenbAddress = tokenb.address;
-                    const spender = this.appConfig.contractAddress;
-                    const relay = new Relay(settingsRelay);
-
-                    const tokensBalance = await relay.getTokenBalance(tokensAddress, address);
-
-                    const tokensAllowance = await relay.getTokenAllowance(tokensAddress, address, spender);
-
-                    const tokenbBalance = await relay.getTokenBalance(tokenbAddress, address);
-
-                    const tokenbAllowance = await relay.getTokenAllowance(tokenbAddress, address, spender);
-
-                    this.tokensAllowance = tokensAllowance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
-
-                    this.tokensBalance = tokensBalance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
-
-                    this.tokenbBalance = tokenbBalance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
-
-                    this.tokenbAllowance = tokenbAllowance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
-
-                }
-            };
+//            async computeToken(wallet, tokens, tokenb) {
+//
+//                if (wallet && tokens) {
+//                    const address = wallet.address;
+//                    const tokensAddress = tokens.address;
+//                    const tokenbAddress = tokenb.address;
+//                    const spender = this.appConfig.contractAddress;
+//                    const relay = new Relay("http://127.0.0.1:8545");
+//
+//                    const tokensBalance = await relay.getTokenBalance(tokensAddress, address);
+//
+//                    const tokensAllowance = await relay.getTokenAllowance(tokensAddress, address, spender);
+//
+//                    const tokenbBalance = await relay.getTokenBalance(tokenbAddress, address);
+//
+//                    const tokenbAllowance = await relay.getTokenAllowance(tokenbAddress, address, spender);
+//
+//                    this.tokensAllowance = tokensAllowance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
+//
+//                    this.tokensBalance = tokensBalance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
+//
+//                    this.tokenbBalance = tokenbBalance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
+//
+//                    this.tokenbAllowance = tokenbAllowance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
+//
+//                }
+//            };
 
             isAllowanceWarn(allowance, token) {
                 if (allowance && token) {
@@ -459,6 +467,25 @@
                 }
                 return false;
             }
+
+            computeTokens(tokens, tokenb, rawBalances) {
+
+                if(rawBalances){
+
+                    const balances = _.keyBy(rawBalances.result.tokens, 'token');
+                    if (tokens ) {
+                        this.tokensBalance = (Number(balances[tokens.token.toUpperCase()].balance) / Number('1e'+tokens.digits)).toPrecision(tokens.precision);
+                        this.tokensAllowance =( Number(balances[tokens.token.toUpperCase()].allowance) / Number('1e'+tokens.digits)).toPrecision(tokens.precision);
+                    }
+                    if(tokenb) {
+                        this.tokenbBalance =(Number(balances[tokenb.token.toUpperCase()].balance) / Number('1e'+tokenb.digits)).toPrecision(tokens.precision);
+                        this.tokenbAllowance = (Number(balances[tokenb.token.toUpperCase()].allowance) / Number('1e'+tokenb.digits)).toPrecision(tokens.precision);
+                    }
+
+                }
+
+            }
+
         }
 
         window.customElements.define(OperationPanel.is, OperationPanel);

@@ -128,7 +128,6 @@
                 reader.readAsText(file);
                 reader.onload = function (e) {
                     this.walletContent = e.target.result;
-                    console.log("walletContent: " + this.walletContent);
                 }.bind(this);
             }
 
