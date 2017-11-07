@@ -50,6 +50,9 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
+                   last-response="{{rawBalances}}" auto></iron-ajax>
+
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -93,7 +96,7 @@
                 <template class="header">Status</template>
                 <template>
                     <div id="progress[[index]]" class="horizontal end-justified layout">
-                        <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.processed]]"
+                        <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.rest]]"
                                         max="[[item.amountB]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
@@ -150,7 +153,7 @@
                     },
                     orders: {
                         type: Object,
-                        computed: '_computeOrders(appConfig, resp)'
+                        computed: '_computeOrders(appConfig, resp, rawBalances)'
                     },
                     currentPage: {
                         type: Number,
@@ -244,16 +247,30 @@
                 return settingsRelay;
             }
 
-            _computeOrders(appConfig, resp) {
-                if (appConfig && resp && resp.result.data) {
-                    return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+            _computeRest(rawBalances,tokenb){
+                if(rawBalances){
+
+                    const balances = _.keyBy(rawBalances.result.tokens, 'token');
+
+                    const balance = Number(balances[tokenb.token].balance);
+                    const allowance = Number(balances[tokenb.token].allowance);
+
+                    return balance >= allowance ? allowance : balance;
                 }
             }
 
-            _computeItem(appConfig, order) {
+            _computeOrders(appConfig, resp,rawBalances) {
+                if (appConfig && resp && resp.result.data) {
+                    return _.map(resp.result.data, o => this._computeItem(appConfig, o,rawBalances));
+                }
+            }
+
+            _computeItem(appConfig, order,rawBalances) {
+
+                console.log("compute item");
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
-                    if (null != marketConfig) {
+                    if (marketConfig) {
                         order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
                         order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
                         if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
@@ -280,52 +297,46 @@
                 } else {
                     order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
                 }
-                let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);
+                let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
                 order.tokenB = order.orginalOrder.tokenB.toUpperCase();
-                order.amountB = this.numberFormat(order.orginalOrder.amountB);
+                order.amountB = this.numberFormat(order.orginalOrder.amountB,tokenb);
                 order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
-                order.pricePrecision = precisionB.pricePrecision;
-                order.volumnPrecisionB = precisionB.volumnPrecision;
-                let precisionS = this._getTokenPrecision(order.orginalOrder.tokenS, appConfig);
+                order.pricePrecision = tokenb.pricePrecision;
+                order.volumnPrecisionB = tokenb.volumnPrecision;
+                let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
                 order.tokenS = order.orginalOrder.tokenS.toUpperCase();
-                order.amountS = this.numberFormat(order.orginalOrder.amountS);
-                order.volumnPrecisionS = precisionS.volumnPrecision;
-                order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB);
-                order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS);
-                order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS)
-                order.processed = this.testBalance(order.amountB);
+                order.amountS = this.numberFormat(order.orginalOrder.amountS,tokens);
+                order.volumnPrecisionS = tokens.volumnPrecision;
+                order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB,tokens);
+                order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS,tokens);
+                order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS,tokens);
+                order.rest = this.numberFormat(this._computeRest(rawBalances,tokenb),tokenb);
+
+                console.log(JSON.stringify(order));
                 return order;
             }
 
-            _getTokenPrecision(tokenName, appConfig) {
+            _getToken(tokenName, appConfig) {
                 let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
                     volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
                 let marketConfig = this.getMarket(tokenName + "-WETH");
                 if (marketConfig) {
                     pricePrecision = marketConfig.pricePrecision;
                 }
-                const tokenxConfig = appConfig.tokenMap[tokenName];
-                if (tokenxConfig) {
-                    volumnPrecision = tokenxConfig.precision;
-                }
-                return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
+                const tokenxConfig = appConfig.tokenMap[tokenName.toUpperCase()];
+
+                tokenxConfig.pricePrecision = pricePrecision;
+                tokenxConfig.volumnPrecision = tokenxConfig.precision || volumnPrecision;
+
+                tokenxConfig.digits =  tokenxConfig.digits || 18 ;
+                tokenxConfig.token =  tokenxConfig.token || tokenName.toUpperCase();
+                return tokenxConfig;
             }
 
-            testBalance(num) {
-                return 0.6 * num;
-            }
-
-            tranHextoNum(hex) {
-                if (hex) {
-                    return Number(hex);
-                }
-                return 0;
-            }
-
-            numberFormat(num) {
+            numberFormat(num, token) {
                 if (!num) return 0;
-                const size = this.tranHextoNum(num);
-                return size / 1000000000000000000;
+                const size = Number(num);
+                return (size / Number('1e' + token.digits));
             }
 
             getPrice(b, s) {
