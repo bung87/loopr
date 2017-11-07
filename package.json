@@ -23,7 +23,6 @@
     "build": "bower install && echo '' > bower_components/font-roboto/roboto.html && polymer build"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
-    "loopring.js": "git+https://github.com/Loopring/loopring.js.git"
+    "lodash": "^4.17.4"
   }
 }
