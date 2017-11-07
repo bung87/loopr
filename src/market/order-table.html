@@ -312,7 +312,6 @@
                 order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS,tokens);
                 order.rest = this.numberFormat(this._computeRest(rawBalances,tokenb),tokenb);
 
-                console.log(JSON.stringify(order));
                 return order;
             }
 
