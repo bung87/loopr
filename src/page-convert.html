@@ -330,7 +330,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         signToSend() {
             const tx = {};
             let subTitle;
-            tx.gasPrice = '0x3b9aca00';
+            tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
             tx.gasLimit = '0x' + this.gasLimit.toString(16);
             const WETHConfig = this.appConfig.tokenMap['WETH'];
             tx.to = WETHConfig.address;

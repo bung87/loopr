@@ -51,14 +51,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 height: 30px;
                 margin-top: 20px;
                 font-weight: 500;
-                color:rgba(0, 0, 0, .54);
+                color: rgba(0, 0, 0, .54);
                 font-size: 14px;
             }
 
             .title {
                 margin-top: 20px;
                 font-weight: 500;
-                color:rgba(0, 0, 0, .54);
+                color: rgba(0, 0, 0, .54);
                 font-size: 14px;
             }
 
@@ -94,7 +94,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <address-text-field value="{{address}}"
-                                                    label="Send To" error-message="invalid ETH address"></address-text-field>
+                                                    label="Send To"
+                                                    error-message="invalid ETH address"></address-text-field>
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="amount" value="{{amount}}" label="Amount to Send"
@@ -195,8 +196,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computeGasLimit(appConfig){
-                if(appConfig){
+            _computeGasLimit(appConfig) {
+                if (appConfig) {
                     return appConfig.defaultGasLimit;
                 }
             }
@@ -243,7 +244,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     availableAllowance: allowance,
                     defaultAllowance: tokenConfig.allowanceWarn,
                     precision: tokenConfig.precision,
-                    digits : tokenConfig.digits,
+                    digits: tokenConfig.digits,
                     address: tokenConfig.address
                 }
             }
@@ -264,9 +265,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var _this = this;
                 combobox.addEventListener('value-changed', function () {
                     //context.token = _this.value;
-                    window.location.href = "#/transfer/"+combobox.value;
+                    window.location.href = "#/transfer/" + combobox.value;
                 });
-                this.$.gasLimit.addEventListener('value-changed', function() {
+                this.$.gasLimit.addEventListener('value-changed', function () {
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
@@ -354,30 +355,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             async signToSend() {
 
                 const tx = {};
-                if(this.selectedTokenBalance.token === 'ETH'){
-                    tx.gasPrice = '0x3b9aca00';
-                    tx.gasLimit = '0x'+ this.gasLimit.toString(16);
-                    tx.to = this.address;
-                    tx.value = '0x' + Number(this.amount) *1e18.toString(16);
-                    tx.data = this.additionalData || '0x';
+                tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                tx.gasLimit = '0x' + this.gasLimit.toString(16);
+                if (this.selectedTokenBalance.token === 'ETH') {
 
-                }else {
-                    tx.gasPrice = '0x3b9aca00';
-                    tx.gasLimit = '0x'+ this.gasLimit.toString(16);
+                    tx.to = this.address;
+                    tx.value = '0x' + Number(this.amount) * 1e18.toString(16);
+                    tx.data = this.additionalData || '0x';
+                } else {
                     tx.to = this.selectedTokenBalance.address;
-                    tx.value =  '0x0';
+                    tx.value = '0x0';
 
                     const method = '0x' + ethUtil.sha3('transfer(address,uint)').toString('hex').slice(0, 8);
                     const params = ethUtil.setLengthLeft(ethUtil.toBuffer(this.address), 32).toString('hex') +
                         ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-                    
+
                     tx.data = method + params;
-                    
+
                 }
 
                 console.log(tx);
 
-                var detail = { raws: [{"raw":JSON.stringify(tx), "subTitle":"transfer ETH"}]};
+                var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }
         }

@@ -110,6 +110,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
+
             <div class="sections">
                 <paper-card>
                     <div class="container">
@@ -440,7 +441,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 const currentAllowance = await relay.getTokenAllowance(this.selectedTokenBalance.address, this.wallet.address, spender);
 
                 const tx = {};
-                tx.gasPrice = '0x3b9aca00';
+                tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
                 tx.gasLimit = '0x' + this.gasLimit.toString(16);
                 tx.to = this.selectedTokenBalance.address;
                 tx.value = '0x0';

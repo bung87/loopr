@@ -40699,6 +40699,7 @@ exports.generateCancelOrderData = function (order) {
 
     return '0x' + method + data;
 };
+
 },{"ethereumjs-abi":26,"ethereumjs-tx":29,"ethereumjs-util":30,"joi":53,"lodash":81}],104:[function(require,module,exports){
 
 },{}],105:[function(require,module,exports){
@@ -54500,24 +54501,21 @@ function Order(data) {
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
 
-    var v;
-    var r;
-    var s;
+    var v = data.v;
+    var r = data.r;
+    var s = data.s;
 
     const orderSchema = Joi.object().keys({
         protocol: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         owner: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         tokenS: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         tokenB: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
-        amountS: Joi.number().integer().min(0),
-        amountB: Joi.number().integer().min(0),
-        timestamp: Joi.number().integer().min(0),
-        ttl: Joi.number().integer().min(0),
-        salt: Joi.number().integer().min(0),
-        lrcFee: Joi.number().integer().min(0),
         buyNoMoreThanAmountB: Joi.boolean(),
         marginSplitPercentage: Joi.number().integer().min(0).max(100),
-    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'amountS', 'amountB', 'timestamp', 'ttl', 'salt', 'lrcFee', 'buyNoMoreThanAmountB', 'marginSplitPercentage');
+        r: Joi.number().integer().min(0),
+        s: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+        v: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'buyNoMoreThanAmountB', 'marginSplitPercentage').without('r', 's', 'v');
 
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
@@ -54573,8 +54571,8 @@ function Order(data) {
 
     this.cancel = function (amount, privateKey) {
 
-        if (!this.r || this.v || this.s) {
-
+     
+        if (!(r && v &&s)) {
             this.sign(privateKey);
         }
 
@@ -54587,10 +54585,10 @@ function Order(data) {
             r,
             s
         };
-        
         return signer.generateCancelOrderData(order);
     }
 }
 
 module.exports = Order;
+
 },{"./signer.js":103,"bn.js":2,"ethereumjs-util":30,"joi":53,"lodash":81}]},{},[]);

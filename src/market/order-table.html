@@ -39,6 +39,9 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -61,7 +64,8 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
                 <template>
-                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
+                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]]
+                                   postfix="[[item.tokenS]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
@@ -73,14 +77,16 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
                 <template>
-                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
+                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]]
+                                   postfix="[[item.tokenB]]"></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Status</template>
                 <template>
                     <div id="progress[[index]]" class="horizontal end-justified layout">
-                        <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.processed]]" max="[[item.amountB]]"></paper-progress>
+                        <paper-progress value="[[item.totalDealedAmountB]]" secondary-progress="[[item.processed]]"
+                                        max="[[item.amountB]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
                                 <div>Original: [[item.amountS]]</div>
@@ -107,147 +113,210 @@
                 </template>
                 <template>
                     <div class="operations">
-                        <a href="javascript:void(0)" hash="[[item.orginalOrder.hash]]" on-click="_cancel">Cancel</a>
+                        <a href="javascript:void(0)" order="[[item.orginalOrder]]" on-click="_cancel">Cancel</a>
                     </div>
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
-        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json"
+                   last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
     </template>
     <script>
-    class OrderTable extends AppConfigMixin(Polymer.Element) {
-        static get is() {
-            return 'order-table';
-        }
+        class OrderTable extends AppConfigMixin(Polymer.Element) {
+            static get is() {
+                return 'order-table';
+            }
 
-        static get properties() {
-            return {
-                market: String,
-                displayMode: {
-                    type: String
-                },
-                relay: {
-                    type: Object,
-                    computed: '_selectedRelay(settingsRelay)'
-                },
-                orders: {
-                    type: Object,
-                    computed: '_computeOrders(appConfig, resp)'
-                }
-            };
-        }
+            static get properties() {
+                return {
+                    market: String,
+                    displayMode: {
+                        type: String
+                    },
+                    relay: {
+                        type: Object,
+                        computed: '_selectedRelay(settingsRelay)'
+                    },
+                    orders: {
+                        type: Object,
+                        computed: '_computeOrders(appConfig, resp)'
+                    }
+                };
+            }
 
-        ready(){
-            super.ready();
-            this.hiddenCancel = true;
-            if (this.displayMode) {
-                let displayMode = this.displayMode.toLowerCase();
-                if ("wallet-orders" === displayMode) {
-                    this.hiddenCancel = false;
+            ready() {
+                super.ready();
+                this.hiddenCancel = true;
+                if (this.displayMode) {
+                    let displayMode = this.displayMode.toLowerCase();
+                    if ("wallet-orders" === displayMode) {
+                        this.hiddenCancel = false;
+                    }
                 }
             }
-        }
 
-        _cancel(e){
-            console.info(e.target.hash + ' was clicked.');
-        }
+            async _cancel(e) {
 
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
 
-        _computeOrders(appConfig, resp) {
-            if(appConfig && resp && resp.result.data){
-                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+                try {
+
+                    const target = e.target.order;
+                    console.log(target);
+                    let data = {};
+                    data.protocol = this.appConfig.contractAddress;
+                    data.owner = this.wallet.address;
+                    data.tokenS = this.appConfig.tokenMap[target.tokenS.toUpperCase()].address;
+                    data.tokenB = this.appConfig.tokenMap[target.tokenB.toUpperCase()].address;
+                    data.amountS = target.amountS;
+                    data.amountB = target.amountB;
+                    data.timestamp = target.timestamp;
+                    data.ttl = target.ttl;
+                    data.salt = target.salt;
+                    data.lrcFee = target.lrcFee;
+                    data.buyNoMoreThanAmountB = target.buyNoMoreThanAmountB;
+                    data.marginSplitPercentage = target.marginSplitPercentage || 50;
+                    data.v = Number(target.v);
+                    data.r = target.r;
+                    data.s = target.s;
+
+                    const order = new Order(data);
+                    const amount  = target.buyNoMoreThanAmountB ? target.amountB : target.amountS;
+
+                    const cancelData = order.cancel(amount, this.wallet.privateKey);
+
+                    const rawTx = {
+                        to: this.appConfig.contractAddress,
+                        gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
+                        gasLimit: '0x14820',
+                        value: '0x0',
+                        data: cancelData
+                    };
+
+                    const relay = new Relay('http://127.0.0.1:8545');
+
+                    const result = await relay.cancelLoopringOrder(rawTx, this.wallet.privateKey);
+
+                    if (result.error) {
+                        var detail = {text: result.error.message, category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                    }
+
+                } catch (e) {
+                    var detail = {text: e.message, category: "error", duration: 8000}
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                }
+
             }
-        }
 
-        _computeItem(appConfig, order){
-            if(this.market){
-                let marketConfig = this.getMarket(this.market);
-                if(null != marketConfig){
-                    order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
-                    order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
-                    if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
-                        let tempS = order.orginalOrder.tokenS,
-                            tempB = order.orginalOrder.tokenB,
-                            tempAmountS = order.orginalOrder.amountB,
-                            tempAmountB = order.orginalOrder.amountS,
-                            tempDealedAmountS = order.totalDealedAmountS,
-                            tempDealedAmountB = order.totalDealedAmountB;
-                        order.orginalOrder.tokenS = tempB;
-                        order.orginalOrder.amountS = tempAmountB;
-                        order.totalDealedAmountS = tempDealedAmountB;
-                        order.orginalOrder.tokenB = tempS;
-                        order.totalDealedAmountB = tempDealedAmountS;
-                        order.orginalOrder.amountB = tempAmountS;
+            _selectedRelay(settingsRelay) {
+                return settingsRelay;
+            }
+
+            _computeOrders(appConfig, resp) {
+                if (appConfig && resp && resp.result.data) {
+                    return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+                }
+            }
+
+            _computeItem(appConfig, order) {
+                if (this.market) {
+                    let marketConfig = this.getMarket(this.market);
+                    if (null != marketConfig) {
+                        order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
+                        order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
+                        if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
+                            let tempS = order.orginalOrder.tokenS,
+                                tempB = order.orginalOrder.tokenB,
+                                tempAmountS = order.orginalOrder.amountB,
+                                tempAmountB = order.orginalOrder.amountS,
+                                tempDealedAmountS = order.totalDealedAmountS,
+                                tempDealedAmountB = order.totalDealedAmountB;
+                            order.orginalOrder.tokenS = tempB;
+                            order.orginalOrder.amountS = tempAmountB;
+                            order.totalDealedAmountS = tempDealedAmountB;
+                            order.orginalOrder.tokenB = tempS;
+                            order.totalDealedAmountB = tempDealedAmountS;
+                            order.orginalOrder.amountB = tempAmountS;
+                        }
+                    } else {
+                        this.dispatchEvent(new CustomEvent('nout-found', {
+                            bubbles: true,
+                            composed: true,
+                            detail: {msg: "not found market:" + this.market}
+                        }));
                     }
                 } else {
-                    this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: {msg: "not found market:"+this.market} }));
+                    order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
                 }
-            } else {
-                order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
+                let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);
+                order.tokenB = order.orginalOrder.tokenB.toUpperCase();
+                order.amountB = this.numberFormat(order.orginalOrder.amountB);
+                order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
+                order.pricePrecision = precisionB.pricePrecision;
+                order.volumnPrecisionB = precisionB.volumnPrecision;
+                let precisionS = this._getTokenPrecision(order.orginalOrder.tokenS, appConfig);
+                order.tokenS = order.orginalOrder.tokenS.toUpperCase();
+                order.amountS = this.numberFormat(order.orginalOrder.amountS);
+                order.volumnPrecisionS = precisionS.volumnPrecision;
+                order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB);
+                order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS);
+                order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS)
+                order.processed = this.testBalance(order.amountB);
+                return order;
             }
-            let precisionB = this._getTokenPrecision(order.orginalOrder.tokenB, appConfig);
-            order.tokenB = order.orginalOrder.tokenB.toUpperCase();
-            order.amountB = this.numberFormat(order.orginalOrder.amountB);
-            order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
-            order.pricePrecision = precisionB.pricePrecision;
-            order.volumnPrecisionB = precisionB.volumnPrecision;
-            let precisionS = this._getTokenPrecision(order.orginalOrder.tokenS, appConfig);
-            order.tokenS = order.orginalOrder.tokenS.toUpperCase();
-            order.amountS = this.numberFormat(order.orginalOrder.amountS);
-            order.volumnPrecisionS = precisionS.volumnPrecision;
-            order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB);
-            order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS);
-            order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS)
-            order.processed = this.testBalance(order.amountB);
-            return order;
-        }
 
-        _getTokenPrecision(tokenName, appConfig){
-            let pricePrecision = appConfig.marketConfig.defaultPricePrecision, volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-            let marketConfig = this.getMarket(tokenName+"-WETH");
-            if (marketConfig) {
-                pricePrecision = marketConfig.pricePrecision;
+            _getTokenPrecision(tokenName, appConfig) {
+                let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
+                    volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+                let marketConfig = this.getMarket(tokenName + "-WETH");
+                if (marketConfig) {
+                    pricePrecision = marketConfig.pricePrecision;
+                }
+                const tokenxConfig = appConfig.tokenMap[tokenName];
+                if (tokenxConfig) {
+                    volumnPrecision = tokenxConfig.precision;
+                }
+                return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
             }
-            const tokenxConfig = appConfig.tokenMap[tokenName];
-            if (tokenxConfig) {
-                volumnPrecision = tokenxConfig.precision;
+
+            testBalance(num) {
+                return 0.6 * num;
             }
-            return {pricePrecision: pricePrecision, volumnPrecision: volumnPrecision}
-        }
 
-        testBalance(num) {
-            return 0.6 * num;
-        }
-
-        tranHextoNum(hex) {
-            if (hex) {
-                return Number(hex);
+            tranHextoNum(hex) {
+                if (hex) {
+                    return Number(hex);
+                }
+                return 0;
             }
-            return 0;
-        }
 
-        numberFormat(num) {
-            if (!num) return 0;
-            const size = this.tranHextoNum(num);
-            return size / 1000000000000000000;
-        }
-
-        getPrice(b, s) {
-            if (b && s && s !== 0) {
-                return (b / s);
+            numberFormat(num) {
+                if (!num) return 0;
+                const size = this.tranHextoNum(num);
+                return size / 1000000000000000000;
             }
-            return 0;
+
+            getPrice(b, s) {
+                if (b && s && s !== 0) {
+                    return (b / s);
+                }
+                return 0;
+            }
+
+            go() {
+                this.$.ajax.generateRequest();
+            }
         }
 
-        go() {
-            this.$.ajax.generateRequest();
-        }
-    }
-
-    window.customElements.define(OrderTable.is, OrderTable);
+        window.customElements.define(OrderTable.is, OrderTable);
     </script>
 </dom-module>
