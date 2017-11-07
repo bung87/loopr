@@ -57,7 +57,7 @@
     "prism-pagination": "Prhythm/prism-pagination#^2.0.2",
     "hot-ajax-paging": "mercmobily/hot-ajax-paging#^0.2.5",
     "bignumber.js": "^4.1.0",
-    "looper": "git://github.com/Loopring/looper.git"
+    "loopring.js": "git://github.com/Loopring/loopring.js.git"
   },
   "resolutions": {
     "polymer": "^2.0.0",
