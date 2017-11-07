@@ -67,6 +67,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+            <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <div class="sections">
                 <paper-card>
                     <div class="card-content vertical center layout">
@@ -82,6 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="item horizontal center layout">
                                 <div class="label">Relay</div>
                                 <vaadin-combo-box id="relay" placeholder="Default Looper Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
+                            </div>
+                            <div class="item horizontal center layout">
+                                <div class="label">Contract Version</div>
+                                <vaadin-combo-box id="version" placeholder="Default Contract Version" items="{{appConfig.contracts}}" item-label-path="version" item-value-path="version"></vaadin-combo-box>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">LRC Fee</div>
@@ -123,6 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.lang.value = this.settingsLang || "en";
             this.$.currency.value = this.settingsCurrency || "usd";
             this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
+            this.$.version.value = this.settingsVersion || "0.0.1";
             this.$.lrcFee.value = this.settingsLrcFee;
             this.$.gasPrice.value = this.settingsGasPrice;
 
@@ -141,6 +148,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.relay.addEventListener('value-changed', function() {
                 _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
                 console.log(_this.settingsRelay);
+            });
+
+            this.$.version.addEventListener('value-changed', function() {
+                _this.settingsVersion = _this.$.version.value || "0.0.1";
+                console.log(_this.settingsVersion);
             });
 
             this.$.lrcFee.addEventListener('value-changed', function() {

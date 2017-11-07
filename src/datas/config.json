@@ -1,11 +1,17 @@
 {
-
     "defaultPricePrecision": 8,
     "defaultVolumePrecision": 8,
-    "defaultLrcFeePermillage":2,
-    "defaultGasPrice": 21,
-    "defaultGasLimit":21000,
-    "contractAddress": "0x5e99aA4bfE902aC32f7036d859175D0892368148",
+    "defaultLrcFeePermillage": 2,
+    "contracts": [
+        {
+            "address": "0x4c44d51cf0d35172fce9d69e2beac728de980e9d",
+            "version": "0.0.1"
+        },
+        {
+            "address": "0x4c44d51cf0d35172fce9d69e2beac728de980e9d",
+            "version": "0.0.2"
+        }
+    ],
     "tokens": [
         {
             "token": "ETH",
@@ -47,7 +53,7 @@
             "token": "ZRX",
             "name": "0x Token",
             "digits": 18,
-            "address": "0x9c7d730432b090e7db5b940b2d8eb65d26b5bb6d",
+            "address": "rueoafdsafjdsafj",
             "unit": "ZRX",
             "website": "https://0xproject.org",
             "allowance": 1000,
@@ -102,7 +108,8 @@
             "allowanceWarn": 5,
             "precision": 6,
             "minTradeValue": 0.001
-        }],
+        }
+    ],
     "langs": [
         {
             "value": "en",
@@ -111,7 +118,8 @@
         {
             "value": "zh",
             "label": "中文"
-        }],
+        }
+    ],
     "fiat": [
         {
             "value": "usd",
@@ -120,8 +128,13 @@
         {
             "value": "cny",
             "label": "CNY"
-        }],
+        }
+    ],
     "relays": [
+        {
+            "value": "http://127.0.0.1:8545",
+            "label": "LocalHost Relay"
+        },
         {
             "value": "//raw.githubusercontent.com",
             "label": "Default Looper Relay"
@@ -131,9 +144,10 @@
             "label": "Backup Looper Relay"
         },
         {
-            "value": "http://127.0.0.1:8545",
+            "value": "//127.0.0.1:8081",
             "label": "Local Relay"
-        }],
+        }
+    ],
     "markets": [
         {
             "tokenx": "LRC",
@@ -164,5 +178,6 @@
             "tokenx": "ZRX",
             "tokeny": "WETH",
             "pricePrecision": 8
-        }]
+        }
+    ]
 }

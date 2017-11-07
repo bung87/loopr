@@ -2,6 +2,7 @@
 <!-- <link rel="import" href="../../bower_components/paper-button/paper-button.html"> -->
 <dom-module id="trade-table" fit>
     <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
          :host {
             display: block;
@@ -23,17 +24,25 @@
             min-width: 10px;
         }
 
-        prism-pagination a.general {
-                        color: black;
-                        text-decoration: none;
-                        padding: 4px;
-                        border: 1px solid rgba(134, 134, 134, 0.3);
-                        margin-right: 3px;
-                      }
+        .hidden {
+            visibility: hidden;
+        }
 
-                      prism-pagination a.current {
-                        background-color: rgba(178, 178, 178, 0.5);
-                      }
+        .show {
+            visibility: visible;
+        }
+
+        prism-pagination a.general {
+            color: black;
+            text-decoration: none;
+            padding: 4px;
+            border: 1px solid rgba(134, 134, 134, 0.3);
+            margin-right: 3px;
+        }
+
+        prism-pagination a.current {
+            background-color: rgba(178, 178, 178, 0.5);
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
@@ -135,27 +144,11 @@
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
-
-        <div>
-        <prism-pagination page="[[currentPage]]" count="[[count]]" range="[[range]]" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page=[[currentPage]]" page-click="linkClick">
-            <template slot="first"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?1">&lt;&lt;</a></template>
-            <template slot="previous"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?2">&lt;</a></template>
-            <template slot="general"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page=[[++currentPage]]">[[text]]</a></template>
-            <template slot="current"><a class$="[[css]]">[[text]]</a></template>
-            <template slot="next"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?4">&gt;</a></template>
-            <template slot="last"><a class$="[[css]]" href$="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?5">&gt;&gt;</a></template>
-        </prism-pagination>
+        <div class$="[[showPage]] horizontal end-justified layout ">
+            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3" page-click="linkClick"></prism-square-pager>
         </div>
-
-        <div>
-        <prism-square-pager page="[[currentPage]]" count="[[count]]" range="[[range]]" url="[[url]]" page-click="linkClick"></prism-square-pager>
-        </div>
-
-        <hot-ajax-paging per-page="10" current-page="1" pager-data="{{pagerData}}">
-            <iron-ajax auto id="ajax1" url="[[relay]]/Loopring/mock-relay-data/master/orders.json" handle-as="json" last-response="{{data11}}" loading="{{loading}}"></iron-ajax>
-        </hot-ajax-paging>
     </template>
     <script>
     class TradeTable extends AppConfigMixin(Polymer.Element) {
@@ -182,6 +175,9 @@
                 market: {
                     type: String
                 },
+                filterMine: {
+                    type: Boolean
+                },
                 orders: {
                     type: Object,
                     computed: '_computeOrders(appConfig, resp)'
@@ -194,13 +190,13 @@
                     type: Number,
                     value: 1
                 },
-                count: {
+                totalPage: {
                     type: Number,
-                    value: 10
+                    value: 20
                 },
-                range: {
-                    type: Number,
-                    value: 5
+                showPage: {
+                    type: String,
+                    value: "hidden"
                 }
             };
         }
@@ -223,10 +219,20 @@
                 if ("market" === displayMode) {
                     this.hiddenPrice = false;
                 }
-                if ("history-trades" === displayMode) {
+                if ("history-trades" === displayMode || "wallet-trades" === displayMode) {
                     //this.hiddenRing = true;
                     this.hiddenBlockNum = false;
                 }
+            }
+            this._pager();
+            this._showPage();
+        }
+
+        _showPage(){
+            if(this.displayMode && (this.displayMode === "history-trades" || "wallet-trades" === this.displayMode)){
+                this.showPage = "show";
+            } else {
+                this.showPage = "hidden";
             }
         }
 
