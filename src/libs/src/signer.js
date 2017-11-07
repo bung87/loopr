@@ -33,3 +33,12 @@ exports.signEthTx = function (tx, privateKey) {
     ethTx.sign(privateKey);
     return '0x' + ethTx.serialize().toString('hex');
 };
+
+
+exports.generateCancelOrderData = function (order) {
+
+    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'], [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
+    const method = abi.methodID('cancelOrder', ['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32']).toString('hex');
+
+    return '0x' + method + data;
+};

@@ -35,15 +35,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         .inputLine {
+            height: 80px;
             @apply(--layout-horizontal);
             @apply(--layout-start-justified);
-        }
-
-        .title {
-            margin-top: 20px;
-            font-weight: 500;
-            color:rgba(0, 0, 0, .54);
-            font-size: 14px;
         }
 
         .inputLine vaadin-text-field {
@@ -130,15 +124,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </div>
                         <div class="line">
                             <div class="inputContainer">
-                                <div class="inputLine title">Amount To Convert</div>
                                 <div class="inputLine">
-                                    <vaadin-text-field value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
+                                    <vaadin-text-field value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
+                                                       label="Amount To Convert" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
                                         <div slot="suffix">[[fromToken]]</div>
                                     </vaadin-text-field>
                                 </div>
-                                <div class="inputLine title">Gas Limit</div>
                                 <div class="inputLine">
-                                    <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" error-message="[[_integerError()]]">
+                                    <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
+                                                       label="Gas Limit" error-message="[[_integerError()]]">
                                     </vaadin-text-field>
                                 </div>
                                 <div class="inputLine">
@@ -336,7 +330,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         signToSend() {
             const tx = {};
             let subTitle;
-            tx.gasPrice = '0x3b9aca00';
+            tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
             tx.gasLimit = '0x' + this.gasLimit.toString(16);
             const WETHConfig = this.appConfig.tokenMap['WETH'];
             tx.to = WETHConfig.address;

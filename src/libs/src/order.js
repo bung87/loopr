@@ -19,22 +19,21 @@ function Order(data) {
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
 
+    var v = data.v;
+    var r = data.r;
+    var s = data.s;
 
-    const orderSchema = Joi.object.keys({
-        protocol: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        owner: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenS: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        tokenB: Joi.string.regex(/^0x[0-9a-fA-F]{40}$/i),
-        amountS: Joi.number().integer().min(0),
-        amountB: Joi.number().integer().min(0),
-        timestamp: Joi.number().integer().min(0),
-        ttl: Joi.number().integer().min(0),
-        salt: Joi.number().integer().min(0),
-        lrcFee: Joi.number().integer().min(0),
+    const orderSchema = Joi.object().keys({
+        protocol: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        owner: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenS: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenB: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
         buyNoMoreThanAmountB: Joi.boolean(),
         marginSplitPercentage: Joi.number().integer().min(0).max(100),
-    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'amountS', 'amountB', 'timestamp', 'ttl', 'salt', 'lrcFee', 'buyNoMoreThanAmountB', 'marginSplitPercentage');
-
+        r: Joi.number().integer().min(0),
+        s: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+        v: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'buyNoMoreThanAmountB', 'marginSplitPercentage').without('r', 's', 'v');
 
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
@@ -64,6 +63,10 @@ function Order(data) {
 
         const signature = ethUtil.ecsign(finalHash, privateKey);
 
+        v = Number(signature.v.toString());
+        r = '0x' + signature.r.toString('hex');
+        s = '0x' + signature.s.toString('hex');
+
         return {
             protocol,
             owner,
@@ -77,11 +80,31 @@ function Order(data) {
             lrcFee,
             buyNoMoreThanAmountB,
             marginSplitPercentage,
-            v: Number(signature.v.toString()),
-            r: '0x' + signature.r.toString('hex'),
-            s: '0x' + signature.s.toString('hex')
+            v,
+            r,
+            s
         }
     };
+
+    this.cancel = function (amount, privateKey) {
+
+        if (!r || !v || !s) {
+
+            this.sign(privateKey);
+        }
+
+        const order = {
+            addresses: [owner, tokenS, tokenB],
+            orderValues: [amountS, amountB, timestamp, ttl, salt, lrcFee, amount],
+            buyNoMoreThanAmountB,
+            marginSplitPercentage,
+            v,
+            r,
+            s
+        };
+
+        return signer.generateCancelOrderData(order);
+    }
 }
 
 module.exports = Order;

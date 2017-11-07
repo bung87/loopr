@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const crypto = require('crypto');
-const Validator = require('./validator');
-const PrivateKey = require('./privateKey');
+const Validator = require('./validator.js');
+const PrivateKey = require('./privateKey.js');
 const ethUtil = require('ethereumjs-util');
 const signer = require('./signer.js');
 const Joi = require('joi');
@@ -9,8 +9,6 @@ const BigNumber = require('bignumber.js');
 const _ = require('lodash');
 
 function relay(host) {
-
-
     const txSchema = Joi.object().keys({
         nonce: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
         gasPrice: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
@@ -259,7 +257,7 @@ function relay(host) {
             throw new Error('invalid token Contract Address');
         }
 
-        if(_.isNumber(value)){
+        if (_.isNumber(value)) {
 
             value = '0x' + value.toString(16);
         }
@@ -269,14 +267,13 @@ function relay(host) {
 
         const data = method + param;
 
-        if(_.isNumber(gasPrice)){
+        if (_.isNumber(gasPrice)) {
             gasPrice = '0x' + gasPrice.toString(16);
         }
 
-        if(_.isNumber(gasLimit)){
+        if (_.isNumber(gasLimit)) {
             gasLimit = '0x' + gasLimit.toString(16);
         }
-
 
 
         const tx = {
@@ -303,7 +300,7 @@ function relay(host) {
             throw new Error('invalid token Contract Address');
         }
 
-        if(_.isNumber(value)){
+        if (_.isNumber(value)) {
 
             value = '0x' + value.toString(16);
         }
@@ -313,11 +310,11 @@ function relay(host) {
 
         const data = method + params;
 
-        if(_.isNumber(gasPrice)){
+        if (_.isNumber(gasPrice)) {
             gasPrice = '0x' + gasPrice.toString(16);
         }
 
-        if(_.isNumber(gasLimit)){
+        if (_.isNumber(gasLimit)) {
             gasLimit = '0x' + gasLimit.toString(16);
         }
 
@@ -337,39 +334,156 @@ function relay(host) {
 
     this.submitLoopringOrder = async function (order) {
 
-
-        request.method = 'loopring_submitOrder';
+        request.method = 'submitOrder';
         request.params = order;
         request.id = id();
 
-       return await fetch(host, {
+        return await fetch(host, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(request)
         }).then(r => r.json()).then(res => {
-            if(res.error){
-                throw  new Error(res.error.message)
-            }
-
-            return res.result;
+            return res;
         });
-
-
-
 
     };
 
-    this.cancelLoopringOrder = async function () {
+    this.cancelLoopringOrder = async function (rawTX, privateKey) {
+        const tx = await this.generateTx(rawTX, privateKey);
+        return await this.sendSignedTx(tx.signedTx);
+    };
+
+    this.getOrders = async function (market, address, status, pageIndex, pageSize) {
+
+        request.method = 'getOrders';
+        request.params = {market, address, status, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getDepth = async function (market, pageIndex, pageSize) {
+
+        request.method = 'getDepth';
+        request.params = {market, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+    };
 
 
+    this.getTicker = async function (market) {
 
+        request.method = 'getTicker';
+        request.params = {market};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+    };
+
+
+    this.getFills = async function (market, address, pageIndex, pageSize) {
+
+        request.method = 'getFills';
+        request.params = {market, address, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getCandleTicks = async function (market, interval, size) {
+
+        request.method = 'getCandleTicks';
+        request.params = {market, interval, size};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+    this.getRingMined = async function (ringHash, orderHash, miner, pageIndex, pageSize) {
+
+        request.method = 'getRingMined';
+        request.params = {ringHash, orderHash, miner, pageIndex, pageSize};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
+
+    };
+
+
+    this.getBalances = async function (address) {
+
+        request.method = 'getBalances';
+        request.params = {address};
+        request.id = id();
+
+        return await fetch(host, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+        }).then(r => r.json()).then(res => {
+            return res;
+        });
     };
 
     function id() {
         return crypto.randomBytes(16).toString('hex');
-    };
+    }
 
     function validHex(data) {
 
@@ -378,8 +492,7 @@ function relay(host) {
         }
 
         return data;
-    };
-
+    }
 }
 
 module.exports = relay;

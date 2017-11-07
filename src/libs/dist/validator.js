@@ -13850,7 +13850,6 @@ exports.normalise = function(name){
         throw e;
     }
 }
-
 },{"idna-uts46":41}],71:[function(require,module,exports){
 (function (global){
 'use strict';
@@ -20856,25 +20855,9 @@ function validator() {
             return false;
         }
     };
-
-    function validateEtherAddress(address) {
-        if (address.substring(0, 2) !== '0x') return false;
-        else if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false;
-        else if (
-            /^(0x)?[0-9a-f]{40}$/.test(address) ||
-            /^(0x)?[0-9A-F]{40}$/.test(address)
-        )
-            return true;
-        else return isChecksumAddress(address);
-    }
-
-    function isChecksumAddress(address) {
-        return address === ethereumUtil.toChecksumAddress(address);
-    }
 }
 
 module.exports = validator;
-
 
 }).call(this,require("buffer").Buffer)
 },{"./ens":70,"buffer":74,"ethereumjs-util":24}]},{},[]);

@@ -40676,7 +40676,6 @@ exports.solSHA3 = function (types, data) {
     return hash;
 };
 
-
 exports.signEthTx = function (tx, privateKey) {
 
     const result = Joi.validate(tx, txSchema);
@@ -40690,6 +40689,15 @@ exports.signEthTx = function (tx, privateKey) {
     }
     ethTx.sign(privateKey);
     return '0x' + ethTx.serialize().toString('hex');
+};
+
+
+exports.generateCancelOrderData = function (order) {
+
+    const data = abi.rawEncode(['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32'], [order.addresses, order.orderValues, order.buyNoMoreThanAmountB, order.marginSplitPercentage, order.v, order.r, order.s]).toString('hex');
+    const method = abi.methodID('cancelOrder', ['address[3]', 'uint[7]', 'bool', 'uint8', 'uint8', 'bytes32', 'bytes32']).toString('hex');
+
+    return '0x' + method + data;
 };
 
 },{"ethereumjs-abi":26,"ethereumjs-tx":29,"ethereumjs-util":30,"joi":53,"lodash":81}],104:[function(require,module,exports){
@@ -54476,6 +54484,7 @@ const signer = require('./signer.js');
 const ethUtil = require('ethereumjs-util');
 const _ = require('lodash');
 const BN = require('bn.js');
+const Joi = require('joi');
 
 function Order(data) {
 
@@ -54491,10 +54500,33 @@ function Order(data) {
     var lrcFee = data.lrcFee;
     var buyNoMoreThanAmountB = data.buyNoMoreThanAmountB;
     var marginSplitPercentage = data.marginSplitPercentage;
-    
+
+    var v = data.v;
+    var r = data.r;
+    var s = data.s;
+
+    const orderSchema = Joi.object().keys({
+        protocol: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        owner: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenS: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        tokenB: Joi.string().regex(/^0x[0-9a-fA-F]{40}$/i),
+        buyNoMoreThanAmountB: Joi.boolean(),
+        marginSplitPercentage: Joi.number().integer().min(0).max(100),
+        r: Joi.number().integer().min(0),
+        s: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+        v: Joi.string().regex(/^0x[0-9a-fA-F]{64}$/i),
+    }).with('protocol', 'owner', 'tokenS', 'tokenB', 'buyNoMoreThanAmountB', 'marginSplitPercentage').without('r', 's', 'v');
+
     const orderTypes = ['address', 'address', 'address', 'address', 'uint', 'uint', 'uint', 'uint', 'uint', 'uint', 'bool', 'uint8'];
 
     this.sign = function (privateKey) {
+
+        const validation = Joi.validate(data, orderSchema);
+
+        if (!validation) {
+            throw new Error('Invalid Loopring Order');
+        }
+
         const hash = signer.solSHA3(orderTypes, [protocol, owner, tokenS, tokenB,
             new BN(Number(amountS).toString(10), 10),
             new BN(Number(amountB).toString(10), 10),
@@ -54504,14 +54536,19 @@ function Order(data) {
             new BN(Number(lrcFee).toString(10), 10),
             buyNoMoreThanAmountB,
             marginSplitPercentage]);
-     console.log('hash: '+ hash.toString('hex'));
+
         const finalHash = ethUtil.hashPersonalMessage(hash);
-console.log(finalHash.toString('hex'));
+
         if (_.isString(privateKey)) {
-            privateKey =ethUtil.toBuffer(privateKey);
+            privateKey = ethUtil.toBuffer(privateKey);
         }
 
         const signature = ethUtil.ecsign(finalHash, privateKey);
+
+
+        v = Number(signature.v.toString());
+        r = '0x' + signature.r.toString('hex');
+        s = '0x' + signature.s.toString('hex');
 
         return {
             protocol,
@@ -54526,13 +54563,32 @@ console.log(finalHash.toString('hex'));
             lrcFee,
             buyNoMoreThanAmountB,
             marginSplitPercentage,
-            v: Number(signature.v.toString()),
-            r: '0x' + signature.r.toString('hex'),
-            s: '0x' + signature.s.toString('hex')
+            v,
+            r,
+            s
         }
     };
+
+    this.cancel = function (amount, privateKey) {
+
+     
+        if (!(r && v &&s)) {
+            this.sign(privateKey);
+        }
+
+        const order = {
+            addresses: [owner, tokenS, tokenB],
+            orderValues: [amountS, amountB, timestamp, ttl, salt, lrcFee, amount],
+            buyNoMoreThanAmountB,
+            marginSplitPercentage,
+            v,
+            r,
+            s
+        };
+        return signer.generateCancelOrderData(order);
+    }
 }
 
 module.exports = Order;
 
-},{"./signer.js":103,"bn.js":2,"ethereumjs-util":30,"lodash":81}]},{},[]);
+},{"./signer.js":103,"bn.js":2,"ethereumjs-util":30,"joi":53,"lodash":81}]},{},[]);

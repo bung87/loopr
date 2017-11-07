@@ -2746,5 +2746,4 @@ exports.valueToHex = function(value){
     var big = new BigNumber(value);
     return '0x' + big.toString(16);
 };
-
 },{"bignumber.js":1}]},{},[]);
