@@ -374,8 +374,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 }
 
-                console.log(tx);
-
                 var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }

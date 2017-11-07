@@ -175,7 +175,7 @@
                     data.salt = target.salt;
                     data.lrcFee = target.lrcFee;
                     data.buyNoMoreThanAmountB = target.buyNoMoreThanAmountB;
-                    data.marginSplitPercentage = target.marginSplitPercentage || 50;
+                    data.marginSplitPercentage = target.marginSplitPercentage;
                     data.v = Number(target.v);
                     data.r = target.r;
                     data.s = target.s;
@@ -193,18 +193,9 @@
                         data: cancelData
                     };
 
-                    const relay = new Relay('http://127.0.0.1:8545');
 
-                    const result = await relay.cancelLoopringOrder(rawTx, this.wallet.privateKey);
-
-                    if (result.error) {
-                        var detail = {text: result.error.message, category: "error", duration: 8000}
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                    }
+                    var detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Cancel Order"}]};
+                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
 
                 } catch (e) {
                     var detail = {text: e.message, category: "error", duration: 8000}
