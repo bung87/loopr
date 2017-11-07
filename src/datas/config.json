@@ -2,6 +2,8 @@
     "defaultPricePrecision": 8,
     "defaultVolumePrecision": 8,
     "defaultLrcFeePermillage": 2,
+    "defaultGasPrice": 21,
+    "defaultGasLimit":21000,
     "contracts": [
         {
             "address": "0x4c44d51cf0d35172fce9d69e2beac728de980e9d",

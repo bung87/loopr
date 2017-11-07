@@ -109,6 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+            <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
 
             <div class="sections">
@@ -301,7 +302,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _selectedToken(appConfig, balances, token) {
                 if (appConfig && balances && token) {
-                    this.authorizeToAddress = appConfig.contractAddress;
+                    let currentVersion = this.$.settingsVersion.value;
+                    this.authorizeToAddress = appConfig.contractVersionMap[currentVersion].address;
                     var combobox = this.$.tokensSelector;
                     combobox.value = token.toUpperCase();
                     return this._getTokenBalance(appConfig, balances, token);
