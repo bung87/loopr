@@ -104,7 +104,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <order-table name="orders" market="{{id}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
                                 <trade-table filter-mine name="mytrades" display-mode="order"></trade-table>
-                                <order-table filter-mine name="myorders"></order-table>
+                                <order-table filter-mine name="myorders" market="{{id}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
