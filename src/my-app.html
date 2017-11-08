@@ -290,6 +290,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
+        const keystore = require('keystore');
+        const privateKeyWallet = require('privateKey');
         const Validator = require('validator');
         const ethUtil = require('ethereumjs-util');
         const Relay = require('relay');
@@ -396,7 +398,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedLang(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsLang"]) {
-                    if(cookieValues["settingsLang"]){
+                    if (cookieValues["settingsLang"]) {
                         return cookieValues["settingsLang"];
                     } else {
                         return appConfig.langs[0].value;
@@ -406,7 +408,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedCurrency(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsCurrency"]) {
-                    if(cookieValues["settingsCurrency"]){
+                    if (cookieValues["settingsCurrency"]) {
                         return cookieValues["settingsCurrency"];
                     } else {
                         return appConfig.fiat[0].value;
@@ -416,7 +418,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedRelay(appConfig, cookieValues) {
                 if (appConfig && cookieValues && !cookieValues["settingsRelay"]) {
-                    if(cookieValues["settingsRelay"]){
+                    if (cookieValues["settingsRelay"]) {
                         return cookieValues["settingsRelay"];
                     } else {
                         return appConfig.relays[0].value;
@@ -426,7 +428,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedLrcFee(appConfig, cookieValues) {
                 if (appConfig && cookieValues) {
-                    if(cookieValues["settingsLrcFee"]){
+                    if (cookieValues["settingsLrcFee"]) {
                         return cookieValues["settingsLrcFee"];
                     } else {
                         return appConfig.defaultLrcFeePermillage;
@@ -436,7 +438,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computedGasPrice(appConfig, cookieValues) {
                 if (appConfig && cookieValues) {
-                    if(cookieValues["settingsGasPrice"]){
+                    if (cookieValues["settingsGasPrice"]) {
                         return cookieValues["settingsGasPrice"]
                     } else {
                         return appConfig.defaultGasPrice;
@@ -447,13 +449,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _computedVersion(appConfig, cookieValues) {
                 if (appConfig && cookieValues) {
                     let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
-                    if(cookieValues["settingsVersion"]){
+                    if (cookieValues["settingsVersion"]) {
                         let currentVersion = cookieValues["settingsVersion"];
                         let warnedVersion = cookieValues["warnedVersion"];
-                        if(latestVersion != currentVersion){
-                            if(!warnedVersion || warnedVersion != latestVersion){
-                                var detail = { text: "Your current contract version is "+currentVersion+", latest version "+latestVersion+" is available", category: "warning", duration: 8000 }
-                                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+                        if (latestVersion != currentVersion) {
+                            if (!warnedVersion || warnedVersion != latestVersion) {
+                                var detail = {
+                                    text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
+                                    category: "warning",
+                                    duration: 8000
+                                }
+                                this.dispatchEvent(new CustomEvent('notification', {
+                                    bubbles: true,
+                                    composed: true,
+                                    detail: detail
+                                }));
                                 this.warnedVersion = latestVersion;
                             }
                         }
@@ -526,9 +536,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _lockButtonClick() {
-//            this.$.lockButton.icon = "lock-open";
-//            this.lockClass = "openned";
-                this.wallet = null
+                if (this.wallet) {
+                    this.wallet = null
+                } else {
+                    window.location = "/#/wallet";
+                }
             }
 
             _routePageChanged(page) {

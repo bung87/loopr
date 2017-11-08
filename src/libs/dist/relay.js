@@ -43071,6 +43071,7 @@ exports.generateCancelOrderData = function (order) {
 
     return '0x' + method + data;
 };
+
 },{"ethereumjs-abi":26,"ethereumjs-tx":28,"ethereumjs-util":"ethereumjs-util","joi":53,"lodash":79}],111:[function(require,module,exports){
 (function (Buffer){
 const ethereumUtil = require('ethereumjs-util');
@@ -57601,8 +57602,6 @@ const BigNumber = require('bignumber.js');
 const _ = require('lodash');
 
 function relay(host) {
-
-
     const txSchema = Joi.object().keys({
         nonce: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
         gasPrice: Joi.string().regex(/^0x[0-9a-fA-F]{1,64}$/i),
@@ -57949,10 +57948,10 @@ function relay(host) {
         return await this.sendSignedTx(tx.signedTx);
     };
 
-    this.getOrders = async function (market, address, status, pageIndex, pageSize) {
+    this.getOrders = async function (market, address, status, pageIndex, pageSize, contractVersion) {
 
         request.method = 'getOrders';
-        request.params = {market, address, status, pageIndex, pageSize};
+        request.params = {market, address, status,contractVersion, pageIndex, pageSize};
         request.id = id();
 
         return await fetch(host, {
@@ -57967,10 +57966,9 @@ function relay(host) {
 
     };
 
-    this.getDepth = async function (market, pageIndex, pageSize) {
-
+    this.getDepth = async function (market, pageIndex, pageSize, contractVersion) {
         request.method = 'getDepth';
-        request.params = {market, pageIndex, pageSize};
+        request.params = {market, pageIndex, pageSize,contractVersion};
         request.id = id();
 
         return await fetch(host, {
@@ -58003,10 +58001,10 @@ function relay(host) {
     };
 
 
-    this.getFills = async function (market, address, pageIndex, pageSize) {
+    this.getFills = async function (market, address, pageIndex, pageSize,contractVersion) {
 
         request.method = 'getFills';
-        request.params = {market, address, pageIndex, pageSize};
+        request.params = {market, address, pageIndex, pageSize,contractVersion};
         request.id = id();
 
         return await fetch(host, {
@@ -58039,10 +58037,10 @@ function relay(host) {
 
     };
 
-    this.getRingMined = async function (ringHash, orderHash, miner, pageIndex, pageSize) {
+    this.getRingMined = async function (ringHash, orderHash, miner, pageIndex, pageSize,contractVersion) {
 
         request.method = 'getRingMined';
-        request.params = {ringHash, orderHash, miner, pageIndex, pageSize};
+        request.params = {ringHash, orderHash, miner, pageIndex, pageSize,contractVersion};
         request.id = id();
 
         return await fetch(host, {

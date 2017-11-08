@@ -125,7 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div class="line">
                             <div class="inputContainer">
                                 <div class="inputLine">
-                                    <vaadin-text-field value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
+                                    <vaadin-text-field id ="amount"  value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
                                                        label="Amount To Convert" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
                                         <div slot="suffix">[[fromToken]]</div>
                                     </vaadin-text-field>
@@ -331,19 +331,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             const tx = {};
             let subTitle;
             tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
-            tx.gasLimit = '0x' + this.gasLimit.toString(16);
+            tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
             const WETHConfig = this.appConfig.tokenMap['WETH'];
             tx.to = WETHConfig.address;
             if (this.fromToken === 'ETH') {
 
-                tx.value = '0x' + Number(this.amount).toString(16);
+                tx.value = '0x' + (Number(this.$.amount.value)* 1e18).toString(16);
                 tx.data = '0x';
 
                 subTitle = 'Convert ETH to  WETH';
             } else {
                 tx.value = '0x0';
                 const method = '0x' + ethUtil.sha3('withdraw(uint)').toString('hex').slice(0, 8);
-                tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + WETHConfig.digits)), 32).toString('hex');
+                tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)), 32).toString('hex');
                 subTitle = 'Convert WETH to  ETH';
             }
 
