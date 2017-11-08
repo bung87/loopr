@@ -100,9 +100,9 @@
                                         max="[[item.total]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
-                                <div>Original: [[item.amountS]]</div>
-                                <div>Filled: [[item.totalDealedAmountS]]</div>
-                                <div>Cancelled: [[item.totalCancelledAmountS]]</div>
+                                <div>Original: [[item.total]]</div>
+                                <div>Filled: [[item.totalDealed]]</div>
+                                <div>Cancelled: [[item.totalCanceled]]</div>
                             </div>
                         </paper-tooltip>
                     </div>
@@ -251,11 +251,11 @@
 
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
 
-                    const balance = order.orginalOrder.buyNoMoreThanAmountB ?  Number(balances[tokenb.token].balance) : Number(balances[tokens.token].balance);
-                    const allowance =order.orginalOrder.buyNoMoreThanAmountB ? Number(balances[tokenb.token].allowance) : Number(balances[tokens.token].allowance) ;
+                    const balance = order.orginalOrder.buyNoMoreThanAmountB ?  this.numberFormat(balances[tokenb.token].balance,tokenb) : this.numberFormat(balances[tokens.token].balance,tokens);
+                    const allowance =order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].allowance,tokenb) : this.numberFormat(balances[tokens.token].allowance,tokens) ;
 
                     const balanceRest = balance >= allowance ? allowance : balance;
-                    const orderRest =  order.total - order.totalDealedAndCanceled
+                    const orderRest =  order.total - order.totalDealedAndCanceled;
 
                     let rest = balanceRest >= orderRest ? orderRest : balanceRest;
 
@@ -275,16 +275,13 @@
             }
 
             _computeItem(appConfig, order,rawBalances) {
+                let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
+                let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
 
-                if (!(appConfig && order && rawBalances)) {
-                    return;
-                }
-
-                const totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? Number(order.totalDealedAmountB) : Number(order.totalDealedAmountS);
-                const totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? Number(order.orginalOrder.amountB) / Number(order.orginalOrder.amountS) * Number(order.totalCancelledAmountS) : Number(order.totalCancelledAmountS);
-                order.totalDealedAndCanceled = totalDealed + totalCanceled;
-
-                order.total =  order.orginalOrder.buyNoMoreThanAmountB ? Number(order.orginalOrder.amountB) : Number(order.orginalOrder.amountS);
+                order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.totalDealedAmountB,tokenb) : this.numberFormat(order.totalDealedAmountS,tokens);
+                order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB,tokenb) / this.numberFormat(order.orginalOrder.amountS,tokens) * this.numberFormat(order.totalCancelledAmountS,tokens) : this.numberFormat(order.totalCancelledAmountS,tokens);
+                order.totalDealedAndCanceled = order.totalDealed + order.totalCanceled;
+                order.total =  order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB,tokenb) : this.numberFormat(order.orginalOrder.amountS,tokens);
 
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
@@ -315,21 +312,21 @@
                 } else {
                     order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
                 }
-                let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
+
                 order.tokenB = order.orginalOrder.tokenB.toUpperCase();
                 order.amountB = this.numberFormat(order.orginalOrder.amountB,tokenb);
                 order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
                 order.pricePrecision = tokenb.pricePrecision;
                 order.volumnPrecisionB = tokenb.volumnPrecision;
-                let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
+
                 order.tokenS = order.orginalOrder.tokenS.toUpperCase();
                 order.amountS = this.numberFormat(order.orginalOrder.amountS,tokens);
                 order.volumnPrecisionS = tokens.volumnPrecision;
                 order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB,tokens);
                 order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS,tokens);
                 order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS,tokens);
-                order.rest = this._computeRest(rawBalances,tokens,order);
 
+                order.rest = this._computeRest(rawBalances,tokenb,tokens,order);
                 return order;
             }
 
