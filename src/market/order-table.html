@@ -96,8 +96,8 @@
                 <template class="header">Status</template>
                 <template>
                     <div id="progress[[index]]" class="horizontal end-justified layout">
-                        <paper-progress value="[[item.totalDealedAmountS]]" secondary-progress="[[item.rest]]"
-                                        max="[[item.amountS]]"></paper-progress>
+                        <paper-progress value="[[item.totalDealedAndCanceled]]" secondary-progress="[[item.rest]]"
+                                        max="[[item.total]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
                                 <div>Original: [[item.amountS]]</div>
@@ -197,7 +197,6 @@
                 try {
 
                     const target = e.target.order;
-                    console.log(target);
                     let data = {};
                     data.protocol = this.appConfig.contractAddress;
                     data.owner = this.wallet.address;
@@ -247,20 +246,20 @@
                 return settingsRelay;
             }
 
-            _computeRest(rawBalances,tokenb,order){
-                if(rawBalances){
+            _computeRest(rawBalances,tokenb, tokens, order){
+                if (rawBalances) {
 
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
 
-                    const balance = Number(balances[tokenb.token].balance);
-                    const allowance = Number(balances[tokenb.token].allowance);
+                    const balance = order.orginalOrder.buyNoMoreThanAmountB ?  Number(balances[tokenb.token].balance) : Number(balances[tokens.token].balance);
+                    const allowance =order.orginalOrder.buyNoMoreThanAmountB ? Number(balances[tokenb.token].allowance) : Number(balances[tokens.token].allowance) ;
 
-                    const  balanceRest =  balance >= allowance ? allowance : balance;
-                    const orderRest = order.amountS - order.totalDealedAmountS - order.totalCancelledAmountS;
+                    const balanceRest = balance >= allowance ? allowance : balance;
+                    const orderRest =  order.total - order.totalDealedAndCanceled
 
-                    let rest =  balanceRest >= orderRest ? orderRest : balanceRest;
+                    let rest = balanceRest >= orderRest ? orderRest : balanceRest;
 
-                    if(rest <0){
+                    if (rest < 0) {
                         rest = 0;
                     }
 
@@ -276,6 +275,16 @@
             }
 
             _computeItem(appConfig, order,rawBalances) {
+
+                if (!(appConfig && order && rawBalances)) {
+                    return;
+                }
+
+                const totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? Number(order.totalDealedAmountB) : Number(order.totalDealedAmountS);
+                const totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? Number(order.orginalOrder.amountB) / Number(order.orginalOrder.amountS) * Number(order.totalCancelledAmountS) : Number(order.totalCancelledAmountS);
+                order.totalDealedAndCanceled = totalDealed + totalCanceled;
+
+                order.total =  order.orginalOrder.buyNoMoreThanAmountB ? Number(order.orginalOrder.amountB) : Number(order.orginalOrder.amountS);
 
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
@@ -319,7 +328,7 @@
                 order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB,tokens);
                 order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS,tokens);
                 order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS,tokens);
-                order.rest = this.numberFormat(this._computeRest(rawBalances,tokens,order),tokens);
+                order.rest = this._computeRest(rawBalances,tokens,order);
 
                 return order;
             }
