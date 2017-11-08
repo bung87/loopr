@@ -50,13 +50,12 @@ const AppConfigMixin = (superclass) => class extends superclass {
     }
 
     _pageClick(e){
-        let selectedPage = Number(e.target.textContent)
         if("general first" === e.target.className){
             this.currentPage = 1;
         } else if("general previous" === e.target.className){
             this.currentPage = this.currentPage - 1;
         } else if("general" === e.target.className){
-            this.currentPage = selectedPage;
+            this.currentPage = Number(e.target.textContent);
         } else if("general next" === e.target.className){
             this.currentPage = this.currentPage + 1;
         } else if("general last" === e.target.className){
