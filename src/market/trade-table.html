@@ -147,7 +147,7 @@
             <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
         <div class$="[[showPage]] horizontal end-justified layout ">
-            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3" page-click="linkClick"></prism-square-pager>
+            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3"></prism-square-pager>
         </div>
     </template>
     <script>
