@@ -215,7 +215,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
         <iron-ajax auto url="/src/datas/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="/src/datas/price-quote.json" handle-as="json"
+        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?{{priceTimestamp}}" handle-as="json"
                    last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -360,6 +360,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     selectedPage: {
                         type: Object,
                         observer: '_selectedPageChanged'
+                    },
+                    priceTimestamp: {
+                        type: String
                     }
                 };
             }
@@ -394,10 +397,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
                 this.addEventListener('reset-wallet', e => this._resetWallet());
                 this.addEventListener('nout-found', e => this._showPage404(e.detail));
+
+                let _this = this;
+                window.setInterval(function(){
+                    _this.priceTimestamp = Date.parse(new Date());
+                }, 600000);
             }
 
             _computedLang(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsLang"]) {
+                if (appConfig && cookieValues) {
                     if (cookieValues["settingsLang"]) {
                         return cookieValues["settingsLang"];
                     } else {
@@ -407,7 +415,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computedCurrency(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsCurrency"]) {
+                if (appConfig && cookieValues) {
                     if (cookieValues["settingsCurrency"]) {
                         return cookieValues["settingsCurrency"];
                     } else {
@@ -417,7 +425,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computedRelay(appConfig, cookieValues) {
-                if (appConfig && cookieValues && !cookieValues["settingsRelay"]) {
+                if (appConfig && cookieValues) {
                     if (cookieValues["settingsRelay"]) {
                         return cookieValues["settingsRelay"];
                     } else {

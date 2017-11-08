@@ -79,10 +79,13 @@
 
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
+        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
 
         <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
                    last-response="{{rawBalances}}" auto></iron-ajax>
@@ -131,6 +134,7 @@
                                 [[tokens.allowanceWarn]] </a> <br>
                         </template>
                         Current Loopring Order Fee is [[settingsLrcFee]] ‰
+                        [[_showAmountInfo(tokens, sellAmount, priceQuote)]]
                     </div>
                 </div>
 
@@ -173,8 +177,8 @@
                             <a href="/#/approve/[[tokenb.token]]"> set allowance to
                                 [[tokenb.allowanceWarn]] </a> <br>
                         </template>
-
                         Current Loopring Order Fee is [[settingsLrcFee]] ‰
+                        [[_showAmountInfo(tokenb, buyTotal, priceQuote)]]
                     </div>
 
                 </div>
@@ -233,7 +237,8 @@
                     tokensBalance: Number,
                     tokensAllowance: Number,
                     tokenbBalance: Number,
-                    tokenbAllowance: Number
+                    tokenbAllowance: Number,
+                    lrcFee: Number
                 };
             }
 
@@ -486,6 +491,20 @@
 
             }
 
+            _showAmount(amount){
+                return Math.floor(amount * 100) / 100;
+            }
+
+            _showAmountInfo(selectToken, sellAmount, priceQuote) {
+                if(selectToken && sellAmount && priceQuote){
+                    let selectTokenPrice = priceQuote.getPrice(selectToken.token);
+                    let amount = sellAmount * selectTokenPrice;
+                    let fee = amount * this.settingsLrcFee / 1000;
+                    let lrcFee = fee / priceQuote.getPrice("LRC");
+                    this.lrcFee = lrcFee;
+                    return "; total order amount: "+this._showAmount(amount)+priceQuote.fiat+", total lrcFee: "+this._showAmount(fee)+priceQuote.fiat+"("+this._showAmount(lrcFee)+"LRC)";
+                }
+            }
         }
 
         window.customElements.define(OperationPanel.is, OperationPanel);
