@@ -39,6 +39,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             width: 260px;
         }
 
+        vaadin-text-field {
+            width: 260px;
+        }
+
         .lrcContainer {
             width: 260px;
         }
@@ -105,10 +109,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">LRC Fee</div>
-                                <div class="lrcContainer horizontal start-justified layout">
-                                    <div class="slider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
-                                    <div class="value-label"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
-                                </div>
+                                    <vaadin-text-field id="lrcFee" value="{{appConfig.defaultLrcFeePermillage}}"
+                                                       pattern="[[_lrcFeePatten()]]"
+                                                       error-message="[[_lrcFeeError()]]">
+                                        <div slot="suffix">‰</div>
+                                    </vaadin-text-field>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Gas Price</div>
@@ -172,9 +177,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
 
             this.$.lrcFee.addEventListener('value-changed', function() {
-                _this.settingsLrcFee = _this.$.lrcFee.value;
-                _this.$.feeLabel.textContent = _this.$.lrcFee.value + "‰";
-                console.log(_this.$.lrcFee.value)
+                if(_this._isLrcFee(_this.$.lrcFee.value)){
+                    _this.settingsLrcFee = _this.$.lrcFee.value;
+                }
+                console.log(_this.settingsLrcFee)
             });
 
             this.$.gasPrice.addEventListener('value-changed', function() {
@@ -182,6 +188,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _this.$.gasPriceLabel.textContent = _this.$.gasPrice.value + "GWEI";
                 console.log(_this.$.gasPrice.value)
             });
+        }
+
+        _lrcFeePatten() {
+            return "^([0-9]{1,3}|1000)$";
+        }
+
+        _isLrcFee(intVal) {
+            return intVal.toString().match(this._lrcFeePatten());
+        }
+
+        _lrcFeeError(int) {
+            return "input valid integer value (0~1000)";
         }
     }
 
