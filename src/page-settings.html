@@ -47,11 +47,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             width: 80%;
         }
 
-        .lable {
+        .value-label {
             width: 20%;
             font-size: 10px;
             @apply(--layout-vertical);
             @apply(--layout-center-justified);
+        }
+
+        .contract-address {
+            width: 260px;
+            height: 15px;
+            font-size: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: var(--app-text-color-light);
         }
         </style>
         <looper-page>
@@ -69,6 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+            <looper-toolbar slot="secondary-toolbar" active-tab="settings"></looper-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="card-content vertical center layout">
@@ -87,20 +98,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Contract Version</div>
-                                <vaadin-combo-box id="version" placeholder="Default Contract Version" items="{{appConfig.contracts}}" item-label-path="version" item-value-path="version"></vaadin-combo-box>
+                                <div>
+                                    <vaadin-combo-box id="version" placeholder="Default Contract Version" items="{{appConfig.contracts}}" item-label-path="version" item-value-path="version"></vaadin-combo-box>
+                                    <div class="contract-address">{{contractAddress}}</div>
+                                </div>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">LRC Fee</div>
                                 <div class="lrcContainer horizontal start-justified layout">
                                     <div class="slider"><paper-slider id="lrcFee" pin max="1000" max-markers="10" step="1" value="{{appConfig.defaultLrcFeePermillage}}"></paper-slider></div>
-                                    <div class="lable"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
+                                    <div class="value-label"><span id="feeLabel" class="caption">{{appConfig.defaultLrcFeePermillage}}‰</span></div>
                                 </div>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Gas Price</div>
                                 <div class="lrcContainer horizontal start-justified layout">
                                     <div class="slider"><paper-slider id="gasPrice" pin min="1" max="60" max-markers="15" step="1" value="{{appConfig.defaultGasPrice}}"></paper-slider></paper-slider></div>
-                                    <div class="lable"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
+                                    <div class="value-label"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
                                 </div>
                             </div>
                         </div>
@@ -130,6 +144,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.currency.value = this.settingsCurrency || "usd";
             this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
             this.$.version.value = this.settingsVersion || "0.0.1";
+            this.contractAddress = this.appConfig.contractVersionMap[this.$.version.value].address;
             this.$.lrcFee.value = this.settingsLrcFee;
             this.$.gasPrice.value = this.settingsGasPrice;
 
@@ -152,6 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             this.$.version.addEventListener('value-changed', function() {
                 _this.settingsVersion = _this.$.version.value || "0.0.1";
+                _this.contractAddress = _this.appConfig.contractVersionMap[_this.settingsVersion].address;
                 console.log(_this.settingsVersion);
             });
 
