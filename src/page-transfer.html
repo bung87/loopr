@@ -356,11 +356,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 const tx = {};
                 tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
-                tx.gasLimit = '0x' + this.gasLimit.toString(16);
+                tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                 if (this.selectedTokenBalance.token === 'ETH') {
 
                     tx.to = this.address;
-                    tx.value = '0x' + Number(this.amount) * 1e18.toString(16);
+                    tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
                     tx.data = this.additionalData || '0x';
                 } else {
                     tx.to = this.selectedTokenBalance.address;
@@ -368,12 +368,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                     const method = '0x' + ethUtil.sha3('transfer(address,uint)').toString('hex').slice(0, 8);
                     const params = ethUtil.setLengthLeft(ethUtil.toBuffer(this.address), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.amount) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
+                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
 
                     tx.data = method + params;
 
                 }
-
+                
                 var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }
