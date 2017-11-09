@@ -125,7 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div class="line">
                             <div class="inputContainer">
                                 <div class="inputLine">
-                                    <vaadin-text-field id ="amount"  value="{{amount}}" placeholder="[[fromTokenBalance.balance]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
+                                    <vaadin-text-field id ="amount"  value="{{amount}}" placeholder="[[amountShow]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
                                                        label="Amount To Convert" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
                                         <div slot="suffix">[[fromToken]]</div>
                                     </vaadin-text-field>
@@ -148,7 +148,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </looper-page>
     </template>
     <script>
-    class PageConvert extends Polymer.Element {
+    class PageConvert extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'page-convert'; }
         static get properties() {
             return {
@@ -175,6 +175,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 amount: {
                     type: Number
+                },
+                amountShow: {
+                    type: Number,
+                    computed: '_computeAmountShow(fromTokenBalance)'
                 },
                 gasLimit: {
                     type: Number,
@@ -214,6 +218,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         }
 
+        _computeAmountShow(fromTokenBalance) {
+            if(fromTokenBalance) {
+                return this._numberFormat(fromTokenBalance.balance, fromTokenBalance.digits, fromTokenBalance.precision);
+            }
+        }
+
         _computeGasLimit(appConfig){
             if(appConfig){
                 return appConfig.defaultGasLimit;
@@ -247,7 +257,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                balance: balance,
                availableAllowance: allowance,
                defaultAllowance: tokenConfig.allowanceWarn,
-               precision: tokenConfig.precision
+               precision: tokenConfig.precision,
+               digits: tokenConfig.digits,
+               address: tokenConfig.address
             }
         }
 
