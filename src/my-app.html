@@ -221,7 +221,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
         <iron-ajax auto url="/src/datas/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?{{priceTimestamp}}" handle-as="json"
+        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json"
                    last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>

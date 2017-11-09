@@ -99,7 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="amount" value="{{amount}}" label="Amount to Send"
-                                                   placeholder="[[selectedTokenBalance.balance]]"
+                                                   placeholder="[[amountShow]]"
                                                    pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                    error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
                                     <div slot="suffix">[[selectedTokenBalance.unit]]</div>
@@ -142,7 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <div secondary>
                                         <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
                                                    last-response="{{rawBalances}}" auto></iron-ajax>
-                                        [[_showTokenBalance(selectedTokenBalance)]]
+                                        [[amountShow]]
                                     </div>
                                 </paper-item-body>
                             </paper-item>
@@ -156,7 +156,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
 
-        class PageTransfer extends Polymer.Element {
+        class PageTransfer extends AppConfigMixin(Polymer.Element)  {
             static get is() {
                 return 'page-transfer';
             }
@@ -168,6 +168,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     amount: {
                         type: Number
+                    },
+                    amountShow: {
+                        type: Number,
+                        value: 0,
+                        computed: '_computeAmountShow(selectedTokenBalance)'
                     },
                     tokens: {
                         type: Object,
@@ -218,6 +223,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            _computeAmountShow(selectedTokenBalance) {
+                if(selectedTokenBalance) {
+                    return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
+                }
+            }
+
             _selectedToken(appConfig, balances, token) {
                 if (appConfig && balances && token) {
                     var combobox = this.$.tokensSelector;
@@ -246,12 +257,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     precision: tokenConfig.precision,
                     digits: tokenConfig.digits,
                     address: tokenConfig.address
-                }
-            }
-
-            _showTokenBalance(selectedTokenBalance) {
-                if (selectedTokenBalance) {
-                    return selectedTokenBalance.balance;
                 }
             }
 
