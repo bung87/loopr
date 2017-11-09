@@ -110,9 +110,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-
             <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
-
             <div class="sections">
                 <paper-card>
                     <div class="container">
@@ -138,17 +136,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
                                                    label="Gas Limit" error-message="[[_integerError()]]">
                                 </vaadin-text-field>
-                            </div>
-                            <div class="line advance">
-                                <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
-                            </div>
-                            <div class="hidden" id="hiddenExtData">
-                                <div class="line">
-                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
-                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                       error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
-                                    </vaadin-text-field>
-                                </div>
                             </div>
                             <div class="line button">
                                 <paper-button primary on-click="_signToSend" id="send">Generate Transaction
