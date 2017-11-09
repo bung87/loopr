@@ -116,8 +116,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="hidden" id="hiddenExtData">
                                 <div class="line">
                                     <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
-                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                       error-message="[[_numError(additionalData, selectedTokenBalance.precision)]]">
+                                                       pattern="^0x[0-9a-fA-F]{8}([0-9a-fA-F]{64})*$"
+                                                       error-message="invalid extra data">
                                     </vaadin-text-field>
                                 </div>
                             </div>
@@ -293,10 +293,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this._buttonDisable();
                     return false;
                 }
-                console.log(address + " " + amount + " " + gasLimit)
                 if (this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
                     if (additionalData) {
-                        if (this._isNum(additionalData)) {
+                        const dataRegex = /^0x[0-9a-fA-F]{8}([0-9a-fA-F]{64})*$/i;
+                        if (additionalData.match(dataRegex)) {
                             this._buttonAvailable();
                         } else {
                             this._buttonDisable();
