@@ -93,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                                   label="Token" item-value-path="token"></vaadin-combo-box>
                             </div>
                             <div class="line">
-                                <address-text-field value="{{address}}"
+                                <address-text-field id="sendTo" value="{{address}}"
                                                     label="Send To"
                                                     error-message="invalid ETH address"></address-text-field>
                             </div>
@@ -276,6 +276,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
+
+                this.$.sendTo.focus();
             }
 
             handleClick() {
