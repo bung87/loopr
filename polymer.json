@@ -8,7 +8,7 @@
         "src/page-ring.html",
         "src/page-order.html",
         "src/page-wallet.html",
-        "src/page-authorize.html",
+        "src/page-approve.html",
         "src/page-convert.html",
         "src/page-transfer.html",
         "src/page-settings.html",
