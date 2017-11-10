@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="input-wrapper horizontal layout center-justified">
                                     <iron-input bind-value="{{password}}" auto-validate>
-                                        <input type="password">
+                                        <input id="passwordInput" type="password">
                                     </iron-input>
                                 </div>
                             </div>
@@ -110,6 +110,7 @@
             ready() {
                 super.ready();
                 this.$.fileInput.addEventListener('change', this.readFile.bind(this), false);
+                this.$.passwordInput.focus();
             }
 
             chooseFile() {
@@ -126,6 +127,7 @@
                 reader.readAsText(file);
                 reader.onload = function (e) {
                     this.walletContent = e.target.result;
+                    this.$.passwordInput.focus();
                 }.bind(this);
             }
 
