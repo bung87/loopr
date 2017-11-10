@@ -117,7 +117,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="hidden" id="hiddenExtData">
                                 <div class="line">
                                     <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
-                                                       pattern="^0x[0-9a-fA-F]{8}([0-9a-fA-F]{64})*$"
+                                                       pattern="^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$"
                                                        error-message="invalid extra data"
                                                        tabindex="6">
                                     </vaadin-text-field>
@@ -308,7 +308,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 if (this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
                     if (additionalData) {
-                        const dataRegex = /^0x[0-9a-fA-F]{8}([0-9a-fA-F]{64})*$/i;
+                        const dataRegex = /^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$/i;
                         if (additionalData.match(dataRegex)) {
                             this._buttonAvailable();
                             return true;
@@ -391,6 +391,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.data = method + params;
 
                 }
+
+                console.log(JSON.stringify(tx));
 
                 var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
