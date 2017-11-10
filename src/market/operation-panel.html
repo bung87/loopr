@@ -130,7 +130,7 @@
                             your allowance is [[tokensAllowance]];
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokensAllowance,tokens)]]">
-                            <a href="/#/approve/[[tokens.token]]"> set allowance to
+                            <a href="/#/approve/[[tokens.token]]" tabindex="-1"> set allowance to
                                 [[tokens.allowanceWarn]] </a> <br>
                         </template>
                         Current Loopring Order Fee is [[settingsLrcFee]] ‰
@@ -174,7 +174,7 @@
                             your allowance is [[tokenbAllowance]];
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokenbAllowance,tokenb)]]">
-                            <a href="/#/approve/[[tokenb.token]]"> set allowance to
+                            <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> set allowance to
                                 [[tokenb.allowanceWarn]] </a> <br>
                         </template>
                         Current Loopring Order Fee is [[settingsLrcFee]] ‰

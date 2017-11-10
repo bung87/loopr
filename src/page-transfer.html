@@ -83,52 +83,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
                         <div class="left">
                             <div class="line">
                                 <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
-                                                  label="Token" item-value-path="token"></vaadin-combo-box>
+                                                  label="Token" item-value-path="token" tabindex="1"></vaadin-combo-box>
                             </div>
                             <div class="line">
                                 <address-text-field id="sendTo" value="{{address}}"
                                                     label="Send To"
-                                                    error-message="invalid ETH address"></address-text-field>
+                                                    error-message="invalid ETH address" tabindex="2"></address-text-field>
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="amount" value="{{amount}}" label="Amount to Send"
                                                    placeholder="[[amountShow]]"
                                                    pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                   error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                                   error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
+                                                   tabindex="3">
                                     <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                 </vaadin-text-field>
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                   label="Gas Limit" error-message="[[_integerError()]]">
+                                                   label="Gas Limit" error-message="[[_integerError()]]" tabindex="4">
                                 </vaadin-text-field>
                             </div>
                             <div class="line advance">
-                                <a href="javascript:void(0)" on-click="handleClick">+Advanced: Add Data</a>
+                                <a href="javascript:void(0)" on-click="handleClick" tabindex="5">+Advanced: Add Data</a>
                             </div>
                             <div class="hidden" id="hiddenExtData">
                                 <div class="line">
                                     <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
                                                        pattern="^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$"
-                                                       error-message="invalid extra data">
+                                                       error-message="invalid extra data"
+                                                       tabindex="6">
                                     </vaadin-text-field>
                                 </div>
                             </div>
                             <div class="line button">
-                                <paper-button primary on-click="signToSend" id="send">Generate Transaction
+                                <paper-button primary on-click="signToSend" id="send" tabindex="7">Generate Transaction
                                 </paper-button>
                             </div>
                         </div>
                         <div class="split"></div>
                         <div class="right">
-                            <paper-item>
+                            <paper-item tabindex="-1">
                                 <paper-item-body two-line>
                                     <div class="title"> Account Address</div>
                                     <div secondary>
@@ -136,7 +138,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     </div>
                                 </paper-item-body>
                             </paper-item>
-                            <paper-item>
+                            <paper-item tabindex="-1">
                                 <paper-item-body two-line>
                                     <div class="title"> Balance</div>
                                     <div secondary>
@@ -276,8 +278,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
-
                 this.$.sendTo.focus();
+                document.addEventListener('keyup', function(event) {
+                    if (event.keyCode == "13") {
+                        this.$.send.click();
+                    }
+                }.bind(this));
             }
 
             handleClick() {
@@ -305,15 +311,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         const dataRegex = /^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$/i;
                         if (additionalData.match(dataRegex)) {
                             this._buttonAvailable();
+                            return true;
                         } else {
                             this._buttonDisable();
                         }
                     } else {
                         this._buttonAvailable();
+                        return true;
                     }
                 } else {
                     this._buttonDisable();
                 }
+                return false;
             }
 
             _buttonAvailable() {
@@ -360,7 +369,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
             async signToSend() {
-
+                if(!this.valid) {
+                    return;
+                }
                 const tx = {};
                 tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
                 tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);

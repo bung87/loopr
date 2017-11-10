@@ -265,7 +265,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div condensed-title></div>
                         <div class="address">[[wallet.address]]</div>
                         <paper-icon-button id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick"
-                                           icon="lock"></paper-icon-button>
+                                           icon="lock" tabindex="-1"></paper-icon-button>
                         <div spacer></div>
                     </app-toolbar>
                 </app-header>
@@ -408,6 +408,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 window.setInterval(function(){
                     _this.priceTimestamp = Date.parse(new Date());
                 }, 600000);
+
+                Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
+                    item.tabIndex = "-1";
+                });
             }
 
             _computedLang(appConfig, cookieValues) {
