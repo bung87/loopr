@@ -1,44 +1,43 @@
 {
-    "entrypoint": "index.html",
-    "shell": "src/my-app.html",
-    "fragments": [
-        "src/page-markets.html",
-        "src/page-market.html",
-        "src/page-history.html",
-        "src/page-ring.html",
-        "src/page-order.html",
-        "src/page-wallet.html",
-        "src/page-approve.html",
-        "src/page-convert.html",
-        "src/page-transfer.html",
-        "src/page-settings.html",
-        "src/page-doc.html",
-        "src/page-404.html",
-        "src/page-dev.html",
-        "src/page-unlockwallet.html",
-        "src/page-generatewallet.html"
-    ],
-    "sources": [
-        "src/**/*",
-        "images/**/*"
-    ],
-    "extraDependencies": [
-        "manifest.json",
-        "bower_components/webcomponentsjs/*.js",
-        "bower_components/loopring.js/dist/*.js"
-    ],
-    "lint":
+  "entrypoint": "index.html",
+  "shell": "src/my-app.html",
+  "fragments": [
+    "src/page-markets.html",
+    "src/page-market.html",
+    "src/page-ring.html",
+    "src/page-order.html",
+    "src/page-history.html",
+    "src/page-wallet.html",
+    "src/page-transfer.html",
+    "src/page-approve.html",
+    "src/page-convert.html",
+    "src/page-settings.html",
+    "src/page-doc.html",
+    "src/page-404.html",
+    "src/page-dev.html",
+    "src/page-generatewallet.html",
+    "src/page-unlockwallet.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*"
+  ],
+  "lint": {
+    "rules": ["polymer-2"]
+  },
+  "builds": [
     {
-        "rules": ["polymer-2"]
-    },
-    "builds": [
-    {
-        "preset": "es5-bundled"
+      "preset": "es5-bundled"
     },
     {
-        "preset": "es6-bundled"
+      "preset": "es6-bundled"
     },
     {
-        "preset": "es6-unbundled"
-    }]
+      "preset": "es6-unbundled"
+    }
+  ]
 }
