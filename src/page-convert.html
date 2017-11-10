@@ -216,6 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.gasLimit.addEventListener('value-changed', function() {
                 _this.gasLimit = _this.$.gasLimit.value;
             });
+            this.$.amount.focus();
         }
 
         _computeAmountShow(fromTokenBalance) {
