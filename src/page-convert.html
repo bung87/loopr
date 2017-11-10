@@ -99,25 +99,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
         <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
         <looper-page>
-            <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
                         <div class="line">
                             <div class="left">
                                 <div class="tokenImage">
-                                    <iron-icon id="fromIcon" src="[[_tokenIcon(fromToken)]]"></iron-icon>
+                                    <iron-icon id="fromIcon" src="[[_tokenIcon(fromToken)]]" tabindex="-1"></iron-icon>
                                 </div>
                                 <div class="tokenName">[[fromToken]]</div>
                             </div>
                             <div class="swap">
-                                <a href="javascript:void(0)" on-click="swap">
+                                <a href="javascript:void(0)" on-click="swap" tabindex="-1">
                                     <iron-icon icon="icons:forward"></iron-icon>
                                 </a>
                             </div>
                             <div class="right">
                                 <div class="tokenImage">
-                                    <iron-icon id="toIcon" src="[[_tokenIcon(toToken)]]"></iron-icon>
+                                    <iron-icon id="toIcon" src="[[_tokenIcon(toToken)]]" tabindex="-1"></iron-icon>
                                 </div>
                                 <div class="tokenName">[[toToken]]</div>
                             </div>
@@ -126,17 +126,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="inputContainer">
                                 <div class="inputLine">
                                     <vaadin-text-field id ="amount"  value="{{amount}}" placeholder="[[amountShow]]" pattern="[[_numPatten(fromTokenBalance.precision)]]"
-                                                       label="Amount To Convert" error-message="[[_numError(amount, fromTokenBalance.precision)]]">
+                                                       label="Amount To Convert" error-message="[[_numError(amount, fromTokenBalance.precision)]]" tabindex="1">
                                         <div slot="suffix">[[fromToken]]</div>
                                     </vaadin-text-field>
                                 </div>
                                 <div class="inputLine">
                                     <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                       label="Gas Limit" error-message="[[_integerError()]]">
+                                                       label="Gas Limit" error-message="[[_integerError()]]" tabindex="2">
                                     </vaadin-text-field>
                                 </div>
                                 <div class="inputLine">
-                                        <paper-button primary raised on-click="signToSend" id="send">Generate Transaction</paper-button>
+                                    <paper-button primary raised on-click="signToSend" id="send" tabindex="3">Generate Transaction</paper-button>
                                 </div>
                             </div>
                         </div>

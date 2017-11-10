@@ -75,7 +75,7 @@
                         </div>
                     </div>
                     <div class$="input-wrapper horizontal layout center-justified [[decryptReadyClass(walletContent,passwordRequired,password)]]">
-                        <paper-button noink primary on-click="unlockClicked">Unlock my wallet</paper-button>
+                        <paper-button id="unlockButton" noink primary on-click="unlockClicked">Unlock my wallet</paper-button>
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
@@ -110,7 +110,11 @@
             ready() {
                 super.ready();
                 this.$.fileInput.addEventListener('change', this.readFile.bind(this), false);
-                this.$.passwordInput.focus();
+                document.addEventListener('keyup', function(event) {
+                    if (event.keyCode == "13") {
+                        this.$.unlockButton.click();
+                    }
+                }.bind(this));
             }
 
             chooseFile() {
