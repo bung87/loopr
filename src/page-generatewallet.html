@@ -49,6 +49,13 @@
         div[show] {
             opacity: 1;
         }
+
+         vaadin-password-field.fixedwidth {
+
+             width: 282px;
+         }
+
+
         </style>
         <looper-page>
             <simple-toolbar slot="secondary-toolbar" title="Wallet" id="Generate New Wallet" back-link="#/wallet"></simple-toolbar>
@@ -59,10 +66,11 @@
                         <div class="vertical center layout ">
                             <div secondary-text> Provide a very strong password:</div>
                             <div class="input-wrapper horizontal layout center-justified">
-                                <iron-input bind-value="{{password}}" auto-validate>
-                                    <input type$="{{inputType}}">
-                                </iron-input>
-                                <paper-icon-button id="visibleBtn" on-click="toggleVisible" icon="{{visibility}}"></paper-icon-button>
+                                <!--<iron-input bind-value="{{password}}" auto-validate>-->
+                                    <!--<input type$="{{inputType}}">-->
+                                <!--</iron-input>-->
+                                <!--<paper-icon-button id="visibleBtn" on-click="toggleVisible" icon="{{visibility}}"></paper-icon-button>-->
+                                <vaadin-password-field  class = "fixedwidth"  id="password" value="{{password}}"></vaadin-password-field>
                             </div>
                             <div class="error" show$="[[showError]]">
                                 Your password is too weak, it should have at least 9 characters.

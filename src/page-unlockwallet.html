@@ -35,9 +35,24 @@
                 visibility: hidden;
             }
 
+            div.error {
+
+                font-size: 14px;
+                color: var(--app-red-color);
+                padding-top: 0;
+                text-align: center;
+            }
+
             div.top {
                 padding-top: 60px;
             }
+
+            vaadin-password-field.fixedwidth {
+
+                width: 282px;
+            }
+
+
         </style>
         <input id="fileInput" type="file"/>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -62,16 +77,11 @@
                                 <div secondary-text>Great. Your wallet is password protected. Provide your password:
                                 </div>
                                 <div class="input-wrapper horizontal layout center-justified">
-                                    <iron-input bind-value="{{password}}" auto-validate>
-                                        <input id="passwordInput" type="password">
-                                    </iron-input>
+                                    <vaadin-password-field  class = "fixedwidth"  id="password" value="{{password}}">
+                                    </vaadin-password-field>
                                 </div>
+                                <div class="error">[[decryptError]]</div>
                             </div>
-                        </div>
-                    </div>
-                    <div class$="[[decryptErrorExistedClass(decryptError)]]">
-                        <div>
-                            [[decryptError]]
                         </div>
                     </div>
                     <div class$="input-wrapper horizontal layout center-justified [[decryptReadyClass(walletContent,passwordRequired,password)]]">
