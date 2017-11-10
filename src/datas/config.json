@@ -134,11 +134,11 @@
     ],
     "relays": [
         {
-            "value": "//raw.githubusercontent.com",
+            "value": "https://raw.githubusercontent.com",
             "label": "Default Looper Relay"
         },
         {
-            "value": "//raw.githubusercontent.com",
+            "value": "https://raw.githubusercontent.com",
             "label": "Backup Looper Relay"
         },
         {
