@@ -73,3 +73,11 @@ Run `polymer help build` for the full list of available options and optimization
 This command serves your app. Replace `build-folder-name` with the folder name of the build you want to serve.
 
     polymer serve build/build-folder-name/
+
+### Deploy
+
+```
+npm install -g firebase-tools
+firebase login
+firebase deploy
+```
