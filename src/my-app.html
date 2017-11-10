@@ -202,6 +202,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-icon-button:not([narrow]) [drawer-toggle] {
                 display: none;
             }
+
+
+            div.address {
+                font-size: 14px;
+            }
+
         </style>
         <!-- routing -->
         <app-location use-hash-as-path route="{{route}}">
@@ -257,7 +263,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div main-title>Looper</div>
                         </a>
                         <div condensed-title></div>
-                        <div>[[wallet.address]]</div>
+                        <div class="address">[[wallet.address]]</div>
                         <paper-icon-button id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick"
                                            icon="lock"></paper-icon-button>
                         <div spacer></div>
@@ -413,6 +419,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
                 }
             }
+
 
             _computedCurrency(appConfig, cookieValues) {
                 if (appConfig && cookieValues) {

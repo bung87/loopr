@@ -121,7 +121,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <div class="amount">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]"
+                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
                                                        label="Amount" pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                        error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
@@ -165,13 +165,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item class="flex">
                                     <paper-item-body two-line>
                                         <div class="title"> [[selectedTokenBalance.token]] Balance</div>
-                                        <div secondary>[[selectedTokenBalance.balance]]</div>
+                                        <div secondary>[[amountShow]]</div>
                                     </paper-item-body>
                                 </paper-item>
                                 <paper-item class="flex">
                                     <paper-item-body two-line>
                                         <div class="title"> Available [[selectedTokenBalance.token]] Allowance</div>
-                                        <div secondary>[[selectedTokenBalance.availableAllowance]]</div>
+                                        <div secondary>[[selectedTokenBalance.availableAllowanceShow]]</div>
                                     </paper-item-body>
                                 </paper-item>
                             </div>
@@ -185,7 +185,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
 
-        class PageApprove extends Polymer.Element {
+        class PageApprove extends AppConfigMixin(Polymer.Element) {
             static get is() {
                 return 'page-approve';
             }
@@ -206,6 +206,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     amount: {
                         type: Number
+                    },
+                    amountShow: {
+                        type: Number,
+                        computed: '_computeAmountShow(selectedTokenBalance)'
                     },
                     balances: {
                         type: Object,
@@ -282,6 +286,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            _computeAmountShow(selectedTokenBalance) {
+                if(selectedTokenBalance) {
+                    return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
+                }
+            }
+
             _computeBalances(data) {
                 if (data) {
                     return _.keyBy(data.result.tokens, o => o.token);
@@ -310,6 +320,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
+                this.$.amount.focus();
             }
 
             _getTokenBalance(appConfig, balances, selectedToken) {
@@ -329,6 +340,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         unit: tokenConfig.unit,
                         balance: balance,
                         availableAllowance: allowance,
+                        availableAllowanceShow: this._numberFormat(allowance, tokenConfig.digits, tokenConfig.precision),
                         defaultAllowance: tokenConfig.allowanceWarn,
                         precision: tokenConfig.precision,
                         digits: tokenConfig.digits,

@@ -98,7 +98,7 @@
             <div name="sell">
                 <div class="sell container">
 
-                    <vaadin-text-field label="[[tokens.token]] Quantity" value="{{sellAmount}}"
+                    <vaadin-text-field id="sellAmount" label="[[tokens.token]] Quantity" value="{{sellAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
                                        error-message="sellAmountError">
                         <div slot="suffix">[[tokens.unit]]</div>
@@ -142,7 +142,7 @@
             <!-- ----- -->
             <div name="buy">
                 <div class="buy container">
-                    <vaadin-text-field label="[[tokens.token]] Quantity" value="{{buyAmount}}"
+                    <vaadin-text-field id="buyAmount" label="[[tokens.token]] Quantity" value="{{buyAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
                                        error-message="buyAmountError">
                         <div slot="suffix">[[tokens.unit]]</div>
@@ -207,7 +207,8 @@
                     },
                     sellOrBuy: {
                         type: String,
-                        value: "buy"
+                        value: "buy",
+                        observer: '_changeTabd'
                     },
                     buyAmount: {
                         type: Number,
@@ -242,6 +243,18 @@
                 };
             }
 
+            ready(){
+                super.ready();
+                this.$.buyAmount.focus();
+            }
+
+            _changeTab() {
+                if("sell" == this.sellOrBuy){
+                   this.$.sellAmount.focus();
+                } else {
+                   this.$.buyAmount.focus();
+                }
+            }
 
             static get observers() {
                 return [ 'buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)',
