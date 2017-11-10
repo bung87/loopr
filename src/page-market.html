@@ -60,7 +60,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <looper-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <simple-toolbar slot="secondary-toolbar" title="Market" id="[[marketId()]]"
-                            back-link="#/markets"></simple-toolbar>
+                            back-link="#/markets" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card id="charts">
                     <div class="vertical layout">
@@ -79,7 +79,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
                         <operation-panel market="{{id}}"></operation-panel>
                     </template>
-
                     <div class$="walletlink [[isUnlockedClass(wallet)]]">
                         <a href="/#/wallet" class="walletlink"> Please Set Your Wallet First ... </a>
                     </div>
@@ -144,7 +143,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             ready() {
                 super.ready()
-                console.log("market:" + this.id)
+                console.log("market:" + this.id);
+                Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
+                    item.tabIndex = "-1";
+                });
             }
 
             marketId() {

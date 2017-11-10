@@ -39,6 +39,17 @@ const AppConfigMixin = (superclass) => class extends superclass {
             .toNumber();
     };
 
+    _numberFormat(value, digits, precision){
+        if(value && digits && precision){
+            if(value >0){
+                let v = value / Math.pow(10, digits);
+                return v.toFixed(precision);
+            } else {
+                return "0."+"0".repeat(precision);
+            }
+        }
+    }
+
     _pager(){
         let pager = this.$.pager;
         if(pager){

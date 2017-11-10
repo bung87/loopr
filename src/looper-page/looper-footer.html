@@ -122,6 +122,13 @@
         static get properties() {
             return {};
         }
+
+        ready(){
+            super.ready();
+            Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
+                item.tabIndex = "-1";
+            });
+        }
     }
 
     window.customElements.define(LooperFooter.is, LooperFooter);

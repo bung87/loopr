@@ -130,7 +130,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        display: block;
+        <<<<<<< HEAD display: block;
     }
 
     app-drawer-layout:not([narrow]) [drawer-toggle] {
@@ -199,12 +199,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         border-radius: 50%;
     }
 
-    .wallet-address {
+    .address {
         font-size: 12px;
-        padding: 0 10px;
+        padding: 0 8px;
         color: white;
     }
-    
+
     paper-icon-button:not([narrow]) [drawer-toggle] {
         display: none;
     }
@@ -262,8 +262,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div main-title>Looper</div>
                         </a>
                         <div condensed-title></div>
-                        <div class="wallet-address">[[wallet.address]]</div>
-                        <paper-icon-button noink id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick" icon="lock"></paper-icon-button>
+                        <div class="address">[[wallet.address]]</div>
+                        <paper-icon-button id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick" icon="lock" tabindex="-1"></paper-icon-button>
                         <div spacer></div>
                     </app-toolbar>
                 </app-header>
@@ -301,297 +301,327 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     const Order = require('order');
 
     class MyApp extends Polymer.Element {
-        static get is() {
-            return 'my-app';
-        }
+            static get is() {
+                return 'my-app';
+            }
 
-        static get properties() {
-            return {
-                cookieValues: {
-                    type: Object
-                },
-                settingsLang: {
-                    type: String,
-                    computed: '_computedLang(appConfig, cookieValues)'
-                },
-                settingsCurrency: {
-                    type: String,
-                    computed: '_computedCurrency(appConfig, cookieValues)'
-                },
-                settingsRelay: {
-                    type: String,
-                    computed: '_computedRelay(appConfig, cookieValues)'
-                },
-                settingsLrcFee: {
-                    type: Number,
-                    computed: '_computedLrcFee(appConfig, cookieValues)'
-                },
-                settingsGasPrice: {
-                    type: Number,
-                    computed: '_computedGasPrice(appConfig, cookieValues)'
-                },
-                settingsVersion: {
-                    type: Number,
-                    computed: '_computedVersion(appConfig, cookieValues)'
-                },
-                page: {
-                    type: String,
-                    reflectToAttribute: true,
-                    observer: '_pageChanged'
-                },
-                pageId: {
-                    type: String,
-                    reflectToAttribute: true
-                },
-                routeData: Object,
-                rootPath: String,
-                subrouteData: Object,
-                appConfigRaw: Object,
-                appConfig: {
-                    type: Object,
-                    computed: '_computeAppConfig(appConfigRaw)'
-                },
-                priceQuoteRaw: Object,
-                priceQuote: {
-                    type: Object,
-                    computed: '_computePriceQuote(priceQuoteRaw)'
-                },
-                wallet: {
-                    type: Object,
-                    observer: '_walletChanged'
-                },
-                selectedPage: {
-                    type: Object,
-                    observer: '_selectedPageChanged'
-                },
-                priceTimestamp: {
-                    type: String
+            static get properties() {
+                    return {
+                        cookieValues: {
+                            type: Object
+                        },
+                        settingsLang: {
+                            type: String,
+                            computed: '_computedLang(appConfig, cookieValues)'
+                        },
+                        settingsCurrency: {
+                            type: String,
+                            computed: '_computedCurrency(appConfig, cookieValues)'
+                        },
+                        settingsRelay: {
+                            type: String,
+                            computed: '_computedRelay(appConfig, cookieValues)'
+                        },
+                        settingsLrcFee: {
+                            type: Number,
+                            computed: '_computedLrcFee(appConfig, cookieValues)'
+                        },
+                        settingsGasPrice: {
+                            type: Number,
+                            computed: '_computedGasPrice(appConfig, cookieValues)'
+                        },
+                        settingsVersion: {
+                            type: Number,
+                            computed: '_computedVersion(appConfig, cookieValues)'
+                        },
+                        page: {
+                            type: String,
+                            reflectToAttribute: true,
+                            observer: '_pageChanged'
+                        },
+                        pageId: {
+                            type: String,
+                            reflectToAttribute: true
+                        },
+                        routeData: Object,
+                        rootPath: String,
+                        subrouteData: Object,
+                        appConfigRaw: Object,
+                        appConfig: {
+                            type: Object,
+                            computed: '_computeAppConfig(appConfigRaw)'
+                        },
+                        priceQuoteRaw: Object,
+                        priceQuote: {
+                            type: Object,
+                            computed: '_computePriceQuote(priceQuoteRaw)'
+                        },
+                        wallet: {
+                            type: Object,
+                            observer: '_walletChanged'
+                        },
+                        selectedPage: {
+                            type: Object,
+                            observer: '_selectedPageChanged'
+                        },
+                        priceTimestamp: {
+                            type: String
+                        }
+                    };
                 }
-            };
-        }
 
-        ready() {
-            super.ready();
-            let cookieValue = {};
-            if (this.$.settingsRelay.value) {
-                cookieValue["settingsRelay"] = this.$.settingsRelay.value;
-            }
-            if (this.$.settingsCurrency.value) {
-                cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
-            }
-            if (this.$.settingsLang.value) {
-                cookieValue["settingsLang"] = this.$.settingsLang.value;
-            }
-            if (this.$.settingsLrcFee.value) {
-                cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
-            }
-            if (this.$.settingsGasPrice.value) {
-                cookieValue["settingsGasPrice"] = this.$.settingsGasPrice.value;
-            }
-            if (this.$.settingsVersion.value) {
-                cookieValue["settingsVersion"] = this.$.settingsVersion.value;
-            }
-            if (this.$.warnedVersion.value) {
-                cookieValue["warnedVersion"] = this.$.warnedVersion.value;
-            }
-            this.cookieValues = cookieValue;
-
-            this.addEventListener('notification', e => this.$.notification.display(e.detail));
-            this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
-            this.addEventListener('reset-wallet', e => this._resetWallet());
-            this.addEventListener('nout-found', e => this._showPage404(e.detail));
-
-            let _this = this;
-            window.setInterval(function() {
-                _this.priceTimestamp = Date.parse(new Date());
-            }, 600000);
-        }
-
-        _computedLang(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsLang"]) {
-                    return cookieValues["settingsLang"];
-                } else {
-                    return appConfig.langs[0].value;
+                <<
+                <<
+                << < HEAD
+            ready() {
+                super.ready();
+                let cookieValue = {};
+                if (this.$.settingsRelay.value) {
+                    cookieValue["settingsRelay"] = this.$.settingsRelay.value;
                 }
-            }
-        }
-
-        _computedCurrency(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsCurrency"]) {
-                    return cookieValues["settingsCurrency"];
-                } else {
-                    return appConfig.fiat[0].value;
+                if (this.$.settingsCurrency.value) {
+                    cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
                 }
-            }
-        }
+                if (this.$.settingsLang.value) {
+                    cookieValue["settingsLang"] = this.$.settingsLang.value; ===
+                    ===
+                    =
+                    let _this = this;
+                    window.setInterval(function() {
+                        _this.priceTimestamp = Date.parse(new Date());
+                    }, 600000);
 
-        _computedRelay(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsRelay"]) {
-                    return cookieValues["settingsRelay"];
-                } else {
-                    return appConfig.relays[0].value;
+                    Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
+                        item.tabIndex = "-1";
+                    }); >>>
+                    >>>
+                    > d02423f82cb2f9aa3b1e1dddce3aaeb0e2c06336
                 }
-            }
-        }
-
-        _computedLrcFee(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsLrcFee"]) {
-                    return cookieValues["settingsLrcFee"];
-                } else {
-                    return appConfig.defaultLrcFeePermillage;
+                if (this.$.settingsLrcFee.value) {
+                    cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
                 }
-            }
-        }
-
-        _computedGasPrice(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsGasPrice"]) {
-                    return cookieValues["settingsGasPrice"]
-                } else {
-                    return appConfig.defaultGasPrice;
+                if (this.$.settingsGasPrice.value) {
+                    cookieValue["settingsGasPrice"] = this.$.settingsGasPrice.value;
                 }
-            }
-        }
+                if (this.$.settingsVersion.value) {
+                    cookieValue["settingsVersion"] = this.$.settingsVersion.value;
+                }
+                if (this.$.warnedVersion.value) {
+                    cookieValue["warnedVersion"] = this.$.warnedVersion.value;
+                }
+                this.cookieValues = cookieValue;
 
-        _computedVersion(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
-                if (cookieValues["settingsVersion"]) {
-                    let currentVersion = cookieValues["settingsVersion"];
-                    let warnedVersion = cookieValues["warnedVersion"];
-                    if (latestVersion != currentVersion) {
-                        if (!warnedVersion || warnedVersion != latestVersion) {
-                            var detail = {
-                                text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
-                                category: "warning",
-                                duration: 8000
-                            }
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: detail
-                            }));
-                            this.warnedVersion = latestVersion;
+                this.addEventListener('notification', e => this.$.notification.display(e.detail));
+                this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
+                this.addEventListener('reset-wallet', e => this._resetWallet());
+                this.addEventListener('nout-found', e => this._showPage404(e.detail));
+
+                let _this = this;
+                window.setInterval(function() {
+                    _this.priceTimestamp = Date.parse(new Date());
+                }, 600000);
+            }
+
+            _computedLang(appConfig, cookieValues) {
+                    if (appConfig && cookieValues) {
+                        if (cookieValues["settingsLang"]) {
+                            return cookieValues["settingsLang"];
+                        } else {
+                            return appConfig.langs[0].value;
                         }
                     }
-                    return currentVersion;
-                } else {
-                    return latestVersion;
-                }
-            }
-        }
-
-        _computeAppConfig(appConfigRaw) {
-            if (appConfigRaw) {
-                var appConfig = appConfigRaw;
-                appConfig.computeMarketId = function(tokenx, tokeny) {
-                    return tokenx + "-" + tokeny;
                 }
 
-                appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
-                appConfig.lrc = appConfig.tokenMap["LRC"];
-                appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
-                appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
-                appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-                appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-                appConfig.marketConfig = { defaultPricePrecision: 3, defaultVolumePrecision: 5 }
-                appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
+                <<
+                <<
+                << < HEAD
+            _computedCurrency(appConfig, cookieValues) {
+                    if (appConfig && cookieValues) {
+                        if (cookieValues["settingsCurrency"]) {
+                            return cookieValues["settingsCurrency"];
+                        } else {
+                            return appConfig.fiat[0].value; ===
+                            ===
+                            =
 
-                this.$.loading.style.display = "none";
-                this.$.pages.style.display = "inherit";
-                return appConfig;
-            }
-        }
+                            _computedCurrency(appConfig, cookieValues) {
+                                if (appConfig && cookieValues) {
+                                    if (cookieValues["settingsCurrency"]) {
+                                        return cookieValues["settingsCurrency"];
+                                    } else {
+                                        return appConfig.fiat[0].value;
+                                    } >>>
+                                    >>>
+                                    > d02423f82cb2f9aa3b1e1dddce3aaeb0e2c06336
+                                }
+                            }
+                        }
 
-        _computePriceQuote(priceQuoteRaw) {
-            if (priceQuoteRaw !== null) {
-                var priceQuote = priceQuoteRaw.result;
-                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
-                priceQuote.getPrice = function(token) {
-                    const t = priceQuote.priceMap[token];
-                    if (t) return t.price;
-                    else return 0;
-                }
+                        _computedRelay(appConfig, cookieValues) {
+                            if (appConfig && cookieValues) {
+                                if (cookieValues["settingsRelay"]) {
+                                    return cookieValues["settingsRelay"];
+                                } else {
+                                    return appConfig.relays[0].value;
+                                }
+                            }
+                        }
 
-                return priceQuote;
-            }
-        }
+                        _computedLrcFee(appConfig, cookieValues) {
+                            if (appConfig && cookieValues) {
+                                if (cookieValues["settingsLrcFee"]) {
+                                    return cookieValues["settingsLrcFee"];
+                                } else {
+                                    return appConfig.defaultLrcFeePermillage;
+                                }
+                            }
+                        }
 
-        _resetWallet() {
-            console.log("reset wallet");
-            this.wallet = null;
-            window.location = "/#/wallet";
-        }
+                        _computedGasPrice(appConfig, cookieValues) {
+                            if (appConfig && cookieValues) {
+                                if (cookieValues["settingsGasPrice"]) {
+                                    return cookieValues["settingsGasPrice"]
+                                } else {
+                                    return appConfig.defaultGasPrice;
+                                }
+                            }
+                        }
 
-        _walletChanged(wallet) {
-            if (wallet) {
-                this.$.walletPage.subpage = "ready";
-                if (this.page !== "wallet") {
-                    window.location = "/#/wallet";
-                }
-            } else {
-                this.$.walletPage.subpage = "default";
-            }
-        }
+                        _computedVersion(appConfig, cookieValues) {
+                            if (appConfig && cookieValues) {
+                                let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
+                                if (cookieValues["settingsVersion"]) {
+                                    let currentVersion = cookieValues["settingsVersion"];
+                                    let warnedVersion = cookieValues["warnedVersion"];
+                                    if (latestVersion != currentVersion) {
+                                        if (!warnedVersion || warnedVersion != latestVersion) {
+                                            var detail = {
+                                                text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
+                                                category: "warning",
+                                                duration: 8000
+                                            }
+                                            this.dispatchEvent(new CustomEvent('notification', {
+                                                bubbles: true,
+                                                composed: true,
+                                                detail: detail
+                                            }));
+                                            this.warnedVersion = latestVersion;
+                                        }
+                                    }
+                                    return currentVersion;
+                                } else {
+                                    return latestVersion;
+                                }
+                            }
+                        }
 
-        static get observers() {
-            return [
-                '_routePageChanged(routeData.page)',
-                '_routeIdChanged(subrouteData.pageId)',
-                'isUnlocked(wallet)'
-            ];
-        }
+                        _computeAppConfig(appConfigRaw) {
+                            if (appConfigRaw) {
+                                var appConfig = appConfigRaw;
+                                appConfig.computeMarketId = function(tokenx, tokeny) {
+                                    return tokenx + "-" + tokeny;
+                                }
 
-        _lockButtonClick() {
-            if (this.wallet) {
-                this.wallet = null
-            } else {
-                window.location = "/#/wallet";
-            }
-        }
+                                appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
+                                appConfig.lrc = appConfig.tokenMap["LRC"];
+                                appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
+                                appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
+                                appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                                appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                                appConfig.marketConfig = { defaultPricePrecision: 3, defaultVolumePrecision: 5 }
+                                appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
 
-        _routePageChanged(page) {
-            this.page = page || 'markets';
-        }
+                                this.$.loading.style.display = "none";
+                                this.$.pages.style.display = "inherit";
+                                return appConfig;
+                            }
+                        }
 
-        _pageChanged(page) {
-            const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
-            Polymer.importHref(
-                resolvedPageUrl,
-                null,
-                this._showPage404.bind(this),
-                true);
-        }
+                        _computePriceQuote(priceQuoteRaw) {
+                            if (priceQuoteRaw !== null) {
+                                var priceQuote = priceQuoteRaw.result;
+                                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                                priceQuote.getPrice = function(token) {
+                                    const t = priceQuote.priceMap[token];
+                                    if (t) return t.price;
+                                    else return 0;
+                                }
 
-        _selectedPageChanged(page) {
-            if (page && page.go) page.go();
-        }
+                                return priceQuote;
+                            }
+                        }
 
-        _routeIdChanged(pageId) {
-            this.pageId = pageId || '';
-        }
+                        _resetWallet() {
+                            console.log("reset wallet");
+                            this.wallet = null;
+                            window.location = "/#/wallet";
+                        }
+
+                        _walletChanged(wallet) {
+                            if (wallet) {
+                                this.$.walletPage.subpage = "ready";
+                                if (this.page !== "wallet") {
+                                    window.location = "/#/wallet";
+                                }
+                            } else {
+                                this.$.walletPage.subpage = "default";
+                            }
+                        }
+
+                        static get observers() {
+                            return [
+                                '_routePageChanged(routeData.page)',
+                                '_routeIdChanged(subrouteData.pageId)',
+                                'isUnlocked(wallet)'
+                            ];
+                        }
+
+                        _lockButtonClick() {
+                            if (this.wallet) {
+                                this.wallet = null
+                            } else {
+                                window.location = "/#/wallet";
+                            }
+                        }
+
+                        _routePageChanged(page) {
+                            this.page = page || 'markets';
+                        }
+
+                        _pageChanged(page) {
+                            const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
+                            Polymer.importHref(
+                                resolvedPageUrl,
+                                null,
+                                this._showPage404.bind(this),
+                                true);
+                        }
+
+                        _selectedPageChanged(page) {
+                            if (page && page.go) page.go();
+                        }
+
+                        _routeIdChanged(pageId) {
+                            this.pageId = pageId || '';
+                        }
 
 
-        _showPage404(errorMsg) {
-            this.page = '404';
-        }
+                        _showPage404(errorMsg) {
+                            this.page = '404';
+                        }
 
-        isUnlocked(wallet) {
-            if (!wallet) {
-                this.$.lockButton.icon = 'lock';
-                this.lockClass = '';
-            } else {
-                this.$.lockButton.icon = "lock-open";
-                this.lockClass = "openned";
-            }
-        }
+                        isUnlocked(wallet) {
+                            if (!wallet) {
+                                this.$.lockButton.icon = 'lock';
+                                this.lockClass = '';
+                            } else {
+                                this.$.lockButton.icon = "lock-open";
+                                this.lockClass = "openned";
+                            }
+                        }
 
-    }
+                    }
 
-    window.customElements.define(MyApp.is, MyApp);
+                    window.customElements.define(MyApp.is, MyApp);
     </script>
 </dom-module>

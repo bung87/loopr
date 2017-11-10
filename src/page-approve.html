@@ -110,20 +110,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
                         <div class="left">
                             <div class="line">
                                 <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
-                                                  label="Token" item-value-path="token"></vaadin-combo-box>
+                                                  label="Token" item-value-path="token" tabindex="1"></vaadin-combo-box>
                             </div>
                             <div class="line">
                                 <div class="amount">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[selectedTokenBalance.balance]]"
+                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
                                                        label="Amount" pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                       error-message="[[_numError(amount, selectedTokenBalance.precision)]]">
+                                                       error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
+                                                       tabindex="2">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                     </vaadin-text-field>
                                     <div class$="horizontal layout start-justified warn [[showAmountWarn]]">
@@ -134,11 +135,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                   label="Gas Limit" error-message="[[_integerError()]]">
+                                                   label="Gas Limit" error-message="[[_integerError()]]" tabindex="3">
                                 </vaadin-text-field>
                             </div>
                             <div class="line button">
-                                <paper-button primary on-click="_signToSend" id="send">Generate Transaction
+                                <paper-button primary on-click="_signToSend" id="send" tabindex="4">Generate Transaction
                                 </paper-button>
                             </div>
                         </div>
@@ -148,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
                                            handle-as="json" last-response="{{data}}"
                                            debounce-duration="300"></iron-ajax>
-                                <paper-item class="flex">
+                                <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
                                         <div class="title"> Token Address</div>
                                         <div secondary>
@@ -156,22 +157,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                         </div>
                                     </paper-item-body>
                                 </paper-item>
-                                <paper-item class="flex">
+                                <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
                                         <div class="title"> Contract Address to Authorize</div>
                                         <div secondary>{{authorizeToAddress}}</div>
                                     </paper-item-body>
                                 </paper-item>
-                                <paper-item class="flex">
+                                <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
                                         <div class="title"> [[selectedTokenBalance.token]] Balance</div>
-                                        <div secondary>[[selectedTokenBalance.balance]]</div>
+                                        <div secondary>[[amountShow]]</div>
                                     </paper-item-body>
                                 </paper-item>
-                                <paper-item class="flex">
+                                <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
                                         <div class="title"> Available [[selectedTokenBalance.token]] Allowance</div>
-                                        <div secondary>[[selectedTokenBalance.availableAllowance]]</div>
+                                        <div secondary>[[selectedTokenBalance.availableAllowanceShow]]</div>
                                     </paper-item-body>
                                 </paper-item>
                             </div>
@@ -185,7 +186,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
 
-        class PageApprove extends Polymer.Element {
+        class PageApprove extends AppConfigMixin(Polymer.Element) {
             static get is() {
                 return 'page-approve';
             }
@@ -206,6 +207,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     amount: {
                         type: Number
+                    },
+                    amountShow: {
+                        type: Number,
+                        computed: '_computeAmountShow(selectedTokenBalance)'
                     },
                     balances: {
                         type: Object,
@@ -282,6 +287,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
+            _computeAmountShow(selectedTokenBalance) {
+                if(selectedTokenBalance) {
+                    return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
+                }
+            }
+
             _computeBalances(data) {
                 if (data) {
                     return _.keyBy(data.result.tokens, o => o.token);
@@ -310,6 +321,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                     //console.log(_this.$.gasLimit.value+" "+_this.gasLimit)
                 });
+                this.$.amount.focus();
+                document.addEventListener('keyup', function(event) {
+                    if (event.keyCode == "13") {console.log(11)
+                        this.$.send.click();
+                    }
+                }.bind(this));
             }
 
             _getTokenBalance(appConfig, balances, selectedToken) {
@@ -329,6 +346,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         unit: tokenConfig.unit,
                         balance: balance,
                         availableAllowance: allowance,
+                        availableAllowanceShow: this._numberFormat(allowance, tokenConfig.digits, tokenConfig.precision),
                         defaultAllowance: tokenConfig.allowanceWarn,
                         precision: tokenConfig.precision,
                         digits: tokenConfig.digits,
@@ -413,7 +431,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             async _signToSend() {
-
+                if(!this.valid) {console.log("invalid")
+                    return;
+                }
                 let detail = {};
                 if (!this.amount || !this.selectedTokenBalance) {
                     detail = {text: "input value and select token", category: "warning", duration: 8000}

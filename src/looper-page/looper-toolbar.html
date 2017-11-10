@@ -37,16 +37,16 @@
         <app-toolbar>
             <!-- <paper-icon-button disabled noink></paper-icon-button> -->
             <div condensed-title></div>
-            <a href="#/markets" active$="[[isActiveTab('markets')]]" styleless>
+            <a href="#/markets" active$="[[isActiveTab('markets')]]" styleless tabindex="-1">
                 <paper-button noink>Markets</paper-button>
             </a>
-            <a href="#/history" active$="[[isActiveTab('history')]]" styleless>
+            <a href="#/history" active$="[[isActiveTab('history')]]" styleless tabindex="-1">
                 <paper-button noink>History</paper-button>
             </a>
-            <a id="walletlink" href="#/wallet" active$="[[isActiveTab('wallet')]]" styleless>
+            <a id="walletlink" href="#/wallet" active$="[[isActiveTab('wallet')]]" styleless tabindex="-1">
                 <paper-button noink>Wallet</paper-button>
             </a>
-            <a href="#/settings" active$="[[isActiveTab('settings')]]" styleless>
+            <a href="#/settings" active$="[[isActiveTab('settings')]]" styleless tabindex="-1">
                 <paper-button noink>Settings</paper-button>
             </a>
             <div condensed-title></div>
