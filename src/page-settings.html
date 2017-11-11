@@ -61,11 +61,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .contract-address {
             width: 260px;
             height: 15px;
-            font-size: 10px;
+            font-size: 11px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             color: var(--app-text-color-light);
+            display: block;
+            /*text-align: center;*/
+            padding-top: 8px;
+            text-decoration: none;
         }
         </style>
         <looper-page>
@@ -104,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <div class="label">Contract Version</div>
                                 <div>
                                     <vaadin-combo-box id="version" placeholder="Default Contract Version" items="{{appConfig.contracts}}" item-label-path="version" item-value-path="version"></vaadin-combo-box>
-                                    <div class="contract-address">{{contractAddress}}</div>
+                                    <a class="contract-address" href="[[contractAddress]]" target="_blank">[[contractAddress]]</a>
                                 </div>
                             </div>
                             <div class="item horizontal center layout">
