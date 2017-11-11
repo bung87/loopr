@@ -30,6 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
 <link rel="import" href="../bower_components/marked-element/marked-element.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -204,6 +205,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none;
     }
 
+    app-toolbar iron-image {
+        width: 140px;
+        height: 32px;
+    }
 
     div.address {
         font-size: 12px;
@@ -255,17 +260,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <!-- <looper-notification-bar id="notification"></looper-notification-bar> -->
                     <app-toolbar>
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
-                        <div spacer></div>
+                        <!-- <div spacer></div> -->
                         <a styleless href="/#/">
-                            <iron-icon icon="menu"></iron-icon>
-                        </a>
-                        <a styleless href="/#/">
-                            <div main-title>Looper</div>
+                            <div main-title><iron-image src="images/logo_white.png" sizing="contain"></iron-image></div>
                         </a>
                         <div condensed-title></div>
                         <div class="address">[[wallet.address]]</div>
-                        <paper-icon-button id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick" icon="lock" tabindex="-1"></paper-icon-button>
-                        <div spacer></div>
+                        <paper-icon-button id="lockButton" noink class$="[[lockClass]]" on-click="_lockButtonClick" icon="lock" tabindex="-1"></paper-icon-button>
+                        <!-- <div spacer></div> -->
                     </app-toolbar>
                 </app-header>
                 <div id="loading" class="vertical layout center center-justified">
