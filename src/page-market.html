@@ -39,6 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             paper-card.operation-panel-container {
                 /*padding: 0;*/
+                padding-bottom: 16px;
             }
 
             a.walletlink {
@@ -80,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <operation-panel market="{{id}}"></operation-panel>
                     </template>
                     <div class$="walletlink [[isUnlockedClass(wallet)]]">
-                        <a href="/#/wallet" class="walletlink">Unlock your wallet to trade</a>
+                        <a href="/#/wallet" class="walletlink"><paper-button primary>Unlock your wallet to trade</paper-button></a>
                     </div>
                 </paper-card>
                 <paper-card>
