@@ -30,6 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
 <link rel="import" href="../bower_components/marked-element/marked-element.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -62,6 +63,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/vaadin-button/vaadin-button.html">
 <link rel="import" href="../bower_components/vaadin-checkbox/vaadin-checkbox.html">
 <link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-password-field.html">
 <link rel="import" href="../bower_components/vaadin-radio-button/vaadin-radio-button.html">
 <link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
 <link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
@@ -100,113 +102,117 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                --app-primary-color: var(--google-blue-500);
-                --app-primary-color-dark: var(--google-blue-700);
-                --app-secondary-color: black;
-                --paper-spinner-color: var(--app-primary-color);
-                --paper-spinner-stroke-width: 1px;
-                --app-red-color: var(--google-red-500);
-                --app-green-color: var(--google-green-500);
-                --app-text-color: rgba(0, 0, 0, .78);
-                --app-text-color-light: rgba(0, 0, 0, .54);
+     :host {
+            --app-primary-color: var(--paper-blue-500);
+            --app-primary-color-dark: var(--paper-blue-700);
+            --app-secondary-color: black;
+            --paper-spinner-color: var(--app-primary-color);
+            --paper-spinner-stroke-width: 1px;
+            --app-red-color: var(--paper-red-500);
+            --app-green-color: var(--paper-green-500);
+            --app-text-color: rgba(0, 0, 0, .78);
+            --app-text-color-light: rgba(0, 0, 0, .54);
 
-                --valo-border-radius: 0px;
-                --valo-primary-text-color: var(--app-text-color);
-                --valo-body-text-color: var(--app-text-color);
-                --valo-contrast-60pct: var(--app-text-color-light);
-                --valo-error-color: var(--google-red-500);
-                --vaadin-grid-header-cell: {
-                    text-transform: uppercase;
-                } --paper-tabs-selection-bar-color: var(--app-primary-color);
-                --paper-tab-ink: transparent;
-                --paper-tab-content: {
-                    color: var(--app-primary-color);
-                } --paper-tab-content-unselected: {
+            --valo-border-radius: 0px;
+            --valo-primary-text-color: var(--app-text-color);
+            --valo-body-text-color: var(--app-text-color);
+            --valo-contrast-60pct: var(--app-text-color-light);
+            --valo-error-color: var(--paper-red-500);
+            --vaadin-grid-header-cell: {
+                text-transform: uppercase;
+            }
+            --paper-tabs-selection-bar-color: var(--app-primary-color);
+            --paper-tab-ink: transparent;
+            --paper-tab-content: {
+                color: var(--app-primary-color);
+            }
+            --paper-tab-content-unselected: {
                 color: var(--app-text-color);
             }
-            }
+        }
 
-            display: block
+        display: block;
+    }
 
-            ;
-            }
+    app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+    }
 
-            app-drawer-layout:not([narrow]) [drawer-toggle] {
-                display: none;
-            }
+    app-header {
+        color: #fff;
+        /*height: 96px;*/
 
-            app-header {
-                color: #fff;
-                /*height: 96px;*/
+        background-color: var(--app-primary-color-dark);
+    }
 
-                background-color: var(--app-primary-color-dark);
-            }
+    app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+    }
 
-            app-header paper-icon-button {
-                --paper-icon-button-ink-color: white;
-            }
+    a[styleless] {
+        color: inherit;
+        text-decoration: none;
+    }
 
-            a[styleless] {
-                color: inherit;
-                text-decoration: none;
-            }
+    .drawer-list {
+        margin: 0 20px;
+    }
 
-            .drawer-list {
-                margin: 0 20px;
-            }
+    .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+    }
 
-            .drawer-list a {
-                display: block;
-                padding: 0 16px;
-                text-decoration: none;
-                color: var(--app-secondary-color);
-                line-height: 40px;
-            }
+    .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+    }
 
-            .drawer-list a.iron-selected {
-                color: black;
-                font-weight: bold;
-            }
+    #pages {
+        display: none;
+    }
 
-            #pages {
-                display: none;
-            }
+    #loading {
+        padding-top: 30vh;
+        color: var(--app-primary-color);
+        font-weight: 200;
+    }
 
-            #loading {
-                padding-top: 30vh;
-                color: var(--app-primary-color);
-                font-weight: 200;
-            }
+    #loading paper-spinner-lite {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+    }
 
-            #loading paper-spinner-lite {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 20px;
-            }
+    #loading iron-icon {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        top: 60px;
+    }
 
-            #loading iron-icon {
-                position: relative;
-                width: 40px;
-                height: 40px;
-                top: 60px;
-            }
+    #lockButton.openned {
+        background-color: var(--paper-amber-700);
+        color: white;
+        border-radius: 50%;
+    }
 
-            #lockButton.openned {
-                background-color: var(--app-red-color);
-                color: white;
-                border-radius: 50%;
-            }
+    paper-icon-button:not([narrow]) [drawer-toggle] {
+        display: none;
+    }
 
-            paper-icon-button:not([narrow]) [drawer-toggle] {
-                display: none;
-            }
+    app-toolbar iron-image {
+        width: 140px;
+        height: 32px;
+    }
 
-
-            div.address {
-                font-size: 14px;
-            }
-
+    div.address {
+        font-size: 12px;
+        padding-right: 8px;
+    }
         </style>
         <!-- routing -->
         <app-location use-hash-as-path route="{{route}}">
@@ -220,8 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
         <iron-ajax auto url="/src/datas/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json"
-                   last-response="{{priceQuoteRaw}}"></iron-ajax>
+        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
@@ -254,18 +259,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <!-- <looper-notification-bar id="notification"></looper-notification-bar> -->
                     <app-toolbar>
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
-                        <div spacer></div>
+                        <!-- <div spacer></div> -->
                         <a styleless href="/#/">
-                            <iron-icon icon="menu"></iron-icon>
-                        </a>
-                        <a styleless href="/#/">
-                            <div main-title>Looper</div>
+                            <div main-title><iron-image src="images/logo_white.png" sizing="contain"></iron-image></div>
                         </a>
                         <div condensed-title></div>
                         <div class="address">[[wallet.address]]</div>
-                        <paper-icon-button id="lockButton" class$="[[lockClass]]" on-click="_lockButtonClick"
-                                           icon="lock" tabindex="-1"></paper-icon-button>
-                        <div spacer></div>
+                        <paper-icon-button id="lockButton" noink class$="[[lockClass]]" on-click="_lockButtonClick" icon="lock" tabindex="-1"></paper-icon-button>
+                        <!-- <div spacer></div> -->
                     </app-toolbar>
                 </app-header>
                 <div id="loading" class="vertical layout center center-justified">
@@ -273,8 +274,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-spinner-lite alt="Loading configuration..." active class="thick"></paper-spinner-lite>
                     <div>Loading configuration...</div>
                 </div>
-                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}"
-                            fallback-selection="404" role="main">
+                <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet"></page-wallet>
@@ -295,310 +295,310 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
-        const keystore = require('keystore');
-        const privateKeyWallet = require('privateKey');
-        const Validator = require('validator');
-        const ethUtil = require('ethereumjs-util');
-        const Relay = require('relay');
-        const Order = require('order');
+    const keystore = require('keystore');
+    const privateKeyWallet = require('privateKey');
+    const Validator = require('validator');
+    const ethUtil = require('ethereumjs-util');
+    const Relay = require('relay');
+    const Order = require('order');
 
-        class MyApp extends Polymer.Element {
-            static get is() {
-                return 'my-app';
-            }
-
-            static get properties() {
-                return {
-                    cookieValues: {
-                        type: Object
-                    },
-                    settingsLang: {
-                        type: String,
-                        computed: '_computedLang(appConfig, cookieValues)'
-                    },
-                    settingsCurrency: {
-                        type: String,
-                        computed: '_computedCurrency(appConfig, cookieValues)'
-                    },
-                    settingsRelay: {
-                        type: String,
-                        computed: '_computedRelay(appConfig, cookieValues)'
-                    },
-                    settingsLrcFee: {
-                        type: Number,
-                        computed: '_computedLrcFee(appConfig, cookieValues)'
-                    },
-                    settingsGasPrice: {
-                        type: Number,
-                        computed: '_computedGasPrice(appConfig, cookieValues)'
-                    },
-                    settingsVersion: {
-                        type: Number,
-                        computed: '_computedVersion(appConfig, cookieValues)'
-                    },
-                    page: {
-                        type: String,
-                        reflectToAttribute: true,
-                        observer: '_pageChanged'
-                    },
-                    pageId: {
-                        type: String,
-                        reflectToAttribute: true
-                    },
-                    routeData: Object,
-                    rootPath: String,
-                    subrouteData: Object,
-                    appConfigRaw: Object,
-                    appConfig: {
-                        type: Object,
-                        computed: '_computeAppConfig(appConfigRaw)'
-                    },
-                    priceQuoteRaw: Object,
-                    priceQuote: {
-                        type: Object,
-                        computed: '_computePriceQuote(priceQuoteRaw)'
-                    },
-                    wallet: {
-                        type: Object,
-                        observer: '_walletChanged'
-                    },
-                    selectedPage: {
-                        type: Object,
-                        observer: '_selectedPageChanged'
-                    },
-                    priceTimestamp: {
-                        type: String
-                    }
-                };
-            }
-
-            ready() {
-                super.ready();
-                let cookieValue = {};
-                if (this.$.settingsRelay.value) {
-                    cookieValue["settingsRelay"] = this.$.settingsRelay.value;
-                }
-                if (this.$.settingsCurrency.value) {
-                    cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
-                }
-                if (this.$.settingsLang.value) {
-                    cookieValue["settingsLang"] = this.$.settingsLang.value;
-                }
-                if (this.$.settingsLrcFee.value) {
-                    cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
-                }
-                if (this.$.settingsGasPrice.value) {
-                    cookieValue["settingsGasPrice"] = this.$.settingsGasPrice.value;
-                }
-                if (this.$.settingsVersion.value) {
-                    cookieValue["settingsVersion"] = this.$.settingsVersion.value;
-                }
-                if (this.$.warnedVersion.value) {
-                    cookieValue["warnedVersion"] = this.$.warnedVersion.value;
-                }
-                this.cookieValues = cookieValue;
-
-                this.addEventListener('notification', e => this.$.notification.display(e.detail));
-                this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
-                this.addEventListener('reset-wallet', e => this._resetWallet());
-                this.addEventListener('nout-found', e => this._showPage404(e.detail));
-
-                let _this = this;
-                window.setInterval(function(){
-                    _this.priceTimestamp = Date.parse(new Date());
-                }, 600000);
-
-                Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
-                    item.tabIndex = "-1";
-                });
-            }
-
-            _computedLang(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    if (cookieValues["settingsLang"]) {
-                        return cookieValues["settingsLang"];
-                    } else {
-                        return appConfig.langs[0].value;
-                    }
-                }
-            }
-
-
-            _computedCurrency(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    if (cookieValues["settingsCurrency"]) {
-                        return cookieValues["settingsCurrency"];
-                    } else {
-                        return appConfig.fiat[0].value;
-                    }
-                }
-            }
-
-            _computedRelay(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    if (cookieValues["settingsRelay"]) {
-                        return cookieValues["settingsRelay"];
-                    } else {
-                        return appConfig.relays[0].value;
-                    }
-                }
-            }
-
-            _computedLrcFee(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    if (cookieValues["settingsLrcFee"]) {
-                        return cookieValues["settingsLrcFee"];
-                    } else {
-                        return appConfig.defaultLrcFeePermillage;
-                    }
-                }
-            }
-
-            _computedGasPrice(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    if (cookieValues["settingsGasPrice"]) {
-                        return cookieValues["settingsGasPrice"]
-                    } else {
-                        return appConfig.defaultGasPrice;
-                    }
-                }
-            }
-
-            _computedVersion(appConfig, cookieValues) {
-                if (appConfig && cookieValues) {
-                    let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
-                    if (cookieValues["settingsVersion"]) {
-                        let currentVersion = cookieValues["settingsVersion"];
-                        let warnedVersion = cookieValues["warnedVersion"];
-                        if (latestVersion != currentVersion) {
-                            if (!warnedVersion || warnedVersion != latestVersion) {
-                                var detail = {
-                                    text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
-                                    category: "warning",
-                                    duration: 8000
-                                }
-                                this.dispatchEvent(new CustomEvent('notification', {
-                                    bubbles: true,
-                                    composed: true,
-                                    detail: detail
-                                }));
-                                this.warnedVersion = latestVersion;
-                            }
-                        }
-                        return currentVersion;
-                    } else {
-                        return latestVersion;
-                    }
-                }
-            }
-
-            _computeAppConfig(appConfigRaw) {
-                if (appConfigRaw) {
-                    var appConfig = appConfigRaw;
-                    appConfig.computeMarketId = function (tokenx, tokeny) {
-                        return tokenx + "-" + tokeny;
-                    }
-
-                    appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
-                    appConfig.lrc = appConfig.tokenMap["LRC"];
-                    appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
-                    appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
-                    appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-                    appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
-                    appConfig.marketConfig = {defaultPricePrecision: 3, defaultVolumePrecision: 5}
-                    appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
-
-                    this.$.loading.style.display = "none";
-                    this.$.pages.style.display = "inherit";
-                    return appConfig;
-                }
-            }
-
-            _computePriceQuote(priceQuoteRaw) {
-                if (priceQuoteRaw !== null) {
-                    var priceQuote = priceQuoteRaw.result;
-                    priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
-                    priceQuote.getPrice = function (token) {
-                        const t = priceQuote.priceMap[token];
-                        if (t) return t.price;
-                        else return 0;
-                    }
-
-                    return priceQuote;
-                }
-            }
-
-            _resetWallet() {
-                console.log("reset wallet");
-                this.wallet = null;
-                window.location = "/#/wallet";
-            }
-
-            _walletChanged(wallet) {
-                if (wallet) {
-                    this.$.walletPage.subpage = "ready";
-                    if (this.page !== "wallet") {
-                        window.location = "/#/wallet";
-                    }
-                } else {
-                    this.$.walletPage.subpage = "default";
-                }
-            }
-
-            static get observers() {
-                return [
-                    '_routePageChanged(routeData.page)',
-                    '_routeIdChanged(subrouteData.pageId)',
-                    'isUnlocked(wallet)'
-                ];
-            }
-
-            _lockButtonClick() {
-                if (this.wallet) {
-                    this.wallet = null
-                } else {
-                    window.location = "/#/wallet";
-                }
-            }
-
-            _routePageChanged(page) {
-                this.page = page || 'markets';
-            }
-
-            _pageChanged(page) {
-                const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
-                Polymer.importHref(
-                    resolvedPageUrl,
-                    null,
-                    this._showPage404.bind(this),
-                    true);
-            }
-
-            _selectedPageChanged(page) {
-                if (page && page.go) page.go();
-            }
-
-            _routeIdChanged(pageId) {
-                this.pageId = pageId || '';
-            }
-
-
-            _showPage404(errorMsg) {
-                this.page = '404';
-            }
-
-            isUnlocked(wallet) {
-                if (!wallet) {
-                    this.$.lockButton.icon = 'lock';
-                    this.lockClass = '';
-                } else {
-                    this.$.lockButton.icon = "lock-open";
-                    this.lockClass = "openned";
-                }
-            }
-
+    class MyApp extends Polymer.Element {
+        static get is() {
+            return 'my-app';
         }
 
-        window.customElements.define(MyApp.is, MyApp);
+        static get properties() {
+            return {
+                cookieValues: {
+                    type: Object
+                },
+                settingsLang: {
+                    type: String,
+                    computed: '_computedLang(appConfig, cookieValues)'
+                },
+                settingsCurrency: {
+                    type: String,
+                    computed: '_computedCurrency(appConfig, cookieValues)'
+                },
+                settingsRelay: {
+                    type: String,
+                    computed: '_computedRelay(appConfig, cookieValues)'
+                },
+                settingsLrcFee: {
+                    type: Number,
+                    computed: '_computedLrcFee(appConfig, cookieValues)'
+                },
+                settingsGasPrice: {
+                    type: Number,
+                    computed: '_computedGasPrice(appConfig, cookieValues)'
+                },
+                settingsVersion: {
+                    type: Number,
+                    computed: '_computedVersion(appConfig, cookieValues)'
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged'
+                },
+                pageId: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                routeData: Object,
+                rootPath: String,
+                subrouteData: Object,
+                appConfigRaw: Object,
+                appConfig: {
+                    type: Object,
+                    computed: '_computeAppConfig(appConfigRaw)'
+                },
+                priceQuoteRaw: Object,
+                priceQuote: {
+                    type: Object,
+                    computed: '_computePriceQuote(priceQuoteRaw)'
+                },
+                wallet: {
+                    type: Object,
+                    observer: '_walletChanged'
+                },
+                selectedPage: {
+                    type: Object,
+                    observer: '_selectedPageChanged'
+                },
+                priceTimestamp: {
+                    type: String
+                }
+            };
+        }
+
+        ready() {
+            super.ready();
+            let cookieValue = {};
+            if (this.$.settingsRelay.value) {
+                cookieValue["settingsRelay"] = this.$.settingsRelay.value;
+            }
+            if (this.$.settingsCurrency.value) {
+                cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
+            }
+            if (this.$.settingsLang.value) {
+                cookieValue["settingsLang"] = this.$.settingsLang.value;
+            }
+            if (this.$.settingsLrcFee.value) {
+                cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
+            }
+            if (this.$.settingsGasPrice.value) {
+                cookieValue["settingsGasPrice"] = this.$.settingsGasPrice.value;
+            }
+            if (this.$.settingsVersion.value) {
+                cookieValue["settingsVersion"] = this.$.settingsVersion.value;
+            }
+            if (this.$.warnedVersion.value) {
+                cookieValue["warnedVersion"] = this.$.warnedVersion.value;
+            }
+            this.cookieValues = cookieValue;
+
+            this.addEventListener('notification', e => this.$.notification.display(e.detail));
+            this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
+            this.addEventListener('reset-wallet', e => this._resetWallet());
+            this.addEventListener('nout-found', e => this._showPage404(e.detail));
+
+            let _this = this;
+            window.setInterval(function() {
+                _this.priceTimestamp = Date.parse(new Date());
+            }, 600000);
+
+            Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
+                item.tabIndex = "-1";
+            });
+        }
+
+        _computedLang(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsLang"]) {
+                    return cookieValues["settingsLang"];
+                } else {
+                    return appConfig.langs[0].value;
+                }
+            }
+        }
+
+
+        _computedCurrency(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsCurrency"]) {
+                    return cookieValues["settingsCurrency"];
+                } else {
+                    return appConfig.fiat[0].value;
+                }
+            }
+        }
+
+        _computedRelay(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsRelay"]) {
+                    return cookieValues["settingsRelay"];
+                } else {
+                    return appConfig.relays[0].value;
+                }
+            }
+        }
+
+        _computedLrcFee(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsLrcFee"]) {
+                    return cookieValues["settingsLrcFee"];
+                } else {
+                    return appConfig.defaultLrcFeePermillage;
+                }
+            }
+        }
+
+        _computedGasPrice(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsGasPrice"]) {
+                    return cookieValues["settingsGasPrice"]
+                } else {
+                    return appConfig.defaultGasPrice;
+                }
+            }
+        }
+
+        _computedVersion(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
+                if (cookieValues["settingsVersion"]) {
+                    let currentVersion = cookieValues["settingsVersion"];
+                    let warnedVersion = cookieValues["warnedVersion"];
+                    if (latestVersion != currentVersion) {
+                        if (!warnedVersion || warnedVersion != latestVersion) {
+                            var detail = {
+                                text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
+                                category: "warning",
+                                duration: 8000
+                            }
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            this.warnedVersion = latestVersion;
+                        }
+                    }
+                    return currentVersion;
+                } else {
+                    return latestVersion;
+                }
+            }
+        }
+
+        _computeAppConfig(appConfigRaw) {
+            if (appConfigRaw) {
+                var appConfig = appConfigRaw;
+                appConfig.computeMarketId = function(tokenx, tokeny) {
+                    return tokenx + "-" + tokeny;
+                }
+
+                appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
+                appConfig.lrc = appConfig.tokenMap["LRC"];
+                appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
+                appConfig.tokenIds = _.map(appConfigRaw.tokens, o => o.token);
+                appConfig.marketMap = _.keyBy(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
+                appConfig.marketConfig = { defaultPricePrecision: 3, defaultVolumePrecision: 5 }
+                appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
+
+                this.$.loading.style.display = "none";
+                this.$.pages.style.display = "inherit";
+                return appConfig;
+            }
+        }
+
+        _computePriceQuote(priceQuoteRaw) {
+            if (priceQuoteRaw !== null) {
+                var priceQuote = priceQuoteRaw.result;
+                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                priceQuote.getPrice = function(token) {
+                    const t = priceQuote.priceMap[token];
+                    if (t) return t.price;
+                    else return 0;
+                }
+
+                return priceQuote;
+            }
+        }
+
+        _resetWallet() {
+            console.log("reset wallet");
+            this.wallet = null;
+            window.location = "/#/wallet";
+        }
+
+        _walletChanged(wallet) {
+            if (wallet) {
+                this.$.walletPage.subpage = "ready";
+                if (this.page !== "wallet") {
+                    window.location = "/#/wallet";
+                }
+            } else {
+                this.$.walletPage.subpage = "default";
+            }
+        }
+
+        static get observers() {
+            return [
+                '_routePageChanged(routeData.page)',
+                '_routeIdChanged(subrouteData.pageId)',
+                'isUnlocked(wallet)'
+            ];
+        }
+
+        _lockButtonClick() {
+            if (this.wallet) {
+                this.wallet = null
+            } else {
+                window.location = "/#/wallet";
+            }
+        }
+
+        _routePageChanged(page) {
+            this.page = page || 'markets';
+        }
+
+        _pageChanged(page) {
+            const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
+            Polymer.importHref(
+                resolvedPageUrl,
+                null,
+                this._showPage404.bind(this),
+                true);
+        }
+
+        _selectedPageChanged(page) {
+            if (page && page.go) page.go();
+        }
+
+        _routeIdChanged(pageId) {
+            this.pageId = pageId || '';
+        }
+
+
+        _showPage404(errorMsg) {
+            this.page = '404';
+        }
+
+        isUnlocked(wallet) {
+            if (!wallet) {
+                this.$.lockButton.icon = 'lock';
+                this.lockClass = '';
+            } else {
+                this.$.lockButton.icon = "lock-open";
+                this.lockClass = "openned";
+            }
+        }
+
+    }
+
+    window.customElements.define(MyApp.is, MyApp);
     </script>
 </dom-module>
