@@ -93,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         <div class="horizontal end-justified layout ">
-            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
+            <prism-square-pager id="pager" page="[[currentPage]]" count=[[totalPage]] range=[[pageRange]]></prism-square-pager>
         </div>
     </template>
     <script>
@@ -133,7 +133,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _computePage(resp){
             if(resp){
-                this.totalPage = resp.result.pageSize;
+                this.totalPage = Math.max(2, resp.result.pageSize);
                 this.currentPage = resp.result.pageIndex;
                 this.pageRange = Math.min(1, resp.result.pageSize);
                 this._pager();

@@ -188,7 +188,7 @@
 
             _computePage(resp){
                 if(resp){
-                    this.totalPage = resp.result.pageSize;
+                    this.totalPage = Math.max(2, resp.result.pageSize);
                     this.currentPage = resp.result.pageIndex;
                     this.pageRange = Math.min(1, resp.result.pageSize);
                     this._pager();
