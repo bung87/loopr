@@ -89,7 +89,6 @@
 
         <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
                    last-response="{{rawBalances}}" auto></iron-ajax>
-
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
             <paper-tab name="sell">Sell</paper-tab>
@@ -97,7 +96,6 @@
         <iron-pages selected="{{sellOrBuy}}" attr-for-selected="name">
             <div name="sell">
                 <div class="sell container">
-
                     <vaadin-text-field id="sellAmount" label="[[tokens.token]] Quantity" value="{{sellAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
                                        error-message="sellAmountError">
@@ -339,6 +337,22 @@
 
                         return;
                     }
+                    if(!this.appConfig){
+                        return;
+                    }
+                    if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
+                        const detail = {
+                            text: 'Your address is not in white list, could not submit order',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
 
                     let data = {};
                     data.protocol = this.appConfig.contractAddress;
@@ -401,6 +415,22 @@
                         }));
 
                         return
+                    }
+                    if(!this.appConfig){
+                        return;
+                    }
+                    if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
+                        const detail = {
+                            text: 'Your address is not in white list, could not submit order',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
                     }
 
                     let data = {};
