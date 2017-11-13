@@ -181,5 +181,9 @@
             "tokeny": "WETH",
             "pricePrecision": 8
         }
+    ],
+    "whiteList": [
+        "0x4c44d51cf0d35172fce9d69e2beac728de980e9d",
+        "0xec28569d3FD03Ac0Eb2157DBeC81a3665cb3D32d"
     ]
 }
