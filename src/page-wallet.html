@@ -34,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
             <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
-                <subpage-ready name="ready" subpage="assets"></subpage-ready>
+                <subpage-ready name="ready" subpage="[[secondaryPage]]"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
             <looper-footer></looper-footer>
@@ -51,6 +51,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     reflectToAttribute: true,
                     value: "default"
+                },
+                secondaryPage: {
+                    type: String,
+                    value: "assets"
                 },
                 selectedTab: {
                     type: String,

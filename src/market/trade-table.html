@@ -32,6 +32,21 @@
             visibility: visible;
         }
 
+        .hiddenMore {
+            visibility: hidden;
+            @apply(--layout-horizontal);
+            @apply(--layout-end-justified);
+        }
+
+        .showMore {
+            @apply(--layout-horizontal);
+            @apply(--layout-end-justified);
+        }
+
+        .seeMoreLink {
+            margin-right: 20px;
+        }
+
         prism-pagination a.general {
             color: black;
             text-decoration: none;
@@ -146,6 +161,9 @@
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </vaadin-grid>
+        <div class$="[[showSeeMore]]">
+            <div class="seeMoreLink"><a id="showMore" href="javascript:void(0)" on-click="_showMore">See More...</a></div>
+        </div>
         <div class$="[[showPage]] horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
@@ -228,6 +246,14 @@
             }
         }
 
+        _showMore(){
+            if(this.filterMine){
+                window.location.href = "#/wallet/trades";
+            } else {
+                window.location.href = "#/history/trades";
+            }
+        }
+
         _computePage(resp){
             if(resp){
                 let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
@@ -242,8 +268,10 @@
         _showPage(){
             if(this.displayMode && (this.displayMode === "history-trades" || "wallet-trades" === this.displayMode)){
                 this.showPage = "show";
+                this.showSeeMore = "hiddenMore";
             } else {
                 this.showPage = "hidden";
+                this.showSeeMore = "showMore";
             }
         }
 
