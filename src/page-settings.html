@@ -72,7 +72,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             text-decoration: none;
         }
         </style>
-        <looper-page>
+        <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-            <looper-toolbar slot="secondary-toolbar" active-tab="settings"></looper-toolbar>
+            <loopr-toolbar slot="secondary-toolbar" active-tab="settings"></loopr-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="card-content vertical center layout">
@@ -102,7 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Relay</div>
-                                <vaadin-combo-box id="relay" placeholder="Default Looper Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
+                                <vaadin-combo-box id="relay" placeholder="Default Loopring Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Contract Version</div>
@@ -130,9 +130,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
+                <loopr-footer></loopr-footer>
             </div>
-        </looper-page>
+        </loopr-page>
     </template>
     <script>
     class PageSettings extends Polymer.Element {

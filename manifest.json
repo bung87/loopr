@@ -1,7 +1,7 @@
 {
-    "name": "Looper - ERC20 Token Wallet and DEX",
-    "short_name": "Looper",
-    "description": "Looper is an open-sourced wallet built for Ether and ERC20 tokens.",
+    "name": "Loopr - Ethereum Wallet and Loopring DEX",
+    "short_name": "Loopr",
+    "description": "Loopr is an open-sourced Ethereum wallet and a Loopring decentralized exchange.",
     "icons": [
     {
         "src": "images/manifest/icon-192x192.png",

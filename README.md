@@ -1,4 +1,4 @@
-# Looper - a Loopring web wallet
+# Loopr - Ethereum Wallet and Loopring DEX
 
 
 ### Setup
