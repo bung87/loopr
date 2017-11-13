@@ -132,7 +132,7 @@
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
         <div class$="[[showPage]] horizontal end-justified layout ">
-            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="3"></prism-square-pager>
+            <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
         <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}"
                    handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
@@ -190,6 +190,7 @@
                 if(resp){
                     this.totalPage = resp.result.pageSize;
                     this.currentPage = resp.result.pageIndex;
+                    this.pageRange = Math.min(1, resp.result.pageSize);
                     this._pager();
                     this._showPage();
                 }
