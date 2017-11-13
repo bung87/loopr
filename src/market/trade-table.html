@@ -230,9 +230,10 @@
 
         _computePage(resp){
             if(resp){
-                this.totalPage = Math.max(2, resp.result.pageSize);
+                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
+                this.totalPage = Math.max(2, pageSize);;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(1, resp.result.pageSize);
+                this.pageRange = Math.min(3, pageSize);
                 this._pager();
                 this._showPage();
             }
