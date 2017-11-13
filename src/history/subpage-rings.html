@@ -107,27 +107,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     computed: '_selectedRelay(settingsRelay)'
                 },
                 currentPage: {
-                    type: Number,
-                    value: 1
+                    type: Number
                 },
                 totalPage: {
-                    type: Number,
-                    value: 20
+                    type: Number
                 },
                 showPage: {
                     type: String,
                     value: "hidden"
+                },
+                resp: {
+                    type: Object,
+                    observer: '_computePage'
                 }
             }
         }
 
         ready(){
             super.ready();
-            this._pager();
         }
 
         _selectedRelay(settingsRelay){
             return settingsRelay;
+        }
+
+        _computePage(resp){
+            if(resp){
+                this.totalPage = resp.result.pageSize;
+                this.currentPage = resp.result.pageIndex;
+                this._pager();
+            }
         }
 
         tranHextoNum(hex) {

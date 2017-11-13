@@ -187,12 +187,14 @@
                     computed: '_selectedRelay(settingsRelay)'
                 },
                 currentPage: {
-                    type: Number,
-                    value: 1
+                    type: Number
                 },
                 totalPage: {
-                    type: Number,
-                    value: 20
+                    type: Number
+                },
+                resp: {
+                    type: Object,
+                    observer: '_computePage'
                 },
                 showPage: {
                     type: String,
@@ -224,8 +226,15 @@
                     this.hiddenBlockNum = false;
                 }
             }
-            this._pager();
-            this._showPage();
+        }
+
+        _computePage(resp){
+            if(resp){
+                this.totalPage = resp.result.pageSize;
+                this.currentPage = resp.result.pageIndex;
+                this._pager();
+                this._showPage();
+            }
         }
 
         _showPage(){
@@ -342,6 +351,7 @@
 
         _computeOrders(appConfig, resp) {
             if (resp && appConfig) {
+                this.totalPage = resp.result.data.length;
                 return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
             }
         }

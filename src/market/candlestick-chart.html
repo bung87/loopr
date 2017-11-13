@@ -12,9 +12,20 @@
             height: 400px;
             min-width: 1000px;
         }
+        #price {
+            height: 50%;
+            min-width: 1000px;
+        }
+        #volume {
+            height: 50%;
+            min-width: 1000px;
+        }
         </style>
         <div class="wrapper">
-            <div id="container"></div>
+            <div id="container">
+                <div id="price"></div>
+                <div id="volume"></div>
+            </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             <iron-ajax auto id="ajax" handle-as="json" url="[[relay]]/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
         </div>
@@ -40,101 +51,216 @@
             return settingsRelay;
         }
 
-        _respChanged(resp) {
-            // console.log(e.detail.response.result);
-            var data = resp.result;
-            // split the data set into ohlc and volume
-            var ohlc = [],
-                volume = [],
-                dataLength = data.length,
-                // set the allowed units for data grouping
-                groupingUnits = [
-                    [
-                        'week', // unit name
-                        [1] // allowed multiples
-                    ],
-                    [
-                        'month', [1, 2, 3, 4, 6]
-                    ]
-                ],
+        syncExtremes(e) {
+            var thisChart = this.chart;
 
-                i = 0;
-
-            for (i; i < dataLength; i += 1) {
-                ohlc.push([
-                    data[i][0], // the date
-                    data[i][1], // open
-                    data[i][2], // high
-                    data[i][3], // low
-                    data[i][4] // close
-                ]);
-
-                volume.push([
-                    data[i][0], // the date
-                    data[i][5] // the volume
-                ]);
+            if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+                Highcharts.each(Highcharts.charts, function (chart) {
+                    if (chart !== thisChart) {
+                        if (chart.xAxis[0].setExtremes) { // It is null while updating
+                            chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, { trigger: 'syncExtremes' });
+                        }
+                    }
+                });
             }
+        }
 
+        _respChanged(resp) {
+            if(!resp) return;
 
-            // create the chart
-            Highcharts.stockChart(this.$.container, {
+            //this._chart2(resp);
+            this._chart1(resp);
+        }
 
-                rangeSelector: {
-                    selected: 1
+        _chart1(resp){
+            resp.xData = Highcharts.map(resp.result, function (val, j) {
+                //return (new Date(val)).toUTCString()
+                return (new Date(val[0])).toDateString();
+            });
+            resp.price = Highcharts.map(resp.result, function (val, j) {
+                return val[1];
+            });
+            resp.volume = Highcharts.map(resp.result, function (val, j) {
+                return val[5];
+            });
+            console.log(resp)
+            Highcharts.chart(this.$.container, {
+                chart: {
+                    zoomType: 'xy'
                 },
-
                 title: {
-                    text: 'AAPL Historical'
+                    text: 'LRC-WETH Price & Volume'
                 },
-
-                yAxis: [{
-                    labels: {
-                        align: 'right',
-                        x: -3
-                    },
-                    title: {
-                        text: 'OHLC'
-                    },
-                    height: '60%',
-                    lineWidth: 2,
-                    resize: {
-                        enabled: true
-                    }
-                }, {
-                    labels: {
-                        align: 'right',
-                        x: -3
-                    },
-                    title: {
-                        text: 'Volume'
-                    },
-                    top: '65%',
-                    height: '35%',
-                    offset: 0,
-                    lineWidth: 2
+                xAxis: [{
+                    categories: resp.xData,
+                    crosshair: true
                 }],
-
+                yAxis: [{ // Primary yAxis
+                    labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    },
+                    title: {
+                        text: 'Price',
+                        style: {
+                            color: Highcharts.getOptions().colors[1]
+                        }
+                    }
+                }, { // Secondary yAxis
+                    labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    },
+                    title: {
+                        text: 'Volume',
+                        style: {
+                            color: Highcharts.getOptions().colors[0]
+                        }
+                    },
+                    opposite: true
+                }],
                 tooltip: {
-                    split: true
+                    shared: true
                 },
-
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    x: 0,
+                    verticalAlign: 'bottom',
+                    y: 0,
+                    floating: true,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                },
                 series: [{
-                    type: 'candlestick',
-                    name: 'AAPL',
-                    data: ohlc,
-                    dataGrouping: {
-                        units: groupingUnits
+                    name: 'Volume',
+                    type: 'column',
+                    yAxis: 1,
+                    data: resp.price,
+                    tooltip: {
+                        valueSuffix: ''
                     }
                 }, {
-                    type: 'column',
-                    name: 'Volume',
-                    data: volume,
-                    yAxis: 1,
-                    dataGrouping: {
-                        units: groupingUnits
+                    name: 'Price',
+                    type: 'spline',
+                    data: resp.volume,
+                    tooltip: {
+                        valueSuffix: 'LRC-1WETH'
                     }
                 }]
             });
+        }
+
+        _chart2(resp){
+            let priceDatas = resp.datasets[0], volumeDatas = resp.datasets[1];
+            // Add X values
+            priceDatas.data = Highcharts.map(priceDatas.data, function (val, j) {
+                return [resp.xData[j], val];
+            });
+            volumeDatas.data = Highcharts.map(volumeDatas.data, function (val, j) {
+                return [resp.xData[j], val];
+            });
+
+            this._chart(this.$.price, priceDatas, Highcharts.getOptions().colors[0]);
+            this._chart(this.$.volume, volumeDatas, Highcharts.getOptions().colors[2]);
+
+            this.$.container.addEventListener('mousemove', this._chartEvent);
+            this.$.container.addEventListener('touchmove', this._chartEvent);
+            this.$.container.addEventListener('touchstart', this._chartEvent);
+
+            Highcharts.Point.prototype.highlight = function (event) {
+                this.onMouseOver(); // Show the hover marker
+                this.series.chart.tooltip.refresh(this); // Show the tooltip
+                this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+            };
+        }
+
+        _chart(dom, datas, color){
+            let chart = Highcharts.chart(dom, {
+                chart: {
+                    marginLeft: 40, // Keep all charts left aligned
+                    spacingTop: 20,
+                    spacingBottom: 20
+                },
+                title: {
+                    text: datas.name,
+                    align: 'left',
+                    margin: 0,
+                    x: 30
+                },
+                credits: {
+                    enabled: false
+                },
+                legend: {
+                    enabled: false
+                },
+                xAxis: {
+                    crosshair: true,
+                    events: {
+                        setExtremes: this.syncExtremes
+                    }
+                    //type: 'datetime'
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
+                },
+                tooltip: {
+                    positioner: function () {
+                        return {
+                            x: this.chart.chartWidth - this.label.width, // right aligned
+                            y: 10 // align to title
+                        };
+                    },
+                    borderWidth: 0,
+                    backgroundColor: 'none',
+                    pointFormat: '{point.y}',
+                    headerFormat: '',
+                    shadow: false,
+                    style: {
+                        fontSize: '18px'
+                    },
+                    valueDecimals: datas.valueDecimals
+                },
+//                tooltip: {
+//                        headerFormat: 'Time: {point.x:.1f}<br>',
+//                        pointFormat: 'Volume {point.y} ',
+//                        shared: true
+//                    },
+                series: [{
+                    data: datas.data,
+                    name: datas.name,
+                    type: datas.type,
+                    color: color,
+                    fillOpacity: 0.3,
+                    tooltip: {
+                        valueSuffix: ' ' + datas.unit
+                    }
+                }]
+            });
+        }
+
+        _chartEvent(e){
+            var chart,
+                point,
+                i,
+                event;
+            console.log(Highcharts.charts.length)
+            for (i = 0; i < Highcharts.charts.length; i = i + 1) {console.log(Highcharts.charts[i])
+                chart = Highcharts.charts[i];
+                if(chart && chart.pointer){
+                    event = chart.pointer.normalize(e.originalEvent); // Find coordinates within the chart
+                    point = chart.series[0].searchPoint(event, true); // Get the hovered point
+
+                    if (point) {
+                        point.highlight(e);
+                    }
+                }
+            }
         }
 
         go() {

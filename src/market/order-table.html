@@ -159,12 +159,14 @@
                         computed: '_computeOrders(appConfig, resp, rawBalances)'
                     },
                     currentPage: {
-                        type: Number,
-                        value: 1
+                        type: Number
                     },
                     totalPage: {
-                        type: Number,
-                        value: 20
+                        type: Number
+                    },
+                    resp: {
+                        type: Object,
+                        observer: '_computePage'
                     },
                     showPage: {
                         type: String,
@@ -182,8 +184,15 @@
                         this.hiddenCancel = false;
                     }
                 }
-                this._pager();
-                this._showPage();
+            }
+
+            _computePage(resp){
+                if(resp){
+                    this.totalPage = resp.result.pageSize;
+                    this.currentPage = resp.result.pageIndex;
+                    this._pager();
+                    this._showPage();
+                }
             }
 
             _showPage() {

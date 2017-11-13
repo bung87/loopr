@@ -41,7 +41,6 @@
     "vaadin-text-field": "vaadin/vaadin-text-field#^1.1.0",
     "vaadin-checkbox": "vaadin/vaadin-checkbox#^1.0.0",
     "vaadin-button": "vaadin/vaadin-button#^1.0.4",
-    "highstock": "highstock-release#^6.0.1",
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
     "scary-cookie": "Scarygami/scary-cookie#^2.0.0",
@@ -57,7 +56,8 @@
     "prism-pagination": "Prhythm/prism-pagination#^2.0.2",
     "hot-ajax-paging": "mercmobily/hot-ajax-paging#^0.2.5",
     "bignumber.js": "^4.1.0",
-    "loopring.js": "git://github.com/Loopring/loopring.js.git"
+    "loopring.js": "git://github.com/Loopring/loopring.js.git",
+    "highcharts": "^6.0.2"
   },
   "resolutions": {
     "polymer": "^2.0.0",
