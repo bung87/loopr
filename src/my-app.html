@@ -277,7 +277,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" id={{pageId}}></page-market>
                     <page-markets name="markets"></page-markets>
-                    <page-wallet id="walletPage" name="wallet"></page-wallet>
+                    <page-wallet id="walletPage" name="wallet" secondary-page={{pageId}}></page-wallet>
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage={{pageId}}></page-history>

@@ -42,6 +42,21 @@
             .show {
                 visibility: visible;
             }
+
+            .hiddenMore {
+                visibility: hidden;
+                @apply(--layout-horizontal);
+                @apply(--layout-end-justified);
+            }
+
+            .showMore {
+                @apply(--layout-horizontal);
+                @apply(--layout-end-justified);
+            }
+
+            .seeMoreLink {
+                margin-right: 20px;
+            }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -131,7 +146,10 @@
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
-        <div class$="[[showPage]] horizontal end-justified layout ">
+        <div class$="[[showSeeMore]] horizontal end-justified layout">
+            <div class="seeMoreLink"><a id="showMore" href="javascript:void(0)" on-click="_showMore">See More...</a></div>
+        </div>
+        <div class$="[[showPage]] horizontal end-justified layout">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
         <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}"
@@ -178,11 +196,20 @@
             ready() {
                 super.ready();
                 this.hiddenCancel = true;
+                this.showSeeMore = "hidden";
                 if (this.displayMode) {
                     let displayMode = this.displayMode.toLowerCase();
                     if ("wallet-orders" === displayMode) {
                         this.hiddenCancel = false;
                     }
+                }
+            }
+
+            _showMore(){
+                if(this.filterMine){
+                    window.location.href = "#/wallet/orders";
+                } else {
+                    window.location.href = "#/history/orders";
                 }
             }
 
@@ -200,8 +227,10 @@
             _showPage() {
                 if (this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)) {
                     this.showPage = "show";
+                    this.showSeeMore = "hiddenMore";
                 } else {
                     this.showPage = "hidden";
+                    this.showSeeMore = "showMore";
                 }
             }
 
