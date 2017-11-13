@@ -36,6 +36,9 @@
 
         static get properties() {
             return {
+                market: {
+                    type: String
+                },
                 resp: {
                     type: Object,
                     observer: '_respChanged'
@@ -83,13 +86,13 @@
             resp.volume = Highcharts.map(resp.result, function (val, j) {
                 return val[5];
             });
-            console.log(resp)
+            let title = this.market.toUpperCase()
             Highcharts.chart(this.$.container, {
                 chart: {
                     zoomType: 'xy'
                 },
                 title: {
-                    text: 'LRC-WETH Price & Volume'
+                    text: title + ' Price & Volume'
                 },
                 xAxis: [{
                     categories: resp.xData,
@@ -148,7 +151,7 @@
                     type: 'spline',
                     data: resp.volume,
                     tooltip: {
-                        valueSuffix: 'LRC-1WETH'
+                        valueSuffix: ''
                     }
                 }]
             });
