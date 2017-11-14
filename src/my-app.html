@@ -237,6 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
         <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
         <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
         <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
@@ -244,6 +245,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <scary-cookie id="settingsGasPrice" name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
         <scary-cookie id="warnedVersion" name="warned-version" value="{{warnedVersion}}"></scary-cookie>
+        <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -336,6 +338,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Number,
                     computed: '_computedVersion(appConfig, cookieValues)'
                 },
+                settingsMarginSplit: {
+                    type: Number,
+                    computed: '_computedMarginSplit(appConfig, cookieValues)'
+                },
                 page: {
                     type: String,
                     reflectToAttribute: true,
@@ -395,6 +401,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             if (this.$.warnedVersion.value) {
                 cookieValue["warnedVersion"] = this.$.warnedVersion.value;
+            }
+            if (this.$.settingsMarginSplit.value) {
+                cookieValue["settingsMarginSplit"] = this.$.settingsMarginSplit.value;
             }
             this.cookieValues = cookieValue;
 
@@ -492,6 +501,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
+        _computedMarginSplit(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                if (cookieValues["settingsMarginSplit"]) {
+                    return cookieValues["settingsMarginSplit"];
+                } else {
+                    return appConfig.defaultMarginSplitPercentage;
+                }
+            }
+        }
+
         _computeAppConfig(appConfigRaw) {
             if (appConfigRaw) {
                 var appConfig = appConfigRaw;
@@ -531,7 +550,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _resetWallet() {
             console.log("reset wallet");
             this.wallet = null;
-            window.location = "/#/wallet";
+            window.location = "/#/wallet/assets";
         }
 
         _walletChanged(wallet) {

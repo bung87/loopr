@@ -76,17 +76,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
-            <scary-cookie name="settings-lang" value="{{settingsLang}}"></scary-cookie>
             <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
-            <scary-cookie name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
-            <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
-            <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+            <scary-cookie name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
+            <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
+            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+            <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
+            <scary-cookie name="settings-lang" value="{{settingsLang}}"></scary-cookie>
             <looper-toolbar slot="secondary-toolbar" active-tab="settings"></looper-toolbar>
             <div class="sections">
                 <paper-card>
@@ -108,16 +108,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <div class="label">Contract Version</div>
                                 <div>
                                     <vaadin-combo-box id="version" placeholder="Default Contract Version" items="{{appConfig.contracts}}" item-label-path="version" item-value-path="version"></vaadin-combo-box>
-                                    <a class="contract-address" href="[[contractAddress]]" target="_blank">[[contractAddress]]</a>
+                                    <a class="contract-address" href="https://etherscan.io/address/[[contractAddress]]" target="_blank">[[contractAddress]]</a>
                                 </div>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">LRC Fee</div>
-                                    <vaadin-text-field id="lrcFee" value="{{appConfig.defaultLrcFeePermillage}}"
-                                                       pattern="[[_lrcFeePatten()]]"
-                                                       error-message="[[_lrcFeeError()]]">
-                                        <div slot="suffix">‰</div>
-                                    </vaadin-text-field>
+                                <vaadin-text-field id="lrcFee" value="{{settingsLrcFee}}"
+                                                   pattern="[[_lrcFeePatten()]]"
+                                                   error-message="[[_lrcFeeError()]]">
+                                    <div slot="suffix">‰</div>
+                                </vaadin-text-field>
+                            </div>
+                            <div class="item horizontal center layout">
+                                <div class="label">Margin Split</div>
+                                <vaadin-text-field id="marginSplit" value="{{settingsMarginSplit}}"
+                                                   pattern="[[_marginSplitPatten()]]"
+                                                   error-message="[[_marginSplitError()]]">
+                                    <div slot="suffix">%</div>
+                                </vaadin-text-field>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Gas Price</div>
@@ -142,23 +150,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-
+                cookieValue: Object,
+                settingsLrcFee: {
+                    type: Number,
+                    computed: '_computedLrcFee(appConfig, cookieValues)'
+                },
+                initContract: {
+                    type: String,
+                    computed: '_initContract(appConfig, settingsVersion)'
+                },
+                settingsMarginSplit: {
+                    type: Number,
+                    computed: '_computedMarginSplit(appConfig, cookieValues)'
+                },
+                contractAddress: String
             };
         }
 
-
         ready() {
             super.ready();
+
+            let cookieValue = {};
+            if (this.$.settingsLrcFee.value) {
+                cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
+            }
+            if (this.$.settingsMarginSplit.value) {
+                cookieValue["settingsMarginSplit"] = this.$.settingsMarginSplit.value;
+            }
+            this.cookieValues = cookieValue;
+
             this.$.lang.value = this.settingsLang || "en";
             this.$.currency.value = this.settingsCurrency || "usd";
             this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
             this.$.version.value = this.settingsVersion || "0.0.1";
-            this.contractAddress = this.appConfig.contractVersionMap[this.$.version.value].address;
-            this.$.lrcFee.value = this.settingsLrcFee;
             this.$.gasPrice.value = this.settingsGasPrice;
 
             var _this = this;
-
             this.$.lang.addEventListener('value-changed', function() {
                 _this.settingsLang = _this.$.lang.value || "en";
                 console.log(_this.settingsLang);
@@ -174,24 +201,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(_this.settingsRelay);
             });
 
-            this.$.version.addEventListener('value-changed', function() {
-                _this.settingsVersion = _this.$.version.value || "0.0.1";
-                _this.contractAddress = _this.appConfig.contractVersionMap[_this.settingsVersion].address;
-                console.log(_this.settingsVersion);
-            });
-
-            this.$.lrcFee.addEventListener('value-changed', function() {
-                if(_this._isLrcFee(_this.$.lrcFee.value)){
-                    _this.settingsLrcFee = _this.$.lrcFee.value;
+            this.$.lrcFee.addEventListener('value-changed', function(e) {
+                if(this._isLrcFee(this.$.lrcFee.value)){
+                    this.$.settingsLrcFee.value = this.$.lrcFee.value;
                 }
-                console.log(_this.settingsLrcFee)
-            });
+                console.log(this.$.settingsLrcFee.value)
+            }.bind(this));
 
             this.$.gasPrice.addEventListener('value-changed', function() {
                 _this.settingsGasPrice = _this.$.gasPrice.value;
                 _this.$.gasPriceLabel.textContent = _this.$.gasPrice.value + "GWEI";
                 console.log(_this.$.gasPrice.value)
             });
+
+            this.$.marginSplit.addEventListener('value-changed', function() {
+                this.$.settingsMarginSplit.value = this.$.marginSplit.value;
+                console.log(this.$.settingsMarginSplit.value);
+            }.bind(this));
+        }
+
+        _computedLrcFee(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                let value = null;
+                if (cookieValues["settingsLrcFee"]) {
+                    value = cookieValues["settingsLrcFee"];
+                } else {
+                    value = appConfig.defaultLrcFeePermillage;
+                }
+                this.$.lrcFee.value = value;
+                return value;
+            }
+        }
+
+        _initContract(appConfig, settingsVersion) {
+            if(appConfig && settingsVersion){
+                var _this = this;
+                this.contractAddress = appConfig.contractVersionMap[settingsVersion].address;
+                this.$.version.addEventListener('value-changed', function() {
+                    _this.settingsVersion = _this.$.version.value;
+                    _this.contractAddress = appConfig.contractVersionMap[_this.settingsVersion].address;
+                });
+            }
+        }
+
+        _computedMarginSplit(appConfig, cookieValues) {
+            if (appConfig && cookieValues) {
+                let value = null;
+                if (cookieValues["settingsMarginSplit"]) {
+                    value = cookieValues["settingsMarginSplit"];
+                } else {
+                    value = appConfig.defaultMarginSplitPercentage;
+                }
+                this.$.marginSplit.value = value;
+                return value;
+            }
         }
 
         _lrcFeePatten() {
@@ -203,7 +266,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _lrcFeeError(int) {
-            return "input valid integer value (0~1000)";
+            return "input valid integer value (0~50)";
+        }
+
+        _marginSplitPatten() {
+            return "^([0-9]{1,3}|1000)$";
+        }
+
+        _marginSplitFee(intVal) {
+            return intVal.toString().match(this._marginSplitPatten());
+        }
+
+        _marginSplitError(int) {
+            return "input valid integer value (0~100)";
         }
     }
 

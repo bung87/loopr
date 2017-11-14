@@ -82,6 +82,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
+            if(!this.secondaryPage){
+                this.secondaryPage = "assets";
+            }
             const page = this.$.pages.selectedItem;
             if (page && page.go) page.go();
         }

@@ -1,8 +1,9 @@
 {
-    "defaultPricePrecision": 8,
-    "defaultVolumePrecision": 8,
-    "defaultLrcFeePermillage": 2,
-    "defaultGasPrice": 21,
+    "defaultPricePrecision":8,
+    "defaultVolumePrecision":8,
+    "defaultLrcFeePermillage":2,
+    "defaultGasPrice":21,
+    "defaultMarginSplitPercentage":50,
     "defaultGasLimit":21000,
     "contracts": [
         {
