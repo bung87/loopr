@@ -28,17 +28,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <app-toolbar slot="secondary-toolbar">
                 <div condensed-title></div>
-                Loopr Documentation
+                Loopr Documentation - [[meta.title]]
                 <div condensed-title></div>
                 <a href="/#/">
                     <paper-icon-button noink icon="close"></paper-icon-button>
                 </a>
             </app-toolbar>
+             <iron-ajax auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}"></iron-ajax>
             <div class="sections">
                 <paper-card>
                     <marked-element>
                         <div slot="markdown-html"></div>
-                        <script type="text/markdown" src="//raw.githubusercontent.com/Loopring/loopr/master/README.md"></script>
+                        <script type="text/markdown" src="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].md"></script>
                     </marked-element>
                 </paper-card>
                 <div class="footer-spacer"></div>
@@ -53,11 +54,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         static get properties() {
             return {
-                markdown: {
+                pageId: {
                     type: String,
-                    reflectToAttribute: true
+                    reflectToAttriute: true
+                },
+                name: {
+                    type: String,
+                    computed: 'computeName(pageId)'
                 }
             };
+        }
+
+        computeName(pageId) {
+            console.log("pageId: " +pageId);
+            if (pageId) return pageId;
+            else return "default";
         }
     }
 
