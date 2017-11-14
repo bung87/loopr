@@ -142,8 +142,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item-body two-line>
                                     <div class="title"> Balance</div>
                                     <div secondary>
-                                        <iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
-                                                   last-response="{{rawBalances}}" auto></iron-ajax>
+                                        <!--<iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
+                                                   last-response="{{rawBalances}}" auto></iron-ajax>-->
+                                        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}"></loopr-ajax>
                                         [[amountShow]]
                                     </div>
                                 </paper-item-body>

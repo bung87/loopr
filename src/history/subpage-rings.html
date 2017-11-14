@@ -91,7 +91,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
         </vaadin-grid>
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
         <div class="horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count=[[totalPage]] range=[[pageRange]]></prism-square-pager>
         </div>
@@ -102,10 +103,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                relay: {
-                    type: Object,
-                    computed: '_selectedRelay(settingsRelay)'
-                },
                 currentPage: {
                     type: Number
                 },
@@ -127,10 +124,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
         }
 
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
-
         _computePage(resp){
             if(resp){
                 let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
@@ -149,7 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            // this.$.ajax.generateRequest();
+            this.$.ajax.generateRequest();
         }
     }
 

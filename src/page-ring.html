@@ -20,7 +20,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>
+        <!--<iron-ajax auto url="[[settingsRelay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>-->
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json" last-response="{{resp}}" loading={{loading}}>
+        </loopr-ajax>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ring" id="[[id]]" back-link="/#/history/rings"></simple-toolbar>
             <div class="sections">
@@ -108,16 +110,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     observer: '_update',
                 },
-                ring: Object,
-                relay: {
-                    type: Object,
-                    computed: '_selectedRelay(settingsRelay)'
-                }
+                ring: Object
             };
-        }
-
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
         }
 
         tranHextoNum(hex) {

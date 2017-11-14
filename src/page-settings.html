@@ -75,18 +75,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-            <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
-            <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
-            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
-            <scary-cookie name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
+            <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
             <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-            <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+            <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <scary-cookie id="settingsGasPrice" name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+            <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
-            <scary-cookie name="settings-lang" value="{{settingsLang}}"></scary-cookie>
+            <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
             <loopr-toolbar slot="secondary-toolbar" active-tab="settings"></loopr-toolbar>
             <div class="sections">
                 <paper-card>
@@ -155,13 +150,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Number,
                     computed: '_computedLrcFee(appConfig, cookieValues)'
                 },
+                settingsMarginSplit: {
+                    type: Number,
+                    computed: '_computedMarginSplit(appConfig, cookieValues)'
+                },
                 initContract: {
                     type: String,
                     computed: '_initContract(appConfig, settingsVersion)'
                 },
-                settingsMarginSplit: {
-                    type: Number,
-                    computed: '_computedMarginSplit(appConfig, cookieValues)'
+                initBind: {
+                    type: Object,
+                    computed: '_initBind(appConfig, cookieValues)'
                 },
                 contractAddress: String
             };
@@ -169,8 +168,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         ready() {
             super.ready();
-
             let cookieValue = {};
+            if (this.$.settingsRelay.value) {
+                cookieValue["settingsRelay"] = this.$.settingsRelay.value;
+            }
+            if (this.$.settingsCurrency.value) {
+                cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
+            }
+            if (this.$.settingsLang.value) {
+                cookieValue["settingsLang"] = this.$.settingsLang.value;
+            }
+            if (this.$.settingsGasPrice.value) {
+                cookieValue["settingsGasPrice"] = this.$.settingsGasPrice.value;
+            }
+            if (this.$.settingsVersion.value) {
+                cookieValue["settingsVersion"] = this.$.settingsVersion.value;
+            }
             if (this.$.settingsLrcFee.value) {
                 cookieValue["settingsLrcFee"] = this.$.settingsLrcFee.value;
             }
@@ -179,44 +192,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             this.cookieValues = cookieValue;
 
-            this.$.lang.value = this.settingsLang || "en";
-            this.$.currency.value = this.settingsCurrency || "usd";
-            this.$.relay.value = this.settingsRelay || "//relay1.loopring.io";
-            this.$.version.value = this.settingsVersion || "0.0.1";
-            this.$.gasPrice.value = this.settingsGasPrice;
-
             var _this = this;
             this.$.lang.addEventListener('value-changed', function() {
                 _this.settingsLang = _this.$.lang.value || "en";
-                console.log(_this.settingsLang);
+                console.log("lang change to:"+_this.settingsLang);
             });
 
             this.$.currency.addEventListener('value-changed', function() {
                 _this.settingsCurrency = _this.$.currency.value || "usd";
-                console.log(_this.settingsCurrency);
+                console.log("currency change to:"+_this.settingsCurrency);
             });
 
             this.$.relay.addEventListener('value-changed', function() {
                 _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
-                console.log(_this.settingsRelay);
+                console.log("relay change to:"+_this.settingsRelay);
             });
 
             this.$.lrcFee.addEventListener('value-changed', function(e) {
                 if(this._isLrcFee(this.$.lrcFee.value)){
                     this.$.settingsLrcFee.value = this.$.lrcFee.value;
                 }
-                console.log(this.$.settingsLrcFee.value)
+                console.log("lrcFee change to:"+this.$.settingsLrcFee.value)
             }.bind(this));
 
             this.$.gasPrice.addEventListener('value-changed', function() {
                 _this.settingsGasPrice = _this.$.gasPrice.value;
                 _this.$.gasPriceLabel.textContent = _this.$.gasPrice.value + "GWEI";
-                console.log(_this.$.gasPrice.value)
+                console.log("gasPrice change to:"+_this.$.gasPrice.value)
             });
 
             this.$.marginSplit.addEventListener('value-changed', function() {
-                this.$.settingsMarginSplit.value = this.$.marginSplit.value;
-                console.log(this.$.settingsMarginSplit.value);
+                if(this._isMarginSplitFee(this.$.marginSplit.value)){
+                    this.$.settingsMarginSplit.value = this.$.marginSplit.value;
+                }
+                console.log("marginSplit change to:"+this.$.settingsMarginSplit.value);
             }.bind(this));
         }
 
@@ -228,7 +237,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     value = appConfig.defaultLrcFeePermillage;
                 }
-                this.$.lrcFee.value = value;
                 return value;
             }
         }
@@ -252,13 +260,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     value = appConfig.defaultMarginSplitPercentage;
                 }
-                this.$.marginSplit.value = value;
                 return value;
             }
         }
 
+        _initBind(appConfig, cookieValues){
+            if (appConfig && cookieValues) {
+                this.$.lang.value = cookieValues["settingsLang"] || appConfig.langs[0].value;
+                this.$.currency.value = cookieValues["settingsCurrency"] || appConfig.fiat[0].value;
+                this.$.relay.value = cookieValues["settingsRelay"] || appConfig.relays[0].value;
+                this.$.version.value = cookieValues["settingsVersion"] || appConfig.contracts[appConfig.contracts.length - 1].version;
+                this.$.gasPrice.value = cookieValues["settingsGasPrice"] || appConfig.defaultGasPrice;
+                this.$.marginSplit.value = cookieValues["settingsMarginSplit"] || appConfig.defaultMarginSplitPercentage;
+                this.$.lrcFee.value = cookieValues["settingsLrcFee"] || appConfig.defaultLrcFeePermillage;
+            }
+        }
+
         _lrcFeePatten() {
-            return "^([0-9]{1,3}|1000)$";
+            return "^([0-9]{1}|[1,2,3,4]{1}[0-9]|50)$";
         }
 
         _isLrcFee(intVal) {
@@ -270,10 +289,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _marginSplitPatten() {
-            return "^([0-9]{1,3}|1000)$";
+            return "^([0-9]{1,2}|100)$";
         }
 
-        _marginSplitFee(intVal) {
+        _isMarginSplitFee(intVal) {
             return intVal.toString().match(this._marginSplitPatten());
         }
 

@@ -70,8 +70,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </vaadin-grid-column>
                     </vaadin-grid>
                     <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-                    <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/tickers.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading={{loading}}>
-                    </iron-ajax>
+                    <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/tickers.json" last-response="{{resp}}" loading={{loading}}>
+                    </loopr-ajax>
                 </paper-card>
                 <div class="footer-spacer flex"></div>
                 <loopr-footer></loopr-footer>
@@ -88,20 +88,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tickers: {
                     type: Object,
                     computed: '_process(resp.result)'
-                },
-                relay: {
-                    type: String,
-                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
 
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
-
         _process(result) {
-
             if (result) {
                 return _.map(result, function(i) {
                     var item = i;

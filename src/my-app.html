@@ -77,6 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/notification-panel.html">
 <link rel="import" href="utils/market-selector.html">
 <link rel="import" href="utils/address-text-field.html">
+<link rel="import" href="utils/loopr-ajax.html">
 <link rel="import" href="loopr-page/looper-toolbar.html">
 <link rel="import" href="loopr-page/looper-footer.html">
 <link rel="import" href="loopr-page/simple-toolbar.html">
@@ -225,8 +226,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <!-- ajax -->
-        <iron-ajax auto url="/src/datas/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>
+        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
+        <!--<iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>-->
+        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
@@ -421,6 +423,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         }
 
+        _ifLoadAjax(settingsRelay, settingsCurrency){
+            return settingsRelay && settingsCurrency;
+        }
+
         _computedLang(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
                 if (cookieValues["settingsLang"]) {
@@ -430,7 +436,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
         }
-
 
         _computedCurrency(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
