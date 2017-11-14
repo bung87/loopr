@@ -77,22 +77,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/notification-panel.html">
 <link rel="import" href="utils/market-selector.html">
 <link rel="import" href="utils/address-text-field.html">
-<link rel="import" href="looper-page/looper-toolbar.html">
-<link rel="import" href="looper-page/looper-footer.html">
-<link rel="import" href="looper-page/simple-toolbar.html">
-<link rel="import" href="looper-page/looper-page.html">
-<link rel="import" href="looper-page/ethereum-signer.html">
-<link rel="import" href="looper-page/signtosend-dialog.html">
-<link rel="lazy-import" href="page-markets.html">
+<link rel="import" href="loopr-page/looper-toolbar.html">
+<link rel="import" href="loopr-page/looper-footer.html">
+<link rel="import" href="loopr-page/simple-toolbar.html">
+<link rel="import" href="loopr-page/looper-page.html">
+<link rel="import" href="loopr-page/ethereum-signer.html">
+<link rel="import" href="loopr-page/signtosend-dialog.html">
+<link rel="import" href="page-markets.html">
+<link rel="import" href="page-settings.html">
+<link rel="import" href="page-wallet.html">
+<link rel="import" href="page-history.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
 <link rel="lazy-import" href="page-order.html">
-<link rel="lazy-import" href="page-history.html">
-<link rel="lazy-import" href="page-wallet.html">
 <link rel="lazy-import" href="page-transfer.html">
 <link rel="lazy-import" href="page-approve.html">
 <link rel="lazy-import" href="page-convert.html">
-<link rel="lazy-import" href="page-settings.html">
 <link rel="lazy-import" href="page-doc.html">
 <link rel="lazy-import" href="page-404.html">
 <link rel="lazy-import" href="page-dev.html">
@@ -258,7 +258,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </app-drawer>
             <app-header-layout has-scrolling-region fullbleed>
                 <app-header fixed slot="header" id="appHeader">
-                    <!-- <looper-notification-bar id="notification"></looper-notification-bar> -->
                     <app-toolbar>
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
                         <!-- <div spacer></div> -->
@@ -289,7 +288,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-settings name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
                     <page-generatewallet name="generatewallet"></page-generatewallet>
-                    <page-doc name="doc" markdown={{pageId}}></page-doc>
+                    <page-doc name="doc" page-id={{pageId}}></page-doc>
                     <page-dev name="dev"></page-dev>
                     <page-404 name="404"></page-404>
                 </iron-pages>

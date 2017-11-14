@@ -1,13 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<dom-module id="looper-footer" fit>
+<dom-module id="loopr-footer" fit>
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
          :host {
             display: block;
-            background-color: var(--paper-grey-700);
+            background: var(--app-text-color-light);
             width: 100%;
-
             font-size: 12px;
         }
 
@@ -21,7 +20,7 @@
         }
 
         .social {
-            background: var(--app-text-color-light);
+            background: var(--app-text-color);
             width: 100%;
             height: 80px;
         }
@@ -29,19 +28,17 @@
         .menus {
             min-height: 100px;
             min-width: 1024px;
-            padding: 16px 0 32px 0;
+            padding: 48px 0 48px 0;
             /*border-top: 1px dashed rgba(0, 0, 0, .1);*/
         }
 
         .menus>div {
             padding-left: 8px;
-            font-weight: 400;
-            /*border-left: solid 4px rgba(0, 0, 0, .1);*/
         }
 
         .menus a {
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.54);
+            color: rgba(255, 255, 255, 0.78);
         }
 
         .menus a:hover {
@@ -49,7 +46,7 @@
         }
 
         .copyright {
-            color: var(--app-text-color);
+            color: rgba(255, 255, 255, 0.78);
             padding-bottom: 0;
             font-size: 12px;
             height: 28px;
@@ -59,7 +56,7 @@
             font-weight: 500;
             text-transform: uppercase;
             color: white;
-            padding-bottom: 8px;
+            padding-bottom: 16px;
         }
         </style>
         <div class="vertical center layout">
@@ -89,21 +86,19 @@
             <div class="horizontal layout justified menus">
                 <div class="vertical start layout">
                     <div class="title">Foundation & Community</div>
-                    <div><a>Loopring Foundation</a></div>
-                    <div><a>Fellowship of the Ring (FoR)</a></div>
-                    <div><a>Knowledge Base</a></div>
+                    <div><a target="_blank" href="https://loopring.org">Loopring Foundation</a></div>
+                    <div><a target="_blank" href="https://docs.loopring.org">Knowledge Base</a></div>
                 </div>
                 <div class="vertical start layout">
                     <div class="title">Loopring Protocol</div>
-                    <div><a href="https://github.com/Loopring/whitepaper/raw/master/en_whitepaper.pdf">Whitepaper</a></div>
+                    <div><a target="_blank" href="https://github.com/Loopring/whitepaper/raw/master/en_whitepaper.pdf">Whitepaper</a></div>
                     <div><a>Ethereum Smart Contracts</a></div>
-                    <div><a>Github Repositories</a></div>
+                    <div><a target="_blank" href="https://github.com/Loopring">Github Repositories</a></div>
                 </div>
                 <div class="vertical start layout">
-                    <div class="title">Looper Wallet & DEX</div>
-                    <div><a>Disclaimer</a></div>
-                    <div><a>Donation</a></div>
-                    <div><a>Documentation</a></div>
+                    <div class="title">Wallet & DEX</div>
+                    <div><a href="/#/doc/disclaimer">Disclaimer</a></div>
+                    <div><a href="/#/doc/home">Documentation</a></div>
                 </div>
                 <!--         <div class="vertical start layout">
           <div> </div>
@@ -116,8 +111,8 @@
         </div>
     </template>
     <script>
-    class LooperFooter extends Polymer.Element {
-        static get is() { return 'looper-footer'; }
+    class LooprFooter extends Polymer.Element {
+        static get is() { return 'loopr-footer'; }
 
         static get properties() {
             return {};
@@ -131,6 +126,6 @@
         }
     }
 
-    window.customElements.define(LooperFooter.is, LooperFooter);
+    window.customElements.define(LooprFooter.is, LooprFooter);
     </script>
 </dom-module>

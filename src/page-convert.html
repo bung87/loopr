@@ -98,7 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
         <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{data}}" debounce-duration="300"></iron-ajax>
-        <looper-page>
+        <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
@@ -143,9 +143,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
+                <loopr-footer></loopr-footer>
             </div>
-        </looper-page>
+        </loopr-page>
     </template>
     <script>
     class PageConvert extends AppConfigMixin(Polymer.Element) {

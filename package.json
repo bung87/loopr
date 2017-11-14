@@ -1,12 +1,12 @@
 {
-  "name": "Looper",
+  "name": "Loopr",
   "version": "0.1.0",
-  "description": "A Loopring Web Wallet",
+  "description": "Ethereum Wallet & Loopring DEX",
   "homepage": "https://loopring.org/",
-  "bugs": "https://github.com/Loopring/looper/issues",
+  "bugs": "https://github.com/Loopring/loopr/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Loopring/looper.git"
+    "url": "https://github.com/Loopring/loopr.git"
   },
   "license": "Apache-2",
   "devDependencies": {

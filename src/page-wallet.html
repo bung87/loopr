@@ -30,15 +30,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
         </style>
-        <looper-page>
-            <looper-toolbar slot="secondary-toolbar" active-tab="wallet"> </looper-toolbar>
+        <loopr-page>
+            <loopr-toolbar slot="secondary-toolbar" active-tab="wallet"> </loopr-toolbar>
             <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
                 <subpage-ready name="ready" subpage="[[secondaryPage]]"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
-            <looper-footer></looper-footer>
-        </looper-page>
+            <loopr-footer></loopr-footer>
+        </loopr-page>
     </template>
     <script>
     class PageWallet extends Polymer.Element {

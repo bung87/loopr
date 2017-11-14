@@ -136,11 +136,11 @@
     "relays": [
         {
             "value": "https://raw.githubusercontent.com",
-            "label": "Default Looper Relay"
+            "label": "Default Loopring Relay"
         },
         {
             "value": "https://raw.githubusercontent.com",
-            "label": "Backup Looper Relay"
+            "label": "Backup Loopring Relay"
         },
         {
             "value": "//127.0.0.1:8081",

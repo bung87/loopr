@@ -25,26 +25,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: white;
         }
         </style>
-        <looper-page>
+        <loopr-page>
             <app-toolbar slot="secondary-toolbar">
                 <div condensed-title></div>
-                Looper Documentation
+                Loopr Documentation - [[meta.title]]
                 <div condensed-title></div>
                 <a href="/#/">
                     <paper-icon-button noink icon="close"></paper-icon-button>
                 </a>
             </app-toolbar>
+             <iron-ajax auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}"></iron-ajax>
             <div class="sections">
                 <paper-card>
                     <marked-element>
                         <div slot="markdown-html"></div>
-                        <script type="text/markdown" src="//raw.githubusercontent.com/Loopring/looper/master/README.md"></script>
+                        <script type="text/markdown" src="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].md"></script>
                     </marked-element>
                 </paper-card>
                 <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
+                <loopr-footer></loopr-footer>
             </div>
-        </looper-page>
+        </loopr-page>
     </template>
     <script>
     class PageDoc extends Polymer.Element {
@@ -53,11 +54,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         static get properties() {
             return {
-                markdown: {
+                pageId: {
                     type: String,
-                    reflectToAttribute: true
+                    reflectToAttriute: true
+                },
+                name: {
+                    type: String,
+                    computed: 'computeName(pageId)'
                 }
             };
+        }
+
+        computeName(pageId) {
+            console.log("pageId: " +pageId);
+            if (pageId) return pageId;
+            else return "default";
         }
     }
 

@@ -18,7 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <looper-page>
+        <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
@@ -68,9 +68,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <trade-table filter-mine name="myfills" display-mode="order"></trade-table>
                 </paper-card>
                 <div class="footer-spacer"></div>
-                <looper-footer></looper-footer>
+                <loopr-footer></loopr-footer>
             </div>
-        </looper-page>
+        </loopr-page>
         <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
         </iron-ajax>
     </template>
