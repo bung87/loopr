@@ -71,8 +71,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <loopr-footer></loopr-footer>
             </div>
         </loopr-page>
-        <iron-ajax auto url="[[relay]]/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
-        </iron-ajax>
+        <!--<iron-ajax auto url="[[settingsRelay]]/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
+        </iron-ajax>-->
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/order.json" last-response="{{resp}}"></loopr-ajax>
     </template>
     <script>
     class PageOrder extends AppConfigMixin(Polymer.Element) {
@@ -94,11 +95,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         ready() {
             super.ready();
-            console.log("order:" + this.id)
         }
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
+
         _computeOrder(appConfig, resp){
             if(appConfig && resp) {
                 let data = resp.result.data;

@@ -55,7 +55,9 @@
             return {
                 subpage: {
                     type: String,
-                    reflectToAttribute: true
+                    reflectToAttribute: true,
+                    value: "assets",
+                    observer: 'go'
                 }
             };
         }

@@ -83,7 +83,8 @@
                 </div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
+            <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderbook.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
         </div>
     </template>
     <script>
@@ -104,20 +105,12 @@
                 market: {
                     type: String,
                     computed: '_computeMarketId(tokenx, tokeny)'
-                },
-                relay: {
-                    type: Object,
-                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
 
         ready(){
             super.ready();
-        }
-
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
         }
 
         _computeMarketId(tokenx, tokeny) {

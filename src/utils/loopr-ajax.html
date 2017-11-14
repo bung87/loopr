@@ -1,0 +1,52 @@
+<!--
+   ETH address validator, use as <vaadin-combo-box></vaadin-combo-box>
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<dom-module id="loopr-ajax">
+    <template>
+        <iron-ajax id="ajax" auto url="[[url]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading={{loading}}></iron-ajax>
+    </template>
+    <script>
+        class LooprAjax extends Polymer.Element {
+            static get is() {
+                return 'loopr-ajax';
+            }
+
+            static get properties() {
+                return {
+                    relay: String,
+                    suffix: String,
+                    url: {
+                        type: String,
+                        value: '',
+                        computed: '_computedUrl(relay, suffix)'
+                    },
+                    lastResponse: {
+                        type: Object,
+                        notify: true
+                    },
+                    loading: {
+                        type: Boolean,
+                        notify: true
+                    }
+                }
+            }
+
+            _computedUrl(relay, suffix){
+                if(relay && suffix){
+                    return relay +"/"+ suffix;
+                }
+            }
+
+            generateRequest(){
+                if(this.$.ajax){
+                    //console.log("generateRequest.........")
+                    this.$.ajax.generateRequest
+                }
+            }
+        }
+        window.customElements.define(LooprAjax.is, LooprAjax);
+    </script>
+
+</dom-module>

@@ -86,6 +86,8 @@
         <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+        <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
+        <scary-cookie name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
 
         <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
                    last-response="{{rawBalances}}" auto></iron-ajax>
@@ -337,7 +339,7 @@
 
                         return;
                     }
-                    if(!this.appConfig){
+                    if(!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee){
                         return;
                     }
                     if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
@@ -366,7 +368,7 @@
                     data.salt = 10;
                     data.lrcFee = 10;
                     data.buyNoMoreThanAmountB = true;
-                    data.marginSplitPercentage = 50;
+                    data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 
@@ -416,7 +418,7 @@
 
                         return
                     }
-                    if(!this.appConfig){
+                    if(!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee){
                         return;
                     }
                     if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
@@ -445,7 +447,7 @@
                     data.salt = 10;
                     data.lrcFee = 10;
                     data.buyNoMoreThanAmountB = true;
-                    data.marginSplitPercentage = 50;
+                    data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 

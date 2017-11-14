@@ -152,8 +152,10 @@
         <div class$="[[showPage]] horizontal end-justified layout">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}"
-                   handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}"
+                   handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
+        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}"
+                    loading="{{loading}}"></loopr-ajax>
     </template>
     <script>
         class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -167,10 +169,6 @@
                     filterMine: Boolean,
                     displayMode: {
                         type: String
-                    },
-                    relay: {
-                        type: Object,
-                        computed: '_selectedRelay(settingsRelay)'
                     },
                     orders: {
                         type: Object,
@@ -279,10 +277,6 @@
                     }));
                 }
 
-            }
-
-            _selectedRelay(settingsRelay) {
-                return settingsRelay;
             }
 
             _computeRest(rawBalances, tokenb, tokens, order) {

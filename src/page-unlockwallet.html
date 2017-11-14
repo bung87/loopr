@@ -141,7 +141,7 @@
                 reader.readAsText(file);
                 reader.onload = function (e) {
                     this.walletContent = e.target.result;
-                    this.$.passwordInput.focus();
+                    this.$.password.focus();
                 }.bind(this);
             }
 
