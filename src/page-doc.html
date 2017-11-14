@@ -24,17 +24,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         paper-icon-button {
             color: white;
         }
+
+        [slot="markdown-html"] * {
+            color: rgba(0, 0, 0, 0.78);
+        }
+
+        [slot="markdown-html"] h2 {
+            color: var(--app-primary-color);
+        }
         </style>
         <loopr-page>
             <app-toolbar slot="secondary-toolbar">
                 <div condensed-title></div>
-                Loopr Documentation - [[meta.title]]
+                [[meta.title]]
                 <div condensed-title></div>
                 <a href="/#/">
                     <paper-icon-button noink icon="close"></paper-icon-button>
                 </a>
             </app-toolbar>
-             <iron-ajax auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}"></iron-ajax>
+            <iron-ajax auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}"></iron-ajax>
             <div class="sections">
                 <paper-card>
                     <marked-element>
@@ -66,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         computeName(pageId) {
-            console.log("pageId: " +pageId);
+            console.log("pageId: " + pageId);
             if (pageId) return pageId;
             else return "default";
         }
