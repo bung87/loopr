@@ -58,7 +58,7 @@
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <!-- ------ -->
-        <iron-ajax auto id="ajax" url="[[relay]]/Loopring/mock-relay-data/master/balances.json" handle-as="json" last-response="{{resp}}" debounce-duration="300" loading="{{loading}}"></iron-ajax>
+        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
@@ -170,10 +170,6 @@
                 erc20Tokens: {
                     type: Array,
                     computed: '_computeBalances(resp)'
-                },
-                relay: {
-                    type: String,
-                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
         }
@@ -209,10 +205,6 @@
                     return i !== null && i.token !== 'WETH' && i.token !== 'ETH';
                 });
             }
-        }
-
-        _selectedRelay(settingsRelay) {
-            return settingsRelay;
         }
 
         _isWETH(token) { return token === 'WETH'; }
