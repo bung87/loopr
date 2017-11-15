@@ -84,10 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/looper-page.html">
 <link rel="import" href="loopr-page/ethereum-signer.html">
 <link rel="import" href="loopr-page/signtosend-dialog.html">
-<link rel="import" href="page-markets.html">
+<link rel="lazy-import" href="page-markets.html">
 <link rel="import" href="page-settings.html">
-<link rel="import" href="page-wallet.html">
-<link rel="import" href="page-history.html">
+<link rel="lazy-import" href="page-wallet.html">
+<link rel="lazy-import" href="page-history.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
 <link rel="lazy-import" href="page-order.html">
@@ -388,13 +388,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             };
         }
 
-        _computedThirdParam(thirdrouteData) {
-            if(thirdrouteData && thirdrouteData.third){
-                console.log("thrid:"+thirdrouteData.third)
-                return thirdrouteData.third;
-            }
-        }
-
         ready() {
             super.ready();
             let cookieValue = {};
@@ -429,9 +422,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
 
-            //this.$.pages.addEventListener('iron-select', e=> this._bbb(e))
-            //this.$.pages.addEventListener('iron-deselect', e=> this._aaa(e))
-
             let _this = this;
             window.setInterval(function() {
                 _this.priceTimestamp = Date.parse(new Date());
@@ -447,10 +437,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.page = "markets";
             this.pageId = null;
             window.location.href = "/#/";
-        }
-
-        _ifLoadAjax(settingsRelay, settingsCurrency){
-            return settingsRelay && settingsCurrency;
         }
 
         _computedLang(appConfig, cookieValues) {
@@ -614,18 +600,45 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if(routeData && routeData.page){
                 this.page = routeData.page;
             }
+            if(!this.subroute || !this.subroute.path){
+                //console.log("clear sub and third")
+                this.subrouteData = null;
+                this.thirdrouteData = null;
+                this.pageId = '';
+                this.thirdParam = '';
+            }
+            if(!this.thirdroute || !this.thirdroute.path){
+                //console.log("clear third")
+                this.thirdrouteData = null;
+                this.thirdParam = '';
+            }
             if(subrouteData && subrouteData.pageId) {
                 this.pageId = subrouteData.pageId;
             }
-            console.log("main spage:"+this.page+" subpage:"+this.pageId)
+        }
+
+        _routePageChanged(page) {
+            if(page && this.route.path){
+                this.page = page;
+            } else {
+                this.page = 'markets';
+            }
         }
 
         _routeIdChanged(pageId) {
-            this.pageId = pageId || '';
+            if(pageId && this.subroute.path){
+                this.pageId = pageId
+            } else {
+                this.pageId = '';
+            }
         }
 
-        _routePageChanged(page) {console.log("//////////");console.log(this.selectedPage)
-            this.page = page || 'markets';
+        _computedThirdParam(thirdrouteData) {
+            if(thirdrouteData && thirdrouteData.third && this.thirdroute.path){
+                return thirdrouteData.third;
+            } else {
+                return '';
+            }
         }
 
         _pageChanged(page) {
@@ -637,7 +650,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 true);
         }
 
-        _selectedPageChanged(page) {console.log(page)
+        _selectedPageChanged(page) {
             if (page && page.go) page.go();
         }
 

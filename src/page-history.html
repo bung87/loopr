@@ -69,18 +69,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-history'; }
         static get properties() {
             return {
-                page:{
-                    type: String,
-                    notify: true
-                },
                 subpage: {
-                    type: String,
-                    reflectToAttribute: true,
-                    notify: true
+                    type: String
                 },
                 third: {
-                    type:String,
-                    notify: true
+                    type:String
                 },
                 selectedTab: {
                     type: String,
@@ -91,11 +84,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     observer: 'go'
                 }
             };
-        }
-
-        _b(v){
-            console.log("history.....page:"+this.page+"/"+this.subpage+"/"+this.third)
-            //if("history" === this.page){this.page = "wallet"}
         }
 
         _computeSelected(subpage) {

@@ -123,13 +123,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             static get properties() {
                 return {
                     subpage:{
-                        type: String,
-                        notify: true,
-                        observer: '_b'
+                        type: String
                     },
                     third: {
-                        type:String,
-                        notify: true
+                        type:String
                     },
                     chartSelection: {
                         type: String,
@@ -148,10 +145,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         observer: '_selectionChanged'
                     },
                 };
-            }
-
-            _b(page){
-                console.log("page-market.....subpage:"+this.subpage+"/"+this.third)
             }
 
             ready() {

@@ -30,19 +30,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get properties() {
             return {
                 subpage: {
-                    type: String,
-                    notify: true
+                    type: String
                 },
                 third: {
-                    type: String,
-                    notify: true
+                    type: String
                 }
             };
-        }
-
-        _a(){
-            console.log("subpage-trades.....page:"+this.page+"/"+this.subNav+"/"+this.market)
-            //if("history" === this.page){this.page = "wallet"}
         }
 
         go() {

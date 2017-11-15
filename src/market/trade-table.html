@@ -187,13 +187,10 @@
         static get properties() {
             return {
                 subpage: {
-                    type: String,
-                    notify: true
-                    //observer: '_b'
+                    type: String
                 },
                 third: {
-                    type: String,
-                    notify: true,
+                    type: String
                 },
                 token: {
                     type: String,
@@ -223,10 +220,6 @@
                     value: "hidden"
                 }
             };
-        }
-
-        _b(page){
-            console.log("trade-table.....subpage:"+this.subpage+"/"+this.third)
         }
 
         ready() {
@@ -276,10 +269,13 @@
         _showPage(){
             if(this.displayMode && (this.displayMode === "history-trades" || "wallet-trades" === this.displayMode)){
                 this.showPage = "show";
-                this.showSeeMore = "hiddenMore";
             } else {
                 this.showPage = "hidden";
+            }
+            if(this.displayMode && this.displayMode === "market"){
                 this.showSeeMore = "showMore";
+            } else {
+                this.showSeeMore = "hiddenMore";
             }
         }
 

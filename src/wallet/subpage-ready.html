@@ -34,13 +34,13 @@
 
         <div class="sections">
             <paper-card transparent>
-                <paper-tabs selected="{{subpage}}" attr-for-selected="name">
+                <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                     <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
                     <paper-tab name="orders"><a styleless href="/#/wallet/orders">My Orders</a></paper-tab>
                     <paper-tab name="trades"><a styleless href="/#/wallet/trades">My Trades</a></paper-tab>
                 </paper-tabs>
             </paper-card>
-            <iron-pages id="pages" selected="{{subpage}}" attr-for-selected="name">
+            <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
                 <wallet-assets name="assets"></wallet-assets>
                 <wallet-trades name="trades"></wallet-trades>
                 <wallet-orders name="orders"></wallet-orders>
@@ -58,6 +58,14 @@
                     reflectToAttribute: true,
                     value: "assets",
                     observer: 'go'
+                },
+                selectedTab: {
+                    type: String,
+                    computed: '_computeSelected(subpage)'
+                },
+                selectedPage: {
+                    type: Object,
+                    observer: 'go'
                 }
             };
         }
@@ -67,7 +75,7 @@
         }
 
         _computeSelected(subpage) {
-            if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
+            if (subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
                 return subpage;
             } else {
                 //TODO: send a 404 error event.

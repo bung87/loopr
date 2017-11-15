@@ -165,13 +165,10 @@
             static get properties() {
                 return {
                     subpage: {
-                        type: String,
-                        notify: true,
-                        observer: '_b'
+                        type: String
                     },
                     third: {
-                        type: String,
-                        notify: true,
+                        type: String
                     },
                     filterMine: Boolean,
                     displayMode: {
@@ -196,10 +193,6 @@
                         value: "hidden"
                     }
                 };
-            }
-
-            _b(v){
-                console.log("order-table.....subpage:"+this.subpage+"/"+this.third)
             }
 
             ready() {
@@ -235,10 +228,13 @@
             _showPage() {
                 if (this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)) {
                     this.showPage = "show";
-                    this.showSeeMore = "hiddenMore";
                 } else {
                     this.showPage = "hidden";
+                }
+                if(this.displayMode && this.displayMode === "market"){
                     this.showSeeMore = "showMore";
+                } else {
+                    this.showSeeMore = "hiddenMore";
                 }
             }
 
