@@ -89,8 +89,9 @@
         <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
         <scary-cookie name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
 
-        <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
-                   last-response="{{rawBalances}}" auto></iron-ajax>
+        <!--<iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
+                   last-response="{{rawBalances}}" auto></iron-ajax>-->
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}"></loopr-ajax>
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
             <paper-tab name="sell">Sell</paper-tab>

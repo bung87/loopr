@@ -65,8 +65,7 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-        <iron-ajax url="[[settingsRelay]]/Loopring/mock-relay-data/master/balances.json"
-                   last-response="{{rawBalances}}" auto></iron-ajax>
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}"></loopr-ajax>
 
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
