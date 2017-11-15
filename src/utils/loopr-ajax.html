@@ -40,10 +40,7 @@
             }
 
             generateRequest(){
-                if(this.$.ajax){
-                    //console.log("generateRequest.........")
-                    this.$.ajax.generateRequest
-                }
+                this.$.ajax.generateRequest();
             }
         }
         window.customElements.define(LooprAjax.is, LooprAjax);

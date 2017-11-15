@@ -59,6 +59,7 @@
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <!-- ------ -->
         <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+
         <!-- ------ -->
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
@@ -68,12 +69,12 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</template>
+                            <div class="horiziontal layout">[[item.token]]</div></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</template>
+                            <div class="horiziontal layout">[[item.name]]</div></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -116,12 +117,12 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</template>
+                            <div class="horiziontal layout">[[item.token]]</div></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</template>
+                            <div class="horiziontal layout">[[item.name]]</div></template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
