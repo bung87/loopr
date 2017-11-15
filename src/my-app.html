@@ -220,7 +220,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-location>
         <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}">
         </app-route>
-        <app-route route="{{subroute}}" pattern="/:pageId" data="{{subrouteData}}">
+        <app-route route="{{subroute}}" pattern="/:pageId" data="{{subrouteData}}" tail="{{thirdroute}}">
+        <app-route route="{{thirdroute}}" pattern="/:third" data="{{thirdrouteData}}"></app-route>
         </app-route>
         <!-- hidden components -->
         <signtosend-dialog id="signtosend"></signtosend-dialog>
@@ -263,7 +264,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <app-toolbar>
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
                         <!-- <div spacer></div> -->
-                        <a styleless href="/#/">
+                        <a styleless href="javascript:void(0)" on-click="_reload">
                             <div main-title><iron-image src="images/logo_white.png" sizing="contain"></iron-image></div>
                         </a>
                         <div condensed-title></div>
@@ -278,12 +279,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div>Loading configuration...</div>
                 </div>
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
-                    <page-market name="market" id={{pageId}}></page-market>
+                    <page-market name="market" subpage={{pageId}} third={{thirdParam}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet" secondary-page={{pageId}}></page-wallet>
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
-                    <page-history name="history" subpage={{pageId}}></page-history>
+                    <page-history name="history" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
                     <page-convert name="convert" fromToken={{pageId}}></page-convert>
                     <page-approve name="approve" token={{pageId}}></page-approve>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
@@ -353,6 +354,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     reflectToAttribute: true
                 },
                 routeData: Object,
+                routeChanged: {
+                    type: Object,
+                    computed: '_routeChanged(routeData, subrouteData, thirdrouteData)'
+                },
                 rootPath: String,
                 subrouteData: Object,
                 appConfigRaw: Object,
@@ -375,8 +380,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 priceTimestamp: {
                     type: String
+                },
+                thirdParam: {
+                    type: Object,
+                    computed: '_computedThirdParam(thirdrouteData)'
                 }
             };
+        }
+
+        _computedThirdParam(thirdrouteData) {
+            if(thirdrouteData && thirdrouteData.third){
+                console.log("thrid:"+thirdrouteData.third)
+                return thirdrouteData.third;
+            }
         }
 
         ready() {
@@ -413,6 +429,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
 
+            //this.$.pages.addEventListener('iron-select', e=> this._bbb(e))
+            //this.$.pages.addEventListener('iron-deselect', e=> this._aaa(e))
+
             let _this = this;
             window.setInterval(function() {
                 _this.priceTimestamp = Date.parse(new Date());
@@ -421,6 +440,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
             });
+        }
+
+        _reload(){
+            this.selectedPage = null;
+            this.page = "markets";
+            this.pageId = null;
+            window.location.href = "/#/";
         }
 
         _ifLoadAjax(settingsRelay, settingsCurrency){
@@ -584,7 +610,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _routePageChanged(page) {
+        _routeChanged(routeData, subrouteData, thirdrouteData) {
+            if(routeData && routeData.page){
+                this.page = routeData.page;
+            }
+            if(subrouteData && subrouteData.pageId) {
+                this.pageId = subrouteData.pageId;
+            }
+            console.log("main spage:"+this.page+" subpage:"+this.pageId)
+        }
+
+        _routeIdChanged(pageId) {
+            this.pageId = pageId || '';
+        }
+
+        _routePageChanged(page) {console.log("//////////");console.log(this.selectedPage)
             this.page = page || 'markets';
         }
 
@@ -597,14 +637,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 true);
         }
 
-        _selectedPageChanged(page) {
+        _selectedPageChanged(page) {console.log(page)
             if (page && page.go) page.go();
         }
-
-        _routeIdChanged(pageId) {
-            this.pageId = pageId || '';
-        }
-
 
         _showPage404(errorMsg) {
             this.page = '404';

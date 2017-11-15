@@ -45,17 +45,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="sections">
                 <paper-card transparent>
                     <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-                        <paper-tab name="trades"><a styleless href="/#/history/trades">Trades</a></paper-tab>
+                        <paper-tab name="trades"><a styleless href="/#/history/trades/{{third}}">Trades</a></paper-tab>
                         <paper-tab name="rings"><a styleless href="/#/history/rings">Rings</a></paper-tab>
-                        <paper-tab name="orders"><a styleless href="/#/history/orders">Orders</a></paper-tab>
+                        <paper-tab name="orders"><a styleless href="/#/history/orders/{{third}}">Orders</a></paper-tab>
                         <paper-tab name="stats"><a styleless href="/#/history/stats">Stats</a></paper-tab>
                     </paper-tabs>
                 </paper-card>
                 <paper-card>
                     <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                        <subpage-trades name="trades"></subpage-trades>
+                        <subpage-trades name="trades" subpage="{{subpage}}" third="{{third}}"></subpage-trades>
                         <subpage-rings name="rings"></subpage-rings>
-                        <subpage-orders name="orders"></subpage-orders>
+                        <subpage-orders name="orders" subpage="{{subpage}}" third="{{third}}"></subpage-orders>
                         <subpage-stats name="stats"></subpage-stats>
                     </iron-pages>
                 </paper-card>
@@ -69,10 +69,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-history'; }
         static get properties() {
             return {
+                page:{
+                    type: String,
+                    notify: true
+                },
                 subpage: {
                     type: String,
                     reflectToAttribute: true,
-                    // value: "trades"
+                    notify: true
+                },
+                third: {
+                    type:String,
+                    notify: true
                 },
                 selectedTab: {
                     type: String,
@@ -83,6 +91,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     observer: 'go'
                 }
             };
+        }
+
+        _b(v){
+            console.log("history.....page:"+this.page+"/"+this.subpage+"/"+this.third)
+            //if("history" === this.page){this.page = "wallet"}
         }
 
         _computeSelected(subpage) {

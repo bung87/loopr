@@ -71,14 +71,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}"
                                     attr-for-selected="name">
-                            <candlestick-chart name="candle" market="{{id}}"></candlestick-chart>
+                            <candlestick-chart name="candle" market="{{subpage}}"></candlestick-chart>
                             <depth-chart name="depth"></depth-chart>
                         </iron-pages>
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
-                        <operation-panel market="{{id}}"></operation-panel>
+                        <operation-panel market="{{subpage}}"></operation-panel>
                     </template>
                     <div class$="walletlink [[isUnlockedClass(wallet)]]">
                         <a href="/#/wallet" class="walletlink"><paper-button primary>Unlock your wallet to trade</paper-button></a>
@@ -99,12 +99,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}"
                                     attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" token="{{id}}"
-                                         market="[[id]]"></trade-table>
-                            <order-table name="orders" display-mode="market" market="{{id}}"></order-table>
+                            <trade-table name="trades" display-mode="market" token="{{subpage}}"
+                                         subpage="" third="[[subpage]]"></trade-table>
+                            <order-table name="orders" display-mode="market" market="{{subpage}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="mytrades" display-mode="market" market="[[id]]"></trade-table>
-                                <order-table filter-mine name="myorders" display-mode="market" market="{{id}}"></order-table>
+                                <trade-table filter-mine name="mytrades" display-mode="market" subpage="" third="[[subpage]]"></trade-table>
+                                <order-table filter-mine name="myorders" display-mode="market" market="{{subpage}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
@@ -122,7 +122,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-                    id: String,
+                    subpage:{
+                        type: String,
+                        notify: true,
+                        observer: '_b'
+                    },
+                    third: {
+                        type:String,
+                        notify: true
+                    },
                     chartSelection: {
                         type: String,
                         value: "depth",
@@ -142,16 +150,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 };
             }
 
+            _b(page){
+                console.log("page-market.....subpage:"+this.subpage+"/"+this.third)
+            }
+
             ready() {
-                super.ready()
-                console.log("market:" + this.id);
+                super.ready();
                 Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                     item.tabIndex = "-1";
                 });
             }
 
             marketId() {
-                if (this.id) return this.id.toUpperCase();
+                if (this.subpage) return this.subpage.toUpperCase();
             }
 
             _isUnlocked(wallet) {

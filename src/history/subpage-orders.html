@@ -16,11 +16,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <order-table id="orders" display-mode="history-orders"></order-table>
+        <order-table id="orders" display-mode="history-orders" subpage="{{subpage}}" third="{{third}}"></order-table>
     </template>
     <script>
     class SubpageOrders extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-orders'; }
+
+        static get properties() {
+            return {
+                subpage: {
+                    type: String,
+                    notify: true
+                },
+                third: {
+                    type: String,
+                    notify: true
+                }
+            }
+        }
 
         go() {
             const page = this.$.orders.go();

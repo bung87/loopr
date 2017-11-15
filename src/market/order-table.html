@@ -165,7 +165,15 @@
 
             static get properties() {
                 return {
-                    market: String,
+                    subpage: {
+                        type: String,
+                        notify: true,
+                        observer: '_b'
+                    },
+                    third: {
+                        type: String,
+                        notify: true,
+                    },
                     filterMine: Boolean,
                     displayMode: {
                         type: String
@@ -191,6 +199,10 @@
                 };
             }
 
+            _b(v){
+                console.log("order-table.....subpage:"+this.subpage+"/"+this.third)
+            }
+
             ready() {
                 super.ready();
                 this.hiddenCancel = true;
@@ -204,9 +216,9 @@
 
             _showMore(){
                 if(this.filterMine){
-                    window.location.href = "#/wallet/orders";
+                    window.location.href = "#/wallet/orders/"+this.market;
                 } else {
-                    window.location.href = "#/history/orders";
+                    window.location.href = "#/history/orders/"+this.market;
                 }
             }
 
