@@ -10,9 +10,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="wallet/subpage-default.html">
 <link rel="import" href="wallet/subpage-ready.html">
-<link rel="import" href="unlocked-wallet/wallet-assets.html">
-<link rel="import" href="unlocked-wallet/wallet-trades.html">
-<link rel="import" href="unlocked-wallet/wallet-orders.html">
 <dom-module id="page-wallet">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
@@ -34,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <loopr-toolbar slot="secondary-toolbar" active-tab="wallet"> </loopr-toolbar>
             <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
-                <subpage-ready name="ready" subpage="[[secondaryPage]]"></subpage-ready>
+                <subpage-ready name="ready" subpage="{{secondaryPage}}"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
             <loopr-footer></loopr-footer>

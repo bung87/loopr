@@ -220,7 +220,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-location>
         <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}">
         </app-route>
-        <app-route route="{{subroute}}" pattern="/:pageId" data="{{subrouteData}}">
+        <app-route route="{{subroute}}" pattern="/:pageId" data="{{subrouteData}}" tail="{{thirdroute}}">
+        <app-route route="{{thirdroute}}" pattern="/:third" data="{{thirdrouteData}}"></app-route>
         </app-route>
         <!-- hidden components -->
         <signtosend-dialog id="signtosend"></signtosend-dialog>
@@ -278,12 +279,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div>Loading configuration...</div>
                 </div>
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
-                    <page-market name="market" id={{pageId}}></page-market>
+                    <page-market name="market" subpage={{pageId}} third={{thirdParam}}></page-market>
                     <page-markets name="markets"></page-markets>
                     <page-wallet id="walletPage" name="wallet" secondary-page={{pageId}}></page-wallet>
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
-                    <page-history name="history" subpage={{pageId}}></page-history>
+                    <page-history name="history" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
                     <page-convert name="convert" fromToken={{pageId}}></page-convert>
                     <page-approve name="approve" token={{pageId}}></page-approve>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
@@ -353,6 +354,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     reflectToAttribute: true
                 },
                 routeData: Object,
+                routeChanged: {
+                    type: Object,
+                    computed: '_routeChanged(routeData, subrouteData, thirdrouteData)'
+                },
                 rootPath: String,
                 subrouteData: Object,
                 appConfigRaw: Object,
@@ -375,6 +380,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 priceTimestamp: {
                     type: String
+                },
+                thirdParam: {
+                    type: Object,
+                    computed: '_computedThirdParam(thirdrouteData)'
                 }
             };
         }
@@ -421,10 +430,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
             });
-        }
-
-        _ifLoadAjax(settingsRelay, settingsCurrency){
-            return settingsRelay && settingsCurrency;
         }
 
         _computedLang(appConfig, cookieValues) {
@@ -584,8 +589,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
+        _routeChanged(routeData, subrouteData, thirdrouteData) {
+            if(routeData && routeData.page){
+                this.page = routeData.page;
+            }
+            if(!this.subroute || !this.subroute.path){
+                //console.log("clear sub and third")
+                this.subrouteData = null;
+                this.thirdrouteData = null;
+                this.pageId = '';
+                this.thirdParam = '';
+            }
+            if(!this.thirdroute || !this.thirdroute.path){
+                //console.log("clear third")
+                this.thirdrouteData = null;
+                this.thirdParam = '';
+            }
+            if(subrouteData && subrouteData.pageId) {
+                this.pageId = subrouteData.pageId;
+            }
+        }
+
         _routePageChanged(page) {
-            this.page = page || 'markets';
+            if(page && this.route.path){
+                this.page = page;
+            } else {
+                this.page = 'markets';
+            }
+        }
+
+        _routeIdChanged(pageId) {
+            if(pageId && this.subroute.path){
+                this.pageId = pageId
+            } else {
+                this.pageId = '';
+            }
+        }
+
+        _computedThirdParam(thirdrouteData) {
+            if(thirdrouteData && thirdrouteData.third && this.thirdroute.path){
+                return thirdrouteData.third;
+            } else {
+                return '';
+            }
         }
 
         _pageChanged(page) {
@@ -600,11 +646,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _selectedPageChanged(page) {
             if (page && page.go) page.go();
         }
-
-        _routeIdChanged(pageId) {
-            this.pageId = pageId || '';
-        }
-
 
         _showPage404(errorMsg) {
             this.page = '404';

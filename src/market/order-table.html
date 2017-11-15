@@ -164,7 +164,12 @@
 
             static get properties() {
                 return {
-                    market: String,
+                    subpage: {
+                        type: String
+                    },
+                    third: {
+                        type: String
+                    },
                     filterMine: Boolean,
                     displayMode: {
                         type: String
@@ -203,9 +208,9 @@
 
             _showMore(){
                 if(this.filterMine){
-                    window.location.href = "#/wallet/orders";
+                    window.location.href = "#/wallet/orders/"+this.market;
                 } else {
-                    window.location.href = "#/history/orders";
+                    window.location.href = "#/history/orders/"+this.market;
                 }
             }
 
@@ -223,10 +228,13 @@
             _showPage() {
                 if (this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)) {
                     this.showPage = "show";
-                    this.showSeeMore = "hiddenMore";
                 } else {
                     this.showPage = "hidden";
+                }
+                if(this.displayMode && this.displayMode === "market"){
                     this.showSeeMore = "showMore";
+                } else {
+                    this.showSeeMore = "hiddenMore";
                 }
             }
 

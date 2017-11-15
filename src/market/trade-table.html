@@ -186,13 +186,16 @@
          */
         static get properties() {
             return {
+                subpage: {
+                    type: String
+                },
+                third: {
+                    type: String
+                },
                 token: {
                     type: String,
                 },
                 displayMode: {
-                    type: String
-                },
-                market: {
                     type: String
                 },
                 filterMine: {
@@ -246,9 +249,9 @@
 
         _showMore(){
             if(this.filterMine){
-                window.location.href = "#/wallet/trades";
+                window.location.href = "#/wallet/trades/"+this.third;
             } else {
-                window.location.href = "#/history/trades";
+                window.location.href = "#/history/trades/"+this.third;
             }
         }
 
@@ -266,10 +269,13 @@
         _showPage(){
             if(this.displayMode && (this.displayMode === "history-trades" || "wallet-trades" === this.displayMode)){
                 this.showPage = "show";
-                this.showSeeMore = "hiddenMore";
             } else {
                 this.showPage = "hidden";
+            }
+            if(this.displayMode && this.displayMode === "market"){
                 this.showSeeMore = "showMore";
+            } else {
+                this.showSeeMore = "hiddenMore";
             }
         }
 
