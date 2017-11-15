@@ -34,7 +34,7 @@
 
         </style>
         <app-toolbar>
-            <a href="javascript:void(0)" on-click="_return" class="styless-link" tabindex="-1">
+            <a href="[[backLink]]" class="styless-link" tabindex="-1">
                 <paper-icon-button icon='arrow-back' noink></paper-icon-button>
             </a>
             <div spacer></div>
@@ -57,9 +57,7 @@
                 id: String
             };
         }
-        _return(){
-            window.location.href = this.backLink
-        }
+
         shouldShow() {
             if (this.id) return true
             else return false;

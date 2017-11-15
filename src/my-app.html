@@ -84,10 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/looper-page.html">
 <link rel="import" href="loopr-page/ethereum-signer.html">
 <link rel="import" href="loopr-page/signtosend-dialog.html">
-<link rel="lazy-import" href="page-markets.html">
+<link rel="import" href="page-markets.html">
 <link rel="import" href="page-settings.html">
-<link rel="lazy-import" href="page-wallet.html">
-<link rel="lazy-import" href="page-history.html">
+<link rel="import" href="page-wallet.html">
+<link rel="import" href="page-history.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
 <link rel="lazy-import" href="page-order.html">
@@ -264,7 +264,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <app-toolbar>
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
                         <!-- <div spacer></div> -->
-                        <a styleless href="javascript:void(0)" on-click="_reload">
+                        <a styleless href="/#/">
                             <div main-title><iron-image src="images/logo_white.png" sizing="contain"></iron-image></div>
                         </a>
                         <div condensed-title></div>
@@ -430,13 +430,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
             });
-        }
-
-        _reload(){
-            this.selectedPage = null;
-            this.page = "markets";
-            this.pageId = null;
-            window.location.href = "/#/";
         }
 
         _computedLang(appConfig, cookieValues) {
