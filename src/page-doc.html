@@ -25,12 +25,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: white;
         }
 
+        marked-element {
+            padding-right: 32px;
+            padding-left: 32px;
+        }
+
+
         [slot="markdown-html"] * {
             color: rgba(0, 0, 0, 0.78);
         }
 
         [slot="markdown-html"] h2 {
             color: var(--app-primary-color);
+        }
+
+
+        [slot="markdown-html"] blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: 0.25em solid #dfe2e5;
+        }
+
+        [slot="markdown-html"] pre {
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            background-color: #f6f8fa;
+            border-radius: 3px;
+        }
+
+
+        [slot="markdown-html"] pre code {
+            display: inline;
+            max-width: auto;
+            padding: 0;
+            margin: 0;
+            overflow: visible;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0;
         }
         </style>
         <loopr-page>
@@ -79,8 +114,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             else return "home";
         }
 
-        _onError(e){
-            if(e){
+        _onError(e) {
+            if (e) {
                 console.log(e.detail.error)
                 window.location.href = "#/404";
             }
