@@ -77,6 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/notification-panel.html">
 <link rel="import" href="utils/market-selector.html">
 <link rel="import" href="utils/address-text-field.html">
+<link rel="import" href="utils/relayname-text-field.html">
 <link rel="import" href="utils/loopr-ajax.html">
 <link rel="import" href="loopr-page/looper-toolbar.html">
 <link rel="import" href="loopr-page/looper-footer.html">
@@ -84,6 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/looper-page.html">
 <link rel="import" href="loopr-page/ethereum-signer.html">
 <link rel="import" href="loopr-page/signtosend-dialog.html">
+<link rel="import" href="loopr-page/customrelay-dialog.html">
 <link rel="import" href="page-markets.html">
 <link rel="import" href="page-settings.html">
 <link rel="import" href="page-wallet.html">
@@ -226,6 +228,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- hidden components -->
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
+        <customrelay-dialog id="customrelay"></customrelay-dialog>
         <!-- ajax -->
         <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
         <!--<iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>-->
@@ -288,7 +291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-convert name="convert" fromToken={{pageId}}></page-convert>
                     <page-approve name="approve" token={{pageId}}></page-approve>
                     <page-transfer name="transfer" token={{pageId}}></page-transfer>
-                    <page-settings name="settings"></page-settings>
+                    <page-settings id="settings" name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
                     <page-generatewallet name="generatewallet"></page-generatewallet>
                     <page-doc name="doc" page-id={{pageId}}></page-doc>
@@ -419,6 +422,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
             this.addEventListener('signtosend', e => this.$.signtosend.show(e.detail));
+            this.addEventListener('customrelay', e => this.$.customrelay.show());
+            this.addEventListener('customrelayadded', e => this.$.settings._newCustomRelay(e.detail));
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
 

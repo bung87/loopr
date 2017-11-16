@@ -1,0 +1,23 @@
+<!--
+   ETH address validator, use as <vaadin-combo-box></vaadin-combo-box>
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="relayname-text-field">
+    <script>
+        class RelayNameTextField extends Vaadin.TextFieldElement {
+            static get is() {
+                return 'relayname-text-field';
+            }
+
+            checkValidity() {
+                if(this.value){
+                    return this.value.replace(/ /g, "").match("^\\S+$");
+                } else {
+                    return false;
+                }
+            }
+        }
+        window.customElements.define(RelayNameTextField.is, RelayNameTextField);
+    </script>
+
+</dom-module>

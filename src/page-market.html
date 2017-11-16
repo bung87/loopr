@@ -65,10 +65,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="sections">
                 <paper-card id="charts">
                     <div class="vertical layout">
+                        <!--
                         <paper-tabs selected="{{chartSelection}}" attr-for-selected="name">
                             <paper-tab name="candle">Candle Chart</paper-tab>
                             <paper-tab name="depth">Depth Chart</paper-tab>
                         </paper-tabs>
+                        -->
                         <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}"
                                     attr-for-selected="name">
                             <candlestick-chart name="candle" market="{{subpage}}"></candlestick-chart>
@@ -130,7 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     chartSelection: {
                         type: String,
-                        value: "depth",
+                        value: "candle",
                     },
                     dataSelection: {
                         type: String,

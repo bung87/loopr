@@ -78,6 +78,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
             <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <scary-cookie id="settingsRelayConfig" name="settings-relay-config" value="{{settingsRelayConfig}}"></scary-cookie>
             <scary-cookie id="settingsGasPrice" name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
@@ -97,7 +98,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Relay</div>
-                                <vaadin-combo-box id="relay" placeholder="Default Loopring Relay" items="{{appConfig.relays}}"></vaadin-combo-box>
+                                <vaadin-combo-box id="relay" placeholder="Default Loopring Relay" items="{{relays}}"></vaadin-combo-box>
+                                <a href="javascript:void(0)" on-click="setCustomRelay"><iron-icon icon="icons:add"></iron-icon></a>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Contract Version</div>
@@ -132,6 +134,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </div>
                     </div>
                 </paper-card>
+
                 <div class="footer-spacer"></div>
                 <loopr-footer></loopr-footer>
             </div>
@@ -154,6 +157,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Number,
                     computed: '_computedMarginSplit(appConfig, cookieValues)'
                 },
+                settingsRelayConfig:{
+                    type: Object
+                },
+                relays: {
+                    type: Object,
+                    computed: '_computedSettingsRelay(appConfig, cookieValues)'
+                },
                 initContract: {
                     type: String,
                     computed: '_initContract(appConfig, settingsVersion)'
@@ -171,6 +181,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             let cookieValue = {};
             if (this.$.settingsRelay.value) {
                 cookieValue["settingsRelay"] = this.$.settingsRelay.value;
+            }
+            if (this.$.settingsRelayConfig.value) {
+                cookieValue["settingsRelayConfig"] = this.$.settingsRelayConfig.value;
             }
             if (this.$.settingsCurrency.value) {
                 cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
@@ -203,8 +216,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log("currency change to:"+_this.settingsCurrency);
             });
 
-            this.$.relay.addEventListener('value-changed', function() {
-                _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
+            this.$.relay.addEventListener('value-changed', function(e) {
+                if(_this.$.relay.value){
+                    _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
+                }
                 console.log("relay change to:"+_this.settingsRelay);
             });
 
@@ -227,6 +242,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 console.log("marginSplit change to:"+this.$.settingsMarginSplit.value);
             }.bind(this));
+        }
+
+        setCustomRelay(){
+            this.dispatchEvent(new CustomEvent('customrelay', { bubbles: true, composed: true }));
         }
 
         _computedLrcFee(appConfig, cookieValues) {
@@ -262,6 +281,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 return value;
             }
+        }
+
+        /**
+        *
+        * @param appConfig
+        * @param cookieValues
+        * @returns {*}
+        * @private
+        */
+        _computedSettingsRelay(appConfig, cookieValues){
+            if (appConfig && cookieValues) {
+                let configs = appConfig.relays;
+                if(cookieValues["settingsRelayConfig"]){
+                    let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
+                    configs = configs.concat(cookieRelay);
+                }
+                return configs;
+            }
+        }
+
+        _newCustomRelay(newRelay){
+            this.relays.push(newRelay);
+            this.settingsRelay = newRelay.value;
+            // to reload relay, above could not make dropbox reload latest relay
+            location.reload();
         }
 
         _initBind(appConfig, cookieValues){

@@ -64,6 +64,15 @@
             return {};
         }
 
+        ready(){
+            super.ready();
+            if(!navigator.cookieEnabled){
+                // set duration to 0 to forbidden paper-toast auto-close
+                var detail = { text: "Cookies are blocked or not supported by your browser. You must enable cookies to use Loopr", category: "error", duration: 0 }
+                this.showOnBottom(detail);
+            }
+        }
+
         display(detail) {
             this.showOnBottom(detail);
         }
@@ -77,7 +86,7 @@
             this.text = detail.text;
             this.link = detail.link;
             this.linkText = detail.linkText;
-            this.$.bottom.duration = detail.duration;
+            this.$.bottom.duration = detail.duration; //when duration is set negative or 0 or Infinity will forbidden paper-toast auto-close
             this.bottomClass = detail.category;
             this.$.bottom.open();
         }

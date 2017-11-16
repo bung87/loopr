@@ -77,8 +77,8 @@
 
         _chart1(resp){
             resp.xData = Highcharts.map(resp.result, function (val, j) {
-                //return (new Date(val)).toUTCString()
-                return (new Date(val[0])).toDateString();
+                //return (new Date(val[0])).toUTCString()
+                return val[0];
             });
             resp.price = Highcharts.map(resp.result, function (val, j) {
                 return val[1];
@@ -95,6 +95,13 @@
                     text: title + ' Price & Volume'
                 },
                 xAxis: [{
+                    type: 'datetime',
+                    labels: {
+                        formatter: function () {
+                            //console.log(Highcharts.dateFormat('%A, %b %e, %Y', this.value));
+                            return Highcharts.dateFormat('%b %e, %Y', this.value);
+                        }
+                    },
                     categories: resp.xData,
                     crosshair: true
                 }],
@@ -135,7 +142,7 @@
                     x: 0,
                     verticalAlign: 'bottom',
                     y: 0,
-                    floating: true,
+                    floating: false,
                     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
                 },
                 series: [{
