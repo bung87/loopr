@@ -9,8 +9,6 @@
     "src/page-market.html",
     "src/page-ring.html",
     "src/page-order.html",
-    "src/page-history.html",
-    "src/page-wallet.html",
     "src/page-transfer.html",
     "src/page-approve.html",
     "src/page-convert.html",
