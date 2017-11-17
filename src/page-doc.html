@@ -42,7 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-icon-button noink icon="close"></paper-icon-button>
                 </a>
             </app-toolbar>
-            <iron-ajax auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}" on-error="_onError"></iron-ajax>
+            <iron-ajax id="ajax" auto url="//raw.githubusercontent.com/Loopring/loopr-docs/master/en/[[name]].json" handle-as="json" last-response="{{meta}}" on-error="_onError"></iron-ajax>
             <div class="sections">
                 <paper-card>
                     <marked-element>
@@ -84,6 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(e.detail.error)
                 window.location.href = "#/404";
             }
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 
