@@ -21,13 +21,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <div class="sections">
             <paper-card>
-                <order-table id="orders" filter-mine display-mode="wallet-orders"></order-table>
+                <order-table id="orders" filter-mine display-mode="wallet-orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
             </paper-card>
         </div>
     </template>
     <script>
     class WalletOrders extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'wallet-orders'; }
+
+        static get properties() {
+            return {
+                page: String,
+                subpage: String,
+                third: String
+            };
+        }
 
         go() {
             const page = this.$.orders.go();

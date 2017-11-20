@@ -42,8 +42,8 @@
             </paper-card>
             <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
                 <wallet-assets name="assets"></wallet-assets>
-                <wallet-trades name="trades"></wallet-trades>
-                <wallet-orders name="orders"></wallet-orders>
+                <wallet-trades name="trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-trades>
+                <wallet-orders name="orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-orders>
             </iron-pages>
         </div>
     </template>
@@ -53,12 +53,14 @@
 
         static get properties() {
             return {
+                page: String,
                 subpage: {
                     type: String,
                     reflectToAttribute: true,
                     value: "assets",
                     observer: 'go'
                 },
+                third: String,
                 selectedTab: {
                     type: String,
                     computed: '_computeSelected(subpage)'

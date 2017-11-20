@@ -105,6 +105,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
+            <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
@@ -146,7 +147,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div class="split"></div>
                         <div class="right">
                             <div class="vertical layout start-justified">
-                                <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{data}}"></loopr-ajax>
                                 <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
                                         <div class="title"> Token Address</div>
@@ -196,8 +196,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             static get properties() {
                 return {
+                    page: String,
+                    subpage: String,
                     token: {
-                        type: String
+                        type: String,
+                        computed: '_computedToken(page, subpage)'
                     },
                     selectedTokenBalance: {
                         type: Object,
@@ -212,7 +215,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     balances: {
                         type: Object,
-                        computed: '_computeBalances(data)',
+                        computed: '_computedBalance(balancesRaw)'
                     },
                     tokens: {
                         type: Object,
@@ -236,6 +239,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
                     }
                 };
+            }
+
+            _computedToken(page, subpage) {
+                if(page && "approve" === page && subpage) return subpage;
             }
 
             _computeGasLimit(appConfig) {
@@ -283,7 +290,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computeBalances(data) {
+            _computedBalance(data) {
                 if (data) {
                     return _.keyBy(data.result.tokens, o => o.token);
                 }

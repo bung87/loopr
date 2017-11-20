@@ -31,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <loopr-toolbar slot="secondary-toolbar" active-tab="wallet"> </loopr-toolbar>
             <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
-                <subpage-ready name="ready" subpage="{{secondaryPage}}"></subpage-ready>
+                <subpage-ready name="ready" page="{{page}}" subpage="{{secondaryPage}}" third="{{third}}"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
             <loopr-footer></loopr-footer>
@@ -44,14 +44,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         static get properties() {
             return {
+                page: String,
+                secondaryPage: {
+                    type: String,
+                    value: "assets"
+                },
+                third: String,
                 subpage: {
                     type: String,
                     reflectToAttribute: true,
                     value: "default"
-                },
-                secondaryPage: {
-                    type: String,
-                    value: "assets"
                 },
                 selectedTab: {
                     type: String,

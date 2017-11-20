@@ -93,11 +93,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{data}}"></loopr-ajax>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
@@ -152,17 +152,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-convert'; }
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
                 },
                 balances: {
                     type: Object,
-                    computed: '_computeBalances(data)',
+                    computed: '_computeBalances(balancesRaw)',
                 },
                 fromToken: {
                     type: String,
-                    value: 'ETH'
+                    value: 'ETH',
+                    computed: '_computeFromToken(page, subpage)'
                 },
                 toToken: {
                     type: String,
@@ -213,6 +216,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _this.gasLimit = _this.$.gasLimit.value;
             });
             this.$.amount.focus();
+        }
+
+        _computeFromToken(page, subpage) {
+            if(page && "convert" === page){
+                if(!subpage){
+                    return "ETH";
+                } else if("ETH" === subpage || "WETH" === subpage){
+                    return subpage;
+                }
+            }
         }
 
         _computeAmountShow(fromTokenBalance) {

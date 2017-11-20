@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <order-table id="orders" display-mode="history-orders" subpage="{{subpage}}" third="{{third}}"></order-table>
+        <order-table id="orders" display-mode="history-orders" page="{{computedPage}}"  subpage="{{computedSubpage}}" third="{{computedThird}}"></order-table>
     </template>
     <script>
     class SubpageOrders extends AppConfigMixin(Polymer.Element) {
@@ -24,13 +24,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                subpage: {
-                    type: String
+                page: String,
+                subpage: String,
+                third: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
                 },
-                third: {
-                    type: String
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
+                computedThird: {
+                    type: String,
+                    computed: '_computedThird(page, subpage, third)'
                 }
             }
+        }
+
+        _computedPage(page) {
+            if(page && "history" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if(page && "history" === page && subpage) return subpage;
+        }
+
+        _computedThird(page, subpage, third) {
+            if(page && "history" === page && subpage && third) return third;
         }
 
         go() {
