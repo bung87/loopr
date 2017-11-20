@@ -63,10 +63,9 @@
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}"></loopr-ajax>
-
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -151,8 +150,6 @@
         <div class$="[[showPage]] horizontal end-justified layout">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orders.json?page={{currentPage}}"
-                   handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
         <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}"
                     loading="{{loading}}"></loopr-ajax>
     </template>
@@ -164,11 +161,12 @@
 
             static get properties() {
                 return {
-                    subpage: {
-                        type: String
-                    },
-                    third: {
-                        type: String
+                    page: String,
+                    subpage: String,
+                    third: String,
+                    market: {
+                        type: String,
+                        computed: '_computedMarket(page, subpage, third)'
                     },
                     filterMine: Boolean,
                     displayMode: {
@@ -176,7 +174,7 @@
                     },
                     orders: {
                         type: Object,
-                        computed: '_computeOrders(appConfig, resp, rawBalances)'
+                        computed: '_computeOrders(appConfig, resp, balancesRaw)'
                     },
                     currentPage: {
                         type: Number
@@ -202,6 +200,19 @@
                     let displayMode = this.displayMode.toLowerCase();
                     if ("wallet-orders" === displayMode) {
                         this.hiddenCancel = false;
+                    }
+                }
+            }
+
+            _computedMarket(page, subpage, third){
+                console.log(page+"/"+subpage+"/"+third)
+                if(page && subpage){
+                    if(page === "market") {
+                        return subpage;
+                    } else if(page === "history" && subpage === "orders") {
+                        if(third) return third;
+                    } else if(page === "wallet" && subpage == "orders") {
+                        if(third) return third;
                     }
                 }
             }

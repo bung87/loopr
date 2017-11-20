@@ -101,12 +101,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}"
                                     attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" token="{{subpage}}"
-                                         subpage="" third="[[subpage]]"></trade-table>
-                            <order-table name="orders" display-mode="market" market="{{subpage}}"></order-table>
+                            <trade-table name="trades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
+                            <order-table name="orders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="mytrades" display-mode="market" subpage="" third="[[subpage]]"></trade-table>
-                                <order-table filter-mine name="myorders" display-mode="market" market="{{subpage}}"></order-table>
+                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
+                                <order-table filter-mine name="myorders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
@@ -124,12 +123,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-                    subpage:{
-                        type: String
-                    },
-                    third: {
-                        type:String
-                    },
+                    page: String,
+                    subpage: String,
+                    third: String,
                     chartSelection: {
                         type: String,
                         value: "candle",

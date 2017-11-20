@@ -230,13 +230,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <customrelay-dialog id="customrelay"></customrelay-dialog>
         <!-- ajax -->
-        <iron-ajax auto url="https://raw.githubusercontent.com/Loopring/mock-relay-data/master/config.json" handle-as="json" last-response="{{appConfigRaw}}"></iron-ajax>
-        <!--<iron-ajax auto id="priceQuoteAjax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" handle-as="json" last-response="{{priceQuoteRaw}}"></iron-ajax>-->
-        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceTimestamp]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
+        <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
+        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceRandom]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json?[[balanceRandom]]" last-response="{{balancesRaw}}"></loopr-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
@@ -282,9 +283,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div>Loading configuration...</div>
                 </div>
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
-                    <page-market name="market" subpage={{pageId}} third={{thirdParam}}></page-market>
+                    <page-market name="market" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-market>
                     <page-markets name="markets"></page-markets>
-                    <page-wallet id="walletPage" name="wallet" secondary-page={{pageId}}></page-wallet>
+                    <page-wallet id="walletPage" name="wallet" secondary-page="{{pageId}}" third="{{thirdParam}}"></page-wallet>
                     <page-ring name="ring" id={{pageId}}></page-ring>
                     <page-order name="order" id={{pageId}}></page-order>
                     <page-history name="history" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
@@ -294,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <page-settings id="settings" name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
                     <page-generatewallet name="generatewallet"></page-generatewallet>
-                    <page-doc name="doc" page-id={{pageId}}></page-doc>
+                    <page-doc name="doc" page="{{page}}" page-id={{pageId}}></page-doc>
                     <page-dev name="dev"></page-dev>
                     <page-404 name="404"></page-404>
                 </iron-pages>
@@ -381,12 +382,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     observer: '_selectedPageChanged'
                 },
-                priceTimestamp: {
-                    type: String
-                },
+                priceRandom: String,
+                balanceRandom: String,
                 thirdParam: {
                     type: Object,
                     computed: '_computedThirdParam(thirdrouteData)'
+                },
+                balances: {
+                    type: Object,
+                    computed: '_computeBalances(balancesRaw)'
                 }
             };
         }
@@ -429,12 +433,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             let _this = this;
             window.setInterval(function() {
-                _this.priceTimestamp = Date.parse(new Date());
+                _this.priceRandom = Date.parse(new Date());
             }, 600000);
+            window.setInterval(function() {
+                _this.balanceRandom = Date.parse(new Date());
+            }, 30000);
 
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
             });
+        }
+
+        _computeBalances(data) {
+            if (data) {
+                return _.keyBy(data.result.tokens, o => o.token);
+            }
         }
 
         _computedLang(appConfig, cookieValues) {
@@ -595,23 +608,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _routeChanged(routeData, subrouteData, thirdrouteData) {
-            if(routeData && routeData.page){
+            if(!this.route || !this.route.path || this.route.path != "/"){
                 this.page = routeData.page;
+            } else {
+                this.routeData = null;
+                this.subrouteData = null;
+                this.thirdrouteData = null;
+                this.page = "markets";
+                this.pageId = '';
+                this.thirdParam = '';
             }
             if(!this.subroute || !this.subroute.path){
-                //console.log("clear sub and third")
                 this.subrouteData = null;
                 this.thirdrouteData = null;
                 this.pageId = '';
                 this.thirdParam = '';
+            } else if(subrouteData){
+                this.pageId = subrouteData.pageId;
             }
             if(!this.thirdroute || !this.thirdroute.path){
-                //console.log("clear third")
                 this.thirdrouteData = null;
                 this.thirdParam = '';
-            }
-            if(subrouteData && subrouteData.pageId) {
-                this.pageId = subrouteData.pageId;
+            } else if(thirdrouteData){
+                this.thirdParam = thirdrouteData.third;
             }
         }
 
@@ -649,7 +668,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _selectedPageChanged(page) {
-            if (page && page.go) page.go();
+            if (page && page.go) {
+                page.go();
+            }
         }
 
         _showPage404(errorMsg) {
@@ -665,7 +686,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.lockClass = "openned";
             }
         }
-
     }
 
     window.customElements.define(MyApp.is, MyApp);

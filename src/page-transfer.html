@@ -79,6 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
@@ -142,9 +143,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item-body two-line>
                                     <div class="title"> Balance</div>
                                     <div secondary>
-                                        <!--<iron-ajax url="[[relay]]/Loopring/mock-relay-data/master/balances.json"
-                                                   last-response="{{rawBalances}}" auto></iron-ajax>-->
-                                        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{rawBalances}}"></loopr-ajax>
                                         [[amountShow]]
                                     </div>
                                 </paper-item-body>
@@ -179,11 +177,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     tokens: {
                         type: Object,
-                        computed: '_computeTokens(rawBalances)'
+                        computed: '_computeTokens(balancesRaw)'
                     },
                     balances: {
                         type: Object,
-                        computed: '_computeBalances(rawBalances)',
+                        computed: '_computeBalances(balancesRaw)',
                     },
                     relay: {
                         type: String,

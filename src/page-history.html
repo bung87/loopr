@@ -53,9 +53,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </paper-card>
                 <paper-card>
                     <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                        <subpage-trades name="trades" subpage="{{subpage}}" third="{{third}}"></subpage-trades>
+                        <subpage-trades name="trades" subpage="trades" third="{{third}}"></subpage-trades>
                         <subpage-rings name="rings"></subpage-rings>
-                        <subpage-orders name="orders" subpage="{{subpage}}" third="{{third}}"></subpage-orders>
+                        <subpage-orders name="orders" subpage="orders" third="{{third}}"></subpage-orders>
                         <subpage-stats name="stats"></subpage-stats>
                     </iron-pages>
                 </paper-card>
@@ -69,12 +69,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-history'; }
         static get properties() {
             return {
-                subpage: {
-                    type: String
-                },
-                third: {
-                    type:String
-                },
+                subpage: String,
+                third: String,
                 selectedTab: {
                     type: String,
                     computed: '_computeSelected(subpage)'

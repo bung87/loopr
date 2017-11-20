@@ -57,14 +57,10 @@
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
-        <!-- ------ -->
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
-
-        <!-- ------ -->
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
-                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[etherTokens]]">
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
@@ -112,7 +108,6 @@
             </paper-card>
             <paper-card transparent>ERC20 Tokens</paper-card>
             <paper-card tablewrapper>
-                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                 <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
@@ -165,12 +160,11 @@
         static get properties() {
             return {
                 priceQuote: Object,
-                resp: Object,
                 totalValue: Number,
                 etherTokens: Array,
                 erc20Tokens: {
                     type: Array,
-                    computed: '_computeBalances(resp)'
+                    computed: '_computeBalances(balancesRaw)'
                 }
             };
         }
@@ -211,7 +205,7 @@
         _isWETH(token) { return token === 'WETH'; }
 
         go() {
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 

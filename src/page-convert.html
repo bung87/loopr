@@ -93,11 +93,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{data}}"></loopr-ajax>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
@@ -158,7 +158,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 balances: {
                     type: Object,
-                    computed: '_computeBalances(data)',
+                    computed: '_computeBalances(balancesRaw)',
                 },
                 fromToken: {
                     type: String,
