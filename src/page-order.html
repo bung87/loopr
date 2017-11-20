@@ -19,7 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         </style>
         <loopr-page>
-            <simple-toolbar slot="secondary-toolbar" title="Order" id="[[id]]" back-link="/#/history/orders"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Order" id="[[hash]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
@@ -82,7 +82,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         static get properties() {
             return {
-                id: String,
+                page: String,
+                subpage: String,
+                hash: {
+                    type: String,
+                    computed: '_computedHash(page, subpage)'
+                },
                 orderItem: {
                     type: Object,
                     computed:'_computeOrder(appConfig, resp)'
@@ -95,6 +100,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
         ready() {
             super.ready();
+        }
+
+        _computedHash(page, subpage) {
+            if(page && subpage && page === "order") {
+                return subpage;
+            }
         }
 
         _computeOrder(appConfig, resp){

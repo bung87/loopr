@@ -196,8 +196,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             static get properties() {
                 return {
+                    page: String,
+                    subpage: String,
                     token: {
-                        type: String
+                        type: String,
+                        computed: '_computedToken(page, subpage)'
                     },
                     selectedTokenBalance: {
                         type: Object,
@@ -236,6 +239,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
                     }
                 };
+            }
+
+            _computedToken(page, subpage) {
+                if(page && "approve" === page && subpage) return subpage;
             }
 
             _computeGasLimit(appConfig) {
@@ -283,7 +290,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computeBalances(data) {
+            _computedBalance(data) {
                 if (data) {
                     return _.keyBy(data.result.tokens, o => o.token);
                 }

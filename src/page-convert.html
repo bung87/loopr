@@ -152,6 +152,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'page-convert'; }
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 wallet: {
                     type: Object,
                     observer: '_walletChanged',
@@ -162,7 +164,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 fromToken: {
                     type: String,
-                    value: 'ETH'
+                    value: 'ETH',
+                    computed: '_computeFromToken(page, subpage)'
                 },
                 toToken: {
                     type: String,
@@ -213,6 +216,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 _this.gasLimit = _this.$.gasLimit.value;
             });
             this.$.amount.focus();
+        }
+
+        _computeFromToken(page, subpage) {
+            if(page && "convert" === page){
+                if(!subpage){
+                    return "ETH";
+                } else if("ETH" === subpage || "WETH" === subpage){
+                    return subpage;
+                }
+            }
         }
 
         _computeAmountShow(fromTokenBalance) {

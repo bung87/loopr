@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <div class="sections">
             <paper-card>
-                <order-table id="orders" filter-mine display-mode="wallet-orders" page="wallet" subpage="orders" third="{{third}}"></order-table>
+                <order-table id="orders" filter-mine display-mode="wallet-orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
             </paper-card>
         </div>
     </template>
@@ -31,6 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                page: String,
                 subpage: String,
                 third: String
             };

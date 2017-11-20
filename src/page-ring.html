@@ -24,7 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json" last-response="{{resp}}" loading={{loading}}>
         </loopr-ajax>
         <loopr-page>
-            <simple-toolbar slot="secondary-toolbar" title="Ring" id="[[id]]" back-link="/#/history/rings"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Ring" id="[[hash]]" back-link="/#/history/rings"></simple-toolbar>
             <div class="sections">
                 <paper-card transparent>Ring Details</paper-card>
                 <paper-card>
@@ -34,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item-body two-line>
                                     <div class="title"> Ring Hash</div>
                                     <div secondary>
-                                        <div class="long-hash">[[id]]</div>
+                                        <div class="long-hash">[[hash]]</div>
                                     </div>
                                 </paper-item-body>
                             </paper-item>
@@ -105,13 +105,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                id: String,
+                page: String,
+                subpage: String,
+                hash: {
+                    type: String,
+                    computed: '_computedHash(page, subpage)'
+                },
                 resp: {
                     type: Object,
                     observer: '_update',
                 },
                 ring: Object
             };
+        }
+
+        _computedHash(page, subpage) {
+            if(page && subpage && page === "ring") return subpage;
         }
 
         tranHextoNum(hex) {

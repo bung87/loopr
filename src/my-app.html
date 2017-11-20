@@ -231,8 +231,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <customrelay-dialog id="customrelay"></customrelay-dialog>
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
-        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]&[[priceRandom]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json?[[balanceRandom]]" last-response="{{balancesRaw}}"></loopr-ajax>
+        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}"></loopr-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
@@ -285,13 +285,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-market>
                     <page-markets name="markets"></page-markets>
-                    <page-wallet id="walletPage" name="wallet" secondary-page="{{pageId}}" third="{{thirdParam}}"></page-wallet>
-                    <page-ring name="ring" id={{pageId}}></page-ring>
-                    <page-order name="order" id={{pageId}}></page-order>
-                    <page-history name="history" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
-                    <page-convert name="convert" fromToken={{pageId}}></page-convert>
-                    <page-approve name="approve" token={{pageId}}></page-approve>
-                    <page-transfer name="transfer" token={{pageId}}></page-transfer>
+                    <page-wallet id="walletPage" name="wallet" page="{{page}}" secondary-page="{{pageId}}" third="{{thirdParam}}"></page-wallet>
+                    <page-ring name="ring" page="{{page}}" subpage="{{pageId}}"></page-ring>
+                    <page-order name="order" page="{{page}}" subpage="{{pageId}}"></page-order>
+                    <page-history name="history" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
+                    <page-convert name="convert" page="{{page}}" subpage="{{pageId}}"></page-convert>
+                    <page-approve name="approve" page="{{page}}" subpage="{{pageId}}"></page-approve>
+                    <page-transfer name="transfer" page="{{page}}" subpage="{{pageId}}"></page-transfer>
                     <page-settings id="settings" name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
                     <page-generatewallet name="generatewallet"></page-generatewallet>
@@ -382,8 +382,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     observer: '_selectedPageChanged'
                 },
-                priceRandom: String,
-                balanceRandom: String,
                 thirdParam: {
                     type: Object,
                     computed: '_computedThirdParam(thirdrouteData)'
@@ -430,14 +428,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('customrelayadded', e => this.$.settings._newCustomRelay(e.detail));
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
-
-            let _this = this;
-            window.setInterval(function() {
-                _this.priceRandom = Date.parse(new Date());
-            }, 600000);
-            window.setInterval(function() {
-                _this.balanceRandom = Date.parse(new Date());
-            }, 30000);
 
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";

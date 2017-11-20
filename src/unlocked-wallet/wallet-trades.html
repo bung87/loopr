@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <div class="sections">
             <paper-card>
-                <trade-table id="trades" filter-mine display-mode="wallet-trades" page="wallet" subpage="trades" third="{{third}}"></trade-table-market>
+                <trade-table id="trades" filter-mine display-mode="wallet-trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table-market>
             </paper-card>
         </div>
     </template>
@@ -31,6 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get is() { return 'wallet-trades'; }
         static get properties() {
             return {
+                page: String,
                 subpage: String,
                 third: String
             };

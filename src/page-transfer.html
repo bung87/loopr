@@ -164,8 +164,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
+                    page: String,
+                    subpage: String,
                     token: {
-                        type: String
+                        type: String,
+                        computed: '_computedToken(page, subpage)'
                     },
                     amount: {
                         type: Number
@@ -200,6 +203,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
                     }
                 }
+            }
+
+            _computedToken(page, subpage) {
+                if(page && "transfer" === page && subpage) return subpage;
             }
 
             _computeGasLimit(appConfig) {
