@@ -256,7 +256,7 @@
 
             static get observers() {
                 return ['buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)',
-                    'computeTokens(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
+                    'computeTokenBalances(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
             }
 
             buyButtonState(buyTotal, tokenbBalance, tokenbAllowance) {
@@ -371,7 +371,7 @@
                     const signed = order.sign(this.wallet.privateKey);
 
                     const relay = new Relay('http://10.137.107.63:3000');
-                    await relay.submitLoopringOrder(signed)
+                    await relay.submitLoopringOrder(signed);
 
                     const detail = {text: 'submit order successfully', category: "info", duration: 5000};
 
@@ -487,7 +487,7 @@
                 return false;
             }
 
-            computeTokens(tokens, tokenb, rawBalances) {
+            computeTokenBalances(tokens, tokenb, rawBalances) {
 
                 console.log("compute tokens");
                 if (rawBalances) {
