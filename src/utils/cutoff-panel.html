@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="cutoff-panel">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+            :host {}
+            .top {
+                padding-top: 0px;
+            }
+            overlay-datetime-picker {
+                width: 260px;
+                height: 44px;
+            }
+            .button {
+                margin-left: 10px;
+                height: 44px;
+            }
+        </style>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <div class="sections top">
+            <paper-card transparent>Operations</paper-card>
+            <paper-card>
+                <div class="vertical center layout">
+                    <div class="item horizontal center layout">
+                        <overlay-datetime-picker id="cutoff" value="{{cutoff}}"></overlay-datetime-picker>
+                        <div class="button"><paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button></div>
+                    </div>
+                </div>
+            </paper-card>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="[[url]]" last-response="{{resp}}"
+                                loading="{{loading}}"></loopr-ajax>
+        </div>
+    </template>
+    <script>
+    class CutoffPanel extends Polymer.Element {
+        static get is() { return 'cutoff-panel'; }
+
+        static get properties() {
+            return {
+                url: {
+                    type: String,
+                    computed: '_computedUrl(wallet, settingsVersion)'
+                },
+                cutoff: {
+                    type: String,
+                    computed: '_computeCutoff(resp)',
+                    value: 0
+                }
+            };
+        }
+
+        ready(){
+            super.ready();
+        }
+
+        _change(date){
+            console.log(date)
+        }
+
+        _computedUrl(wallet, settingsVersion) {
+            if(wallet && settingsVersion) {
+                return "Loopring/mock-relay-data/master/getCutoff.json?address="+wallet.address+"&version="+settingsVersion;
+            }
+        }
+
+        _computeCutoff(resp) {
+            if(resp && resp.result.data){
+                return resp.result.data;
+            }
+        }
+
+        commitCutoff(){
+            console.log(this.$.cutoff.value);
+        }
+
+    }
+
+    window.customElements.define(CutoffPanel.is, CutoffPanel);
+    </script>
+</dom-module>
