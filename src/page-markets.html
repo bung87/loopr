@@ -109,7 +109,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         item.changeClass = "";
                         item.changeStr = "0.0%";
                     }
-
                     const marketConfig = this.appConfig.marketMap[i.market];
                     if (marketConfig) {
                         item.pricePrecision = marketConfig.pricePrecision;
@@ -118,14 +117,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         if (tokenxConfig) {
                             item.volumnPrecision = tokenxConfig.precision;
                         } else {
-                            item.volumnPrecision = defaultVolumePrecision;
+                            item.volumnPrecision = this.appConfig.defaultVolumePrecision;
                         }
-
                     } else {
                         item.pricePrecision = this.appConfig.defaultPricePrecision;
                         item.volumnPrecision = this.appConfig.defaultVolumePrecision;
                     }
-
                     return item;
                 }.bind(this));
             }
