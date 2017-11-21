@@ -97,7 +97,7 @@
                         <template>
                             <div class="operations">
                                 <a href="#/transfer/[[item.token]]">Transfer</a>
-                                <a href="#/convert">Convert</a>
+                                <a href="#/convert/[[item.token]]">Convert</a>
                                 <template is="dom-if" if="[[_isWETH(item.token)]]">
                                     <a href="#/approve/[[item.token]]">Approve</a>
                                 </template>
