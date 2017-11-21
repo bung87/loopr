@@ -386,15 +386,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
 
-                    const method = '0x' + ethUtil.sha3('transfer(address,uint)').toString('hex').slice(0, 8);
+                    const method = '0x' + ethUtil.sha3('transfer(address,uint256)').toString('hex').slice(0, 8);
                     const params = ethUtil.setLengthLeft(ethUtil.toBuffer(this.address), 32).toString('hex') +
                         ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
 
                     tx.data = method + params;
 
                 }
-
-                console.log(JSON.stringify(tx));
 
                 var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
