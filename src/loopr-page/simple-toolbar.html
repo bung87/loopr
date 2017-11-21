@@ -39,8 +39,8 @@
             </a>
             <div spacer></div>
             [[title]]
-            <iron-icon show$="[[shouldShow()]]" icon="chevron-right"></iron-icon>
-            [[formatId()]]
+            <iron-icon show$="[[shouldShow(id)]]" icon="chevron-right"></iron-icon>
+            [[formatId(id)]]
         </app-toolbar>
     </template>
     <script>
@@ -58,12 +58,12 @@
             };
         }
 
-        shouldShow() {
-            if (this.id) return true
+        shouldShow(id) {
+            if (id) return true
             else return false;
         }
-        formatId() {
-            if (this.id) return this.id;
+        formatId(id) {
+            if (id) return id;
             else return "";
         }
     }
