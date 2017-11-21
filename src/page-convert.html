@@ -375,9 +375,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         swap() {
-            let tempFrom = this.fromToken;
-            this.fromToken = this.toToken;
-            this.toToken = tempFrom;
+            let another = this.fromToken === "ETH" ? "WETH" : "ETH";
+            window.location.href = "#/convert/" + another;
         }
     }
 
