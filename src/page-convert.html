@@ -364,7 +364,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 subTitle = 'Convert ETH to  WETH';
             } else {
                 tx.value = '0x0';
-                const method = '0x' + ethUtil.sha3('withdraw(uint)').toString('hex').slice(0, 8);
+                const method = '0x' + ethUtil.sha3('withdraw(uint256)').slice(0, 4).toString('hex');
                 tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)), 32).toString('hex');
                 subTitle = 'Convert WETH to  ETH';
             }

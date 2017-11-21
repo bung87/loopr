@@ -248,7 +248,7 @@
                 }
             }
 
-            async _cancel(e) {
+             _cancel(e) {
                 try {
                     const target = e.target.order;
                     let data = {};
@@ -294,6 +294,17 @@
                     }));
                 }
 
+            }
+
+
+            setCutOff(){
+                const rawTx = {
+                    to: this.appConfig.contractAddress,
+                    gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
+                    gasLimit: '0x14820',
+                    value: '0x0',
+                    data:''
+                };
             }
 
             _computeRest(rawBalances, tokenb, tokens, order) {
