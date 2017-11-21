@@ -206,7 +206,7 @@
                     sellOrBuy: {
                         type: String,
                         value: "buy",
-                        observer: '_changeTabd'
+                        observer: '_changeTab'
                     },
                     buyAmount: {
                         type: Number,
@@ -218,7 +218,7 @@
                     },
                     buyTotal: {
                         type: Number,
-                        computed: '_multiply(buyAmount, buyPrice,tokenb)'
+                        computed: '_multiply(buyAmount, buyPrice)'
                     },
                     sellAmount: {
                         type: Number,
@@ -241,28 +241,28 @@
                 };
             }
 
-            ready(){
+            ready() {
                 super.ready();
                 this.$.buyAmount.focus();
             }
 
             _changeTab() {
-                if("sell" == this.sellOrBuy){
-                   this.$.sellAmount.focus();
+                if ("sell" == this.sellOrBuy) {
+                    this.$.sellAmount.focus();
                 } else {
-                   this.$.buyAmount.focus();
+                    this.$.buyAmount.focus();
                 }
             }
 
             static get observers() {
-                return [ 'buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)',
+                return ['buyButtonState(buyTotal,tokenbBalance,tokenbAllowance)',
                     'computeTokens(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokensBalance,tokensAllowance)'];
             }
 
             buyButtonState(buyTotal, tokenbBalance, tokenbAllowance) {
 
-                if (buyTotal && tokenbBalance && Number(tokenbBalance) && tokenbAllowance
-                    && Number(tokenbAllowance) && buyTotal <= tokenbBalance && buyTotal <= tokenbAllowance) {
+                if (buyTotal && tokenbBalance && tokenbBalance && tokenbAllowance
+                    && tokenbAllowance && buyTotal <= tokenbBalance && buyTotal <= tokenbAllowance) {
 
                     this.$.buyButton.disabled = false;
                     this.$.buyButton.style.backgroundColor = 'var(--paper-green-500)';
@@ -310,9 +310,9 @@
                 return "\\d+(\\.\\d{0," + precision + "})?";
             }
 
-            _multiply(amount, price, tokenb) {
-                if (tokenb && amount && price) {
-                    return (amount * price).toPrecision(tokenb.precision);
+            _multiply(amount, price) {
+                if (amount && price) {
+                    return (amount * price);
                 }
             }
 
@@ -337,10 +337,10 @@
 
                         return;
                     }
-                    if(!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee){
+                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
@@ -416,10 +416,10 @@
 
                         return
                     }
-                    if(!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee){
+                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if(this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address)<0){
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
@@ -472,35 +472,6 @@
                 }
             }
 
-
-//            async computeToken(wallet, tokens, tokenb) {
-//
-//                if (wallet && tokens) {
-//                    const address = wallet.address;
-//                    const tokensAddress = tokens.address;
-//                    const tokenbAddress = tokenb.address;
-//                    const spender = this.appConfig.contractAddress;
-//                    const relay = new Relay("http://127.0.0.1:8545");
-//
-//                    const tokensBalance = await relay.getTokenBalance(tokensAddress, address);
-//
-//                    const tokensAllowance = await relay.getTokenAllowance(tokensAddress, address, spender);
-//
-//                    const tokenbBalance = await relay.getTokenBalance(tokenbAddress, address);
-//
-//                    const tokenbAllowance = await relay.getTokenAllowance(tokenbAddress, address, spender);
-//
-//                    this.tokensAllowance = tokensAllowance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
-//
-//                    this.tokensBalance = tokensBalance.dividedBy(Number('1e' + tokens.digits)).toPrecision(tokens.precision);
-//
-//                    this.tokenbBalance = tokenbBalance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
-//
-//                    this.tokenbAllowance = tokenbAllowance.dividedBy(Number('1e' + tokenb.digits)).toPrecision(tokenb.precision);
-//
-//                }
-//            };
-
             isAllowanceWarn(allowance, token) {
                 if (allowance && token) {
                     return allowance >= token.allowanceWarn;
@@ -518,34 +489,42 @@
 
             computeTokens(tokens, tokenb, rawBalances) {
 
-                if(rawBalances){
-
+                console.log("compute tokens");
+                if (rawBalances) {
+                    console.log("compute tokens --0");
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
-                    if (tokens ) {
-                        this.tokensBalance = (Number(balances[tokens.token.toUpperCase()].balance) / Number('1e'+tokens.digits)).toPrecision(tokens.precision);
-                        this.tokensAllowance =( Number(balances[tokens.token.toUpperCase()].allowance) / Number('1e'+tokens.digits)).toPrecision(tokens.precision);
+                    if (tokens) {
+                        const balance =balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].balance) : 0 ;
+                        const allowance = balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].allowance) : 0;
+                        this.tokensBalance = ((balance ? balance : 0) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
+                        this.tokensAllowance = ((allowance ? allowance : 0 ) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
+
+                        console.log("compute tokens "+ this.tokensAllowance+ "----"+ this.tokensBalance);
                     }
-                    if(tokenb) {
-                        this.tokenbBalance =(Number(balances[tokenb.token.toUpperCase()].balance) / Number('1e'+tokenb.digits)).toPrecision(tokens.precision);
-                        this.tokenbAllowance = (Number(balances[tokenb.token.toUpperCase()].allowance) / Number('1e'+tokenb.digits)).toPrecision(tokens.precision);
+                    if (tokenb) {
+                        const balance =balances[tokenb.token.toUpperCase()] ? Number(balances[tokenb.token.toUpperCase()].balance) : 0 ;
+                        const allowance = balances[tokenb.token.toUpperCase()].allowance ? Number(balances[tokenb.token.toUpperCase()].allowance) : 0;
+                        this.tokenbBalance = ((balance ? balance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
+                        this.tokenbAllowance = ((allowance ? allowance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
+                        console.log("compute tokens "+ this.tokenbAllowance+ "----"+ this.tokenbBalance);
                     }
 
                 }
 
             }
 
-            _showAmount(amount){
+            _showAmount(amount) {
                 return Math.floor(amount * 100) / 100;
             }
 
             _showAmountInfo(selectToken, sellAmount, priceQuote) {
-                if(selectToken && sellAmount && priceQuote){
+                if (selectToken && sellAmount && priceQuote) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * this.settingsLrcFee / 1000;
                     let lrcFee = fee / priceQuote.getPrice("LRC");
                     this.lrcFee = lrcFee;
-                    return "; total order amount: "+this._showAmount(amount)+priceQuote.fiat+", total lrcFee: "+this._showAmount(fee)+priceQuote.fiat+"("+this._showAmount(lrcFee)+"LRC)";
+                    return "; total order amount: " + this._showAmount(amount) + priceQuote.fiat + ", total lrcFee: " + this._showAmount(fee) + priceQuote.fiat + "(" + this._showAmount(lrcFee) + "LRC)";
                 }
             }
         }
