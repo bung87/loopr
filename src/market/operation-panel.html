@@ -489,9 +489,7 @@
 
             computeTokenBalances(tokens, tokenb, rawBalances) {
 
-                console.log("compute tokens");
                 if (rawBalances) {
-                    console.log("compute tokens --0");
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
                     if (tokens) {
                         const balance =balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].balance) : 0 ;
@@ -499,14 +497,12 @@
                         this.tokensBalance = ((balance ? balance : 0) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
                         this.tokensAllowance = ((allowance ? allowance : 0 ) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
 
-                        console.log("compute tokens "+ this.tokensAllowance+ "----"+ this.tokensBalance);
                     }
                     if (tokenb) {
                         const balance =balances[tokenb.token.toUpperCase()] ? Number(balances[tokenb.token.toUpperCase()].balance) : 0 ;
                         const allowance = balances[tokenb.token.toUpperCase()].allowance ? Number(balances[tokenb.token.toUpperCase()].allowance) : 0;
                         this.tokenbBalance = ((balance ? balance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
                         this.tokenbAllowance = ((allowance ? allowance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
-                        console.log("compute tokens "+ this.tokenbAllowance+ "----"+ this.tokenbBalance);
                     }
 
                 }
