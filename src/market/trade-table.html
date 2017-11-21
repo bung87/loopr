@@ -310,6 +310,7 @@
                         item.buyOrSell = item.tokenS === marketConfig.tokenx ? "Sell" : "Buy";
                         this._computePrecisionInMarket(item, marketConfig, appConfig);
                     } else {
+                        this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: { text: "not supportd market:"+this.market, category: "error", duration: 8000 } }));
                         this.dispatchEvent(new CustomEvent('nout-found', { bubbles: true, composed: true, detail: { msg: "not found market:" + this.market } }));
                     }
                 } else {

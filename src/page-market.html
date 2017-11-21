@@ -60,7 +60,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
-            <simple-toolbar slot="secondary-toolbar" title="Market" id="[[marketId()]]"
+            <simple-toolbar slot="secondary-toolbar" title="Market" id="[[market]]"
                             back-link="#/markets" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card id="charts">
@@ -73,14 +73,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         -->
                         <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}"
                                     attr-for-selected="name">
-                            <candlestick-chart name="candle" market="{{subpage}}"></candlestick-chart>
+                            <candlestick-chart name="candle" market="{{market}}"></candlestick-chart>
                             <depth-chart name="depth"></depth-chart>
                         </iron-pages>
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
-                        <operation-panel market="{{subpage}}"></operation-panel>
+                        <operation-panel market="{{market}}"></operation-panel>
                     </template>
                     <div class$="walletlink [[isUnlockedClass(wallet)]]">
                         <a href="/#/wallet" class="walletlink"><paper-button primary>Unlock your wallet to trade</paper-button></a>
@@ -126,6 +126,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     page: String,
                     subpage: String,
                     third: String,
+                    market: {
+                        type: String,
+                        computed: '_computedMarket(page, subpage)'
+                    },
                     chartSelection: {
                         type: String,
                         value: "candle",
@@ -152,8 +156,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 });
             }
 
-            marketId() {
-                if (this.subpage) return this.subpage.toUpperCase();
+            _computedMarket(page, subpage) {
+                if(page && "market" === page && subpage) return subpage;
             }
 
             _isUnlocked(wallet) {
