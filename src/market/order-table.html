@@ -66,6 +66,7 @@
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -250,9 +251,13 @@
 
              _cancel(e) {
                 try {
+                    let currentVersion = this.$.settingsVersion.value;
+                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
+
+
                     const target = e.target.order;
                     let data = {};
-                    data.protocol = this.appConfig.contractAddress;
+                    data.protocol = contractAddress;
                     data.owner = this.wallet.address;
                     data.tokenS = this.appConfig.tokenMap[target.tokenS.toUpperCase()].address;
                     data.tokenB = this.appConfig.tokenMap[target.tokenB.toUpperCase()].address;
@@ -274,7 +279,7 @@
                     const cancelData = order.cancel(amount, this.wallet.privateKey);
 
                     const rawTx = {
-                        to: this.appConfig.contractAddress,
+                        to: contractAddress,
                         gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
                         gasLimit: '0x14820',
                         value: '0x0',
@@ -296,16 +301,6 @@
 
             }
 
-
-            setCutOff(){
-                const rawTx = {
-                    to: this.appConfig.contractAddress,
-                    gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
-                    gasLimit: '0x14820',
-                    value: '0x0',
-                    data:''
-                };
-            }
 
             _computeRest(rawBalances, tokenb, tokens, order) {
                 if (rawBalances) {
