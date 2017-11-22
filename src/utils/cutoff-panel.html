@@ -21,34 +21,36 @@
             .show {
                 display: block;
             }
-
-            paper-checkbox {
-                --paper-checkbox-checked-color: var(--paper-red-500);
-              }
-              --my-toolbar-title-theme: {
-                        color: green;
-                      };
-
-                      html { --my-theme-color: blue; }
+            .explain {
+                margin-top: 10px;
+                color: var(--app-primary-color);
+            }
+            overlay-datetime-picker{
+                --datetime-background: blue;
+                --datetime-color: red;
+            }
         </style>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <div class="sections top">
-            <paper-card transparent>Operations</paper-card>
+            <paper-card transparent>Cutoff</paper-card>
             <paper-card>
                 <div class="vertical center layout">
                     <div class="horizontal center layout">
                         <overlay-datetime-picker id="cutoff" locale="en" native datetime="{{cutoff}}"></overlay-datetime-picker>
                         <div class="button"><paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button></div>
                     </div>
-                    <div class="horizontal center layout">
+                    <div class="explain horizontal center layout">
                         <template is="dom-if" if="[[hasSet]]">
                             You haven't set cutoff, you could submit a cutoff time to cancel all your submitted orders
                         </template>
                         <template is="dom-if" if="[[!hasSet]]">
-                            You haven set cutoff, all your submitted orders before the selected time will not be filled
+                            You have set cutoff, all your submitted orders before the selected time will not be filled
                         </template>
+                    </div>
+                    <div class="horizontal center layout">
+                        <a href="javascript:void(0)" on-click="_testHaveCutoff">test have cutoff</a> &nbsp;&nbsp; <a href="javascript:void(0)" on-click="_testNoCutoff">test no cutoff</a>
                     </div>
                 </div>
             </paper-card>
@@ -84,16 +86,12 @@
             super.ready();
         }
 
-        _computedShowCutoff(cutoff){console.log(1)
+        _computedShowCutoff(cutoff){console.log(cutoff)
             if(cutoff){
-                return false
+                return false;
             } else {
-                return true
+                return true;
             }
-        }
-
-        _toShowCutoff(){console.log(this.root.hasSet);
-            this.root.hasSet = false;console.log(this.root.hasSet)
         }
 
         _computedUrl(wallet, settingsVersion) {
@@ -102,10 +100,10 @@
             }
         }
 
-        _computeCutoff(resp) {console.log(2)
+        _computeCutoff(resp) {
             if(resp && resp.result.data){
                 return "2000-01-01T00:00:00";
-                //return ''
+                //return resp.result.data;
             }
         }
 
@@ -115,6 +113,14 @@
             cutoffNode.datetime = "2000-01-01T01:00:00";
             console.log(cutoffNode.datetime);
             this.hasSet = false;
+        }
+
+        _testHaveCutoff(){console.log(this.cutoff);
+            this.cutoff = "2000-01-01T00:00:00";console.log(this.cutoff);
+        }
+
+        _testNoCutoff(){console.log(this.cutoff);
+            this.cutoff = "";console.log(this.cutoff);
         }
 
     }
