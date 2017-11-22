@@ -27,7 +27,8 @@
                 <div id="volume"></div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <iron-ajax auto id="ajax" handle-as="json" url="[[relay]]/Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>
+            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}"
+                                loading="{{loading}}"></loopr-ajax>
         </div>
     </template>
     <script>
@@ -42,16 +43,8 @@
                 resp: {
                     type: Object,
                     observer: '_respChanged'
-                },
-                relay: {
-                    type: Object,
-                    computed: '_selectedRelay(settingsRelay)'
                 }
             };
-        }
-
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
         }
 
         syncExtremes(e) {
@@ -70,12 +63,10 @@
 
         _respChanged(resp) {
             if(!resp) return;
-
-            //this._chart2(resp);
-            this._chart1(resp);
+            this._chart(resp);
         }
 
-        _chart1(resp){
+        _chart(resp){
             resp.xData = Highcharts.map(resp.result, function (val, j) {
                 //return (new Date(val[0])).toUTCString()
                 return val[0];
@@ -162,115 +153,6 @@
                     }
                 }]
             });
-        }
-
-        _chart2(resp){
-            let priceDatas = resp.datasets[0], volumeDatas = resp.datasets[1];
-            // Add X values
-            priceDatas.data = Highcharts.map(priceDatas.data, function (val, j) {
-                return [resp.xData[j], val];
-            });
-            volumeDatas.data = Highcharts.map(volumeDatas.data, function (val, j) {
-                return [resp.xData[j], val];
-            });
-
-            this._chart(this.$.price, priceDatas, Highcharts.getOptions().colors[0]);
-            this._chart(this.$.volume, volumeDatas, Highcharts.getOptions().colors[2]);
-
-            this.$.container.addEventListener('mousemove', this._chartEvent);
-            this.$.container.addEventListener('touchmove', this._chartEvent);
-            this.$.container.addEventListener('touchstart', this._chartEvent);
-
-            Highcharts.Point.prototype.highlight = function (event) {
-                this.onMouseOver(); // Show the hover marker
-                this.series.chart.tooltip.refresh(this); // Show the tooltip
-                this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
-            };
-        }
-
-        _chart(dom, datas, color){
-            let chart = Highcharts.chart(dom, {
-                chart: {
-                    marginLeft: 40, // Keep all charts left aligned
-                    spacingTop: 20,
-                    spacingBottom: 20
-                },
-                title: {
-                    text: datas.name,
-                    align: 'left',
-                    margin: 0,
-                    x: 30
-                },
-                credits: {
-                    enabled: false
-                },
-                legend: {
-                    enabled: false
-                },
-                xAxis: {
-                    crosshair: true,
-                    events: {
-                        setExtremes: this.syncExtremes
-                    }
-                    //type: 'datetime'
-                },
-                yAxis: {
-                    title: {
-                        text: null
-                    }
-                },
-                tooltip: {
-                    positioner: function () {
-                        return {
-                            x: this.chart.chartWidth - this.label.width, // right aligned
-                            y: 10 // align to title
-                        };
-                    },
-                    borderWidth: 0,
-                    backgroundColor: 'none',
-                    pointFormat: '{point.y}',
-                    headerFormat: '',
-                    shadow: false,
-                    style: {
-                        fontSize: '18px'
-                    },
-                    valueDecimals: datas.valueDecimals
-                },
-//                tooltip: {
-//                        headerFormat: 'Time: {point.x:.1f}<br>',
-//                        pointFormat: 'Volume {point.y} ',
-//                        shared: true
-//                    },
-                series: [{
-                    data: datas.data,
-                    name: datas.name,
-                    type: datas.type,
-                    color: color,
-                    fillOpacity: 0.3,
-                    tooltip: {
-                        valueSuffix: ' ' + datas.unit
-                    }
-                }]
-            });
-        }
-
-        _chartEvent(e){
-            var chart,
-                point,
-                i,
-                event;
-            console.log(Highcharts.charts.length)
-            for (i = 0; i < Highcharts.charts.length; i = i + 1) {console.log(Highcharts.charts[i])
-                chart = Highcharts.charts[i];
-                if(chart && chart.pointer){
-                    event = chart.pointer.normalize(e.originalEvent); // Find coordinates within the chart
-                    point = chart.series[0].searchPoint(event, true); // Get the hovered point
-
-                    if (point) {
-                        point.highlight(e);
-                    }
-                }
-            }
         }
 
         go() {

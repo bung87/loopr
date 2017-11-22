@@ -15,6 +15,21 @@
                 margin-left: 10px;
                 height: 44px;
             }
+            .hidden {
+                display: none;
+            }
+            .show {
+                display: block;
+            }
+
+            paper-checkbox {
+                --paper-checkbox-checked-color: var(--paper-red-500);
+              }
+              --my-toolbar-title-theme: {
+                        color: green;
+                      };
+
+                      html { --my-theme-color: blue; }
         </style>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -23,9 +38,17 @@
             <paper-card transparent>Operations</paper-card>
             <paper-card>
                 <div class="vertical center layout">
-                    <div class="item horizontal center layout">
-                        <overlay-datetime-picker id="cutoff" value="{{cutoff}}"></overlay-datetime-picker>
+                    <div class="horizontal center layout">
+                        <overlay-datetime-picker id="cutoff" locale="en" native datetime="{{cutoff}}"></overlay-datetime-picker>
                         <div class="button"><paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button></div>
+                    </div>
+                    <div class="horizontal center layout">
+                        <template is="dom-if" if="[[hasSet]]">
+                            You haven't set cutoff, you could submit a cutoff time to cancel all your submitted orders
+                        </template>
+                        <template is="dom-if" if="[[!hasSet]]">
+                            You haven set cutoff, all your submitted orders before the selected time will not be filled
+                        </template>
                     </div>
                 </div>
             </paper-card>
@@ -47,7 +70,12 @@
                 cutoff: {
                     type: String,
                     computed: '_computeCutoff(resp)',
-                    value: 0
+                    value: ''
+                },
+                hasSet: {
+                    type: Boolean,
+                    value: true,
+                    computed: '_computedShowCutoff(cutoff)'
                 }
             };
         }
@@ -56,8 +84,16 @@
             super.ready();
         }
 
-        _change(date){
-            console.log(date)
+        _computedShowCutoff(cutoff){console.log(1)
+            if(cutoff){
+                return false
+            } else {
+                return true
+            }
+        }
+
+        _toShowCutoff(){console.log(this.root.hasSet);
+            this.root.hasSet = false;console.log(this.root.hasSet)
         }
 
         _computedUrl(wallet, settingsVersion) {
@@ -66,14 +102,19 @@
             }
         }
 
-        _computeCutoff(resp) {
+        _computeCutoff(resp) {console.log(2)
             if(resp && resp.result.data){
-                return resp.result.data;
+                return "2000-01-01T00:00:00";
+                //return ''
             }
         }
 
         commitCutoff(){
-            console.log(this.$.cutoff.value);
+            let cutoffNode = this.$.cutoff;
+            console.log(cutoffNode.datetime);
+            cutoffNode.datetime = "2000-01-01T01:00:00";
+            console.log(cutoffNode.datetime);
+            this.hasSet = false;
         }
 
     }
