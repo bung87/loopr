@@ -74,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 height: 30px;
                 margin-top: 20px;
                 font-weight: 500;
-                color:rgba(0, 0, 0, .54);
+                color: rgba(0, 0, 0, .54);
                 font-size: 12px;
             }
 
@@ -111,7 +111,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet" tabindex="-1"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"
+                            tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
@@ -123,7 +124,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="line">
                                 <div class="amount">
                                     <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
-                                                       label="Amount" pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                       label="Amount"
+                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                        error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
                                                        tabindex="2">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
@@ -242,7 +244,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computedToken(page, subpage) {
-                if(page && "approve" === page && subpage) return subpage;
+                if (page && "approve" === page && subpage) return subpage;
             }
 
             _computeGasLimit(appConfig) {
@@ -285,7 +287,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computeAmountShow(selectedTokenBalance) {
-                if(selectedTokenBalance) {
+                if (selectedTokenBalance) {
                     return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
                 }
             }
@@ -311,7 +313,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var combobox = this.$.tokensSelector;
                 var _this = this;
                 combobox.addEventListener('value-changed', function () {
-                    if(combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]){
+                    if (combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]) {
                         window.location.href = "#/approve/" + combobox.value;
                     }
                 });
@@ -319,7 +321,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                 });
                 this.$.amount.focus();
-                document.addEventListener('keyup', function(event) {
+                document.addEventListener('keyup', function (event) {
                     if (event.keyCode == "13") {
                         this.$.send.click();
                     }
@@ -428,7 +430,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             async _signToSend() {
-                if(!this.valid) {
+                if (!this.valid) {
                     return;
                 }
                 let detail = {};
@@ -446,32 +448,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 const spender = this.appConfig.contractVersionMap[currentVersion].address;
 
                 const currentAllowance = Number(this.balances[this.token].allowance);
-                
+
                 const tx = {};
                 tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
                 tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                 tx.to = this.selectedTokenBalance.address;
                 tx.value = '0x0';
-                const method = '0x' + ethUtil.sha3('approve(address,uint256)').toString('hex').slice(0, 8);
-                if (currentAllowance === 0 ) {
-                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-                    tx.data = method + params;
-
+                if (currentAllowance === 0) {
+                    tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                     detail = {
                         raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
                     };
-
                 } else {
-
-                    tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(0), 32).toString('hex');
-
+                    tx.data = signer.generateApproveData(spender, '0x0');
                     const cancelRaw = JSON.stringify(tx);
-
-                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-                    tx.data = method + params;
+                    tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                     detail = {
                         raws: [{
                             "raw": cancelRaw,

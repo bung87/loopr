@@ -357,20 +357,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             const WETHConfig = this.appConfig.tokenMap['WETH'];
             tx.to = WETHConfig.address;
             if (this.fromToken === 'ETH') {
-
                 tx.value = '0x' + (Number(this.$.amount.value)* 1e18).toString(16);
                 tx.data = '0x';
-
                 subTitle = 'Convert ETH to  WETH';
             } else {
                 tx.value = '0x0';
-                const method = '0x' + ethUtil.sha3('withdraw(uint256)').slice(0, 4).toString('hex');
-                tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)), 32).toString('hex');
+                tx.data = signer.generateWithdrawData('0x'+(Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)).toString(16));
                 subTitle = 'Convert WETH to  ETH';
             }
-
             const detail = {raws: [{raw: JSON.stringify(tx), subTitle}]};
-
             this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
         }
 
