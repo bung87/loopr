@@ -323,9 +323,15 @@
                 item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
                 item.feeLrc = Number(item.feeLrc);
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
+                if(marginSplitToken){
+                    item.marginSplitUnit = marginSplitToken.unit;
+                    item.marginSplitPrecision = marginSplitToken.precision;
+                } else {
+                    console.error("data error, no token:"+item.marginSplitToken+" config")
+                    item.marginSplitUnit = item.marginSplitToken.toUpperCase();
+                    item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
+                }
                 item.marginSplit = Number(item.marginSplit);
-                item.marginSplitUnit = marginSplitToken.unit;
-                item.marginSplitPrecision = marginSplitToken.precision;
                 return item;
             }
         }
