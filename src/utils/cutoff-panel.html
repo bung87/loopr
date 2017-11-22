@@ -122,7 +122,6 @@
 
             commitCutoff() {
                 let cutoffNode = this.$.cutoff;
-                console.log(cutoffNode.value);
                 let currentVersion = this.settingsVersion;
                 const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
                 const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
@@ -133,7 +132,6 @@
                     value: '0x0',
                     data
                 };
-                console.log(JSON.stringify(rawTx));
                 const detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Set Cut Off"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 this.hasSet = false;
