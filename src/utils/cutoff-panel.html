@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="cutoff-panel">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+            :host {
+            }
+
+            .top {
+                padding-top: 0px;
+            }
+
+            overlay-datetime-picker {
+                width: 260px;
+                height: 44px;
+            }
+
+            .button {
+                margin-left: 10px;
+                height: 44px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .show {
+                display: block;
+            }
+
+            .explain {
+                margin-top: 10px;
+                color: var(--app-primary-color);
+            }
+            overlay-datetime-picker{
+                --datetime-background: blue;
+                --datetime-color: red;
+            }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <div class="sections top">
+            <paper-card transparent>Cutoff</paper-card>
+            <paper-card>
+                <div class="vertical center layout">
+                    <div class="horizontal center layout">
+                        <overlay-datetime-picker id="cutoff" locale="en" native
+                                                 value="{{cutoff}}"></overlay-datetime-picker>
+                        <div class="button">
+                            <paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button>
+                        </div>
+                    </div>
+                    <div class="explain horizontal center layout">
+                        <template is="dom-if" if="[[hasSet]]">
+                            You haven't set cutoff, you could submit a cutoff time to cancel all your submitted orders
+                        </template>
+                        <template is="dom-if" if="[[!hasSet]]">
+                            You have set cutoff, all your submitted orders before the selected time will not be filled
+                        </template>
+                    </div>
+                </div>
+            </paper-card>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="[[url]]" last-response="{{resp}}"
+                        loading="{{loading}}"></loopr-ajax>
+        </div>
+    </template>
+    <script>
+        class CutoffPanel extends Polymer.Element {
+            static get is() {
+                return 'cutoff-panel';
+            }
+
+            static get properties() {
+                return {
+                    url: {
+                        type: String,
+                        computed: '_computedUrl(wallet, settingsVersion)'
+                    },
+                    cutoff: {
+                        type: String,
+                        computed: '_computeCutoff(resp)',
+                        value: ''
+                    },
+                    hasSet: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_computedShowCutoff(cutoff)'
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+            }
+
+            _computedShowCutoff(cutoff){
+                if(cutoff){
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            _computedUrl(wallet, settingsVersion) {
+                if(wallet && settingsVersion) {
+                    return "Loopring/mock-relay-data/master/getCutoff.json?address="+wallet.address+"&version="+settingsVersion;
+                }
+            }
+
+            _computeCutoff(resp) {
+                if(resp && resp.result.data){
+                    //return "2000-01-01T00:00:00"; // datetime
+                    //return 1500337168000 //value
+                    return Number(resp.result.data) * 1000;
+                }
+            }
+
+            commitCutoff() {
+                let cutoffNode = this.$.cutoff;
+                let currentVersion = this.settingsVersion;
+                const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
+                const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
+                const rawTx = {
+                    to: contractAddress,
+                    gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
+                    gasLimit: '0x14820',
+                    value: '0x0',
+                    data
+                };
+                const detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Set Cut Off"}]};
+                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                this.hasSet = false;
+            }
+
+        }
+
+        window.customElements.define(CutoffPanel.is, CutoffPanel);
+    </script>
+</dom-module>

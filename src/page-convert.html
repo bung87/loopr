@@ -240,10 +240,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _selectedRelay(settingsRelay){
-            return settingsRelay;
-        }
-
         _selectedToken(appConfig, balances, fromToken){
             if(appConfig && balances && fromToken){
                 return this._getTokenBalance(appConfig, balances, fromToken);
