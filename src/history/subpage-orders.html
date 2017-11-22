@@ -47,11 +47,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedSubpage(page, subpage) {
-            if(page && "history" === page && subpage) return subpage;
+            if(page && "history" === page && subpage && subpage === "orders") return subpage;
         }
 
         _computedThird(page, subpage, third) {
-            if(page && "history" === page && subpage && third) return third;
+            if(page && "history" === page && subpage && subpage === "orders" && third) return third;
         }
 
         go() {

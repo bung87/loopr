@@ -100,7 +100,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedSubpage(page, subpage) {
-            if(page && "history" === page && subpage) return subpage;
+            if(page && "history" === page){
+                if(subpage){
+                    return subpage;
+                } else {
+                    return "trades";
+                }
+            }
         }
 
         _computedThird(page, subpage, third) {
