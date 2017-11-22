@@ -381,12 +381,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
-
-                    const method = '0x' + ethUtil.sha3('transfer(address,uint256)').toString('hex').slice(0, 8);
-                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(this.address), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-
-                    tx.data = method + params;
+                    tx.data = signer.generateTransferData(this.address,'0x'+ (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
 
                 }
 
