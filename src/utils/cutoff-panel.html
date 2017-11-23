@@ -114,8 +114,6 @@
 
             _computeCutoff(resp) {
                 if(resp && resp.result.data){
-                    //return "2000-01-01T00:00:00"; // datetime
-                    //return 1500337168000 //value
                     return Number(resp.result.data) * 1000;
                 }
             }
