@@ -132,7 +132,8 @@
                 if (resp && resp.result.data) {
                     return Number(resp.result.data) * 1000;
                 } else {
-                    return -1;
+                    this.$.cutoff.datetime = "1970-01-01T00:00:00Z"; // datetime
+                    return 0;
                 }
             }
 
