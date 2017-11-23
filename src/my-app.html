@@ -536,7 +536,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.computeMarketId = function(tokenx, tokeny) {
                     return tokenx + "-" + tokeny;
                 }
-
                 appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
                 appConfig.lrc = appConfig.tokenMap["LRC"];
                 appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);
