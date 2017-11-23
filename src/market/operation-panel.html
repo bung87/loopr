@@ -381,8 +381,8 @@
                     data.amountB = '0x' + (Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toString(16);
                     data.timestamp = new Date().getTime();
                     data.ttl = 10 * 24 * 3600;
-                    data.salt = 10;
-                    data.lrcFee = 10;
+                    data.salt = Math.round(Math.random() * 1e18);
+                    data.lrcFee = this._showAmount(this.lrcFee);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
@@ -459,19 +459,16 @@
                     data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toString(16);
                     data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = new Date().getTime();
-                    data.ttl = 10 * 24 * 3600;
-                    data.salt = 10;
-                    data.lrcFee = 10;
+                    data.ttl = 30 * 24 * 3600;
+                    data.salt = Math.round(Math.random() * 1e18);
+                    data.lrcFee = this._showAmount(this.lrcFee);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
-
                     const relay = new Relay(settingsRelay);
                     await relay.submitLoopringOrder(signed)
-
                     const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
-
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
