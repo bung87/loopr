@@ -55,11 +55,11 @@
                         </div>
                     </div>
                     <div class="explain horizontal center layout">
-                        <template is="dom-if" if="[[hasSet]]">
-                            You haven't set cutoff, you could submit a cutoff time to cancel all your submitted orders
-                        </template>
                         <template is="dom-if" if="[[!hasSet]]">
-                            You have set cutoff, all your submitted orders before the selected time will not be filled
+                            All previously submitted orders with a timestamp smaller than this address's cutoff will be invalidated and never get filled. You can only increase the cutoff but can never decrease it. If you set its value to a timestamp in the far future, this address is basically disabled for trading. An address's default cutoff is 0.
+                        </template>
+                        <template is="dom-if" if="[[hasSet]]">
+                            The default cutoff is 0.
                         </template>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                     value: '0x0',
                     data
                 };
-                const detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Set Cut Off"}]};
+                const detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Set Expiration Cutoff Timestamp"}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 this.hasSet = false;
             }

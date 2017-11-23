@@ -117,22 +117,21 @@
                 <div class="balance">
                     <div class="error">
                         <template is="dom-if" if="[[nonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            your balance or allowance is not enough.
+                            You have insuffcient balance([[tokensBalance]]) or allowance([[tokensAllowance]]).
                         </template>
                     </div>
                     <div class="common">
                         <template is="dom-if" if="[[tokensBalance]]">
-                            your balance is [[tokensBalance]];
+                            Your balance is [[tokensBalance]].
                         </template>
                         <template is="dom-if" if="[[tokensAllowance]]">
-                            your allowance is [[tokensAllowance]];
+                            Your allowance is [[tokensAllowance]].
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokensAllowance,tokens)]]">
-                            <a href="/#/approve/[[tokens.token]]" tabindex="-1"> set allowance to
+                            <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
                                 [[tokens.allowanceWarn]] </a> <br>
                         </template>
-                        Current Loopring Order Fee is [[settingsLrcFee]] ‰
-                        [[_showAmountInfo(tokens, sellAmount, priceQuote)]]
+                        [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                     </div>
                 </div>
 
@@ -161,22 +160,21 @@
                 <div class="balance">
                     <div class="error">
                         <template is="dom-if" if="[[nonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
-                            your balance or allowance is not enough.
+                            You have insuffcient balance([[tokenbBalance]]) or allowance([[tokenbAllowance]]).
                         </template>
                     </div>
                     <div class="common">
                         <template is="dom-if" if="[[tokenbBalance]]">
-                            your balance is [[tokenbBalance]];
+                            Your balance is [[tokenbBalance]].
                         </template>
                         <template is="dom-if" if="[[tokenbAllowance]]">
-                            your allowance is [[tokenbAllowance]];
+                            Your allowance is [[tokenbAllowance]].
                         </template>
                         <template is="dom-if" if="![[isAllowanceWarn(tokenbAllowance,tokenb)]]">
-                            <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> set allowance to
+                            <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
                                 [[tokenb.allowanceWarn]] </a> <br>
                         </template>
-                        Current Loopring Order Fee is [[settingsLrcFee]] ‰
-                        [[_showAmountInfo(tokenb, buyTotal, priceQuote)]]
+                        [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                     </div>
 
                 </div>
@@ -513,14 +511,14 @@
                 return Math.floor(amount * 100) / 100;
             }
 
-            _showAmountInfo(selectToken, sellAmount, priceQuote) {
+            _showAmountInfo(selectToken, sellAmount, priceQuote,settingsLrcFee) {
                 if (selectToken && sellAmount && priceQuote) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * this.settingsLrcFee / 1000;
                     let lrcFee = fee / priceQuote.getPrice("LRC");
                     this.lrcFee = lrcFee;
-                    return "; total order amount: " + this._showAmount(amount) + priceQuote.fiat + ", total lrcFee: " + this._showAmount(fee) + priceQuote.fiat + "(" + this._showAmount(lrcFee) + "LRC)";
+                    return "Estimated order value: " + this._showAmount(amount) + ' '+ priceQuote.fiat + ". Estimated LRC fee value: " + this._showAmount(fee)+ ' ' + priceQuote.fiat + " (" +this._showAmount(amount)+' * '+settingsLrcFee+'‰, about '+ this._showAmount(lrcFee) + " LRC)";
                 }
             }
         }
