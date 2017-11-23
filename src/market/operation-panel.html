@@ -388,10 +388,10 @@
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 
-                    const relay = new Relay('http://10.137.107.63:3000');
+                    const relay = new Relay('http://127.0.0.1:8545');
                     await relay.submitLoopringOrder(signed);
 
-                    const detail = {text: 'submit order successfully', category: "info", duration: 5000};
+                    const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
 
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
@@ -470,7 +470,7 @@
                     const relay = new Relay(settingsRelay);
                     await relay.submitLoopringOrder(signed)
 
-                    const detail = {text: 'submit order successfully', category: "info", duration: 5000};
+                    const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
 
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
