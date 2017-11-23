@@ -34,7 +34,7 @@
             }
             overlay-datetime-picker{
                 --datetime-selected-background: var(--paper-amber-700);
-                --datetime-picker: { box-shadow: 0 3px 4px 0 rgba(1, 1, 1, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 3px -2px rgba(0, 0, 0, 0.4); }
+                --datetime-input: {height: 40px;border-radius: 0px; padding: 0em; border: none; outline: none; text-align: center; color: inherit; cursor: pointer; background-color: var(--google-grey-100); box-sizing: content-box; transition: background-color 150ms cubic-bezier(0.6, 1, 0.2, 1);}
             }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -48,7 +48,7 @@
             <paper-card>
                 <div class="vertical center layout">
                     <div class="horizontal center layout">
-                        <overlay-datetime-picker id="cutoff" locale="en" native
+                        <overlay-datetime-picker id="cutoff" native
                                                  value="{{cutoff}}"></overlay-datetime-picker>
                         <div class="button">
                             <paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button>
@@ -99,7 +99,7 @@
             }
 
             _computedShowCutoff(cutoff){
-                if(cutoff){
+                if(cutoff && cutoff >0){
                     return false;
                 } else {
                     return true;
@@ -115,6 +115,8 @@
             _computeCutoff(resp) {
                 if(resp && resp.result.data){
                     return Number(resp.result.data) * 1000;
+                } else {
+                    return -1;
                 }
             }
 
