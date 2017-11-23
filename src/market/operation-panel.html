@@ -69,7 +69,6 @@
             }
 
             div.common {
-
                 color: var(--app-primary-color);
             }
 
@@ -116,22 +115,33 @@
                 </div>
                 <div class="balance">
                     <div class="error">
-                        <template is="dom-if" if="[[nonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            You have insuffcient balance([[tokensBalance]]) or allowance([[tokensAllowance]]).
+                        <template is="dom-if" if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
+                            <template is="dom-if" if="[[!isEnough(sellAmount,tokensBalance)]]">
+                                You have insufficient balance([[tokensBalance]]).<br>
+                            </template>
+                            <template is="dom-if" if="[[!isEnough(sellAmount,tokensAllowance)]]">
+                                You have insufficient allowance([[tokensAllowance]]). <a
+                                    href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
+                            </template>
+                        </template>
+                        <template is="dom-if" if="[[bothNonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
+                            You have insufficient balance([[tokensBalance]]) and allowance([[tokensAllowance]]).
                         </template>
                     </div>
                     <div class="common">
-                        <template is="dom-if" if="[[tokensBalance]]">
-                            Your balance is [[tokensBalance]].
+                        <template is="dom-if" if="[[!nonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
+                            <template is="dom-if" if="[[tokensBalance]]">
+                                Your balance is [[tokensBalance]].
+                            </template>
+                            <template is="dom-if" if="[[tokensAllowance]]">
+                                Your allowance is [[tokensAllowance]].
+                            </template>
+                            <template is="dom-if" if="[[!isAllowanceWarn(tokensAllowance,tokens)]]">
+                                <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
+                                    [[tokens.allowanceWarn]] </a>
+                            </template>
+                            <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                         </template>
-                        <template is="dom-if" if="[[tokensAllowance]]">
-                            Your allowance is [[tokensAllowance]].
-                        </template>
-                        <template is="dom-if" if="![[isAllowanceWarn(tokensAllowance,tokens)]]">
-                            <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
-                                [[tokens.allowanceWarn]] </a> <br>
-                        </template>
-                        [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                     </div>
                 </div>
 
@@ -159,24 +169,34 @@
                 </div>
                 <div class="balance">
                     <div class="error">
-                        <template is="dom-if" if="[[nonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
-                            You have insuffcient balance([[tokenbBalance]]) or allowance([[tokenbAllowance]]).
+                        <template is="dom-if" if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
+                            <template is="dom-if" if="[[!isEnough(buyTotal,tokenbBalance)]]">
+                                You have insufficient balance([[tokenbBalance]]).<br>
+                            </template>
+                            <template is="dom-if" if="[[!isEnough(buyTotal,tokenbAllowance)]]">
+                                You have insufficient allowance([[tokenbAllowance]]). <a
+                                    href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
+                            </template>
+                        </template>
+                        <template is="dom-if" if="[[bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
+                            You have insufficient balance([[tokenbBalance]]) and allowance([[tokenbAllowance]]).
                         </template>
                     </div>
                     <div class="common">
-                        <template is="dom-if" if="[[tokenbBalance]]">
-                            Your balance is [[tokenbBalance]].
+                        <template is="dom-if" if="[[!nonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
+                            <template is="dom-if" if="[[tokenbBalance]]">
+                                Your balance is [[tokenbBalance]].
+                            </template>
+                            <template is="dom-if" if="[[tokenbAllowance]]">
+                                Your allowance is [[tokenbAllowance]].
+                            </template>
+                            <template is="dom-if" if="[[!isAllowanceWarn(tokenbAllowance,tokenb)]]">
+                                <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
+                                    [[tokenb.allowanceWarn]] </a>
+                            </template>
+                            <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                         </template>
-                        <template is="dom-if" if="[[tokenbAllowance]]">
-                            Your allowance is [[tokenbAllowance]].
-                        </template>
-                        <template is="dom-if" if="![[isAllowanceWarn(tokenbAllowance,tokenb)]]">
-                            <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
-                                [[tokenb.allowanceWarn]] </a> <br>
-                        </template>
-                        [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                     </div>
-
                 </div>
             </div>
             </div>
@@ -361,17 +381,17 @@
                     data.amountB = '0x' + (Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toString(16);
                     data.timestamp = new Date().getTime();
                     data.ttl = 10 * 24 * 3600;
-                    data.salt = 10;
-                    data.lrcFee = 10;
+                    data.salt = Math.round(Math.random() * 1e18);
+                    data.lrcFee = this._showAmount(this.lrcFee);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 
-                    const relay = new Relay('http://10.137.107.63:3000');
+                    const relay = new Relay('http://127.0.0.1:8545');
                     await relay.submitLoopringOrder(signed);
 
-                    const detail = {text: 'submit order successfully', category: "info", duration: 5000};
+                    const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
 
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
@@ -439,19 +459,16 @@
                     data.amountS = '0x' + (Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toString(16);
                     data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = new Date().getTime();
-                    data.ttl = 10 * 24 * 3600;
-                    data.salt = 10;
-                    data.lrcFee = 10;
+                    data.ttl = 30 * 24 * 3600;
+                    data.salt = Math.round(Math.random() * 1e18);
+                    data.lrcFee = this._showAmount(this.lrcFee);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
-
                     const relay = new Relay(settingsRelay);
                     await relay.submitLoopringOrder(signed)
-
-                    const detail = {text: 'submit order successfully', category: "info", duration: 5000};
-
+                    const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
@@ -480,9 +497,25 @@
             nonEnough(amount, balance, allowance) {
 
                 if (amount && balance && allowance) {
-                    return amount > balance || amount > allowance
+                    return Number(amount) > balance || Number(amount) > allowance
                 }
                 return false;
+            }
+
+            bothNonEnough(amount, balance, allowance) {
+                if (amount && balance && allowance) {
+                    return Number(amount) > balance && Number(amount) > allowance
+                }
+                return false
+
+            }
+
+            isEnough(require, left) {
+
+                if (require && left) {
+                    return left >= Number(require)
+                }
+                return true;
             }
 
             computeTokenBalances(tokens, tokenb, rawBalances) {
@@ -490,14 +523,14 @@
                 if (rawBalances) {
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
                     if (tokens) {
-                        const balance =balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].balance) : 0 ;
+                        const balance = balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].balance) : 0;
                         const allowance = balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].allowance) : 0;
                         this.tokensBalance = ((balance ? balance : 0) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
                         this.tokensAllowance = ((allowance ? allowance : 0 ) / Number('1e' + tokens.digits)).toPrecision(tokens.precision);
 
                     }
                     if (tokenb) {
-                        const balance =balances[tokenb.token.toUpperCase()] ? Number(balances[tokenb.token.toUpperCase()].balance) : 0 ;
+                        const balance = balances[tokenb.token.toUpperCase()] ? Number(balances[tokenb.token.toUpperCase()].balance) : 0;
                         const allowance = balances[tokenb.token.toUpperCase()].allowance ? Number(balances[tokenb.token.toUpperCase()].allowance) : 0;
                         this.tokenbBalance = ((balance ? balance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
                         this.tokenbAllowance = ((allowance ? allowance : 0) / Number('1e' + tokenb.digits)).toPrecision(tokens.precision);
@@ -511,14 +544,14 @@
                 return Math.floor(amount * 100) / 100;
             }
 
-            _showAmountInfo(selectToken, sellAmount, priceQuote,settingsLrcFee) {
+            _showAmountInfo(selectToken, sellAmount, priceQuote, settingsLrcFee) {
                 if (selectToken && sellAmount && priceQuote) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * this.settingsLrcFee / 1000;
                     let lrcFee = fee / priceQuote.getPrice("LRC");
                     this.lrcFee = lrcFee;
-                    return "Estimated order value: " + this._showAmount(amount) + ' '+ priceQuote.fiat + ". Estimated LRC fee value: " + this._showAmount(fee)+ ' ' + priceQuote.fiat + " (" +this._showAmount(amount)+' * '+settingsLrcFee+'‰, about '+ this._showAmount(lrcFee) + " LRC)";
+                    return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.fiat + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.fiat + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showAmount(lrcFee) + " LRC)";
                 }
             }
         }

@@ -32,9 +32,22 @@
                 margin-top: 10px;
                 color: var(--app-primary-color);
             }
-            overlay-datetime-picker{
+
+            overlay-datetime-picker {
                 --datetime-selected-background: var(--paper-amber-700);
-                --datetime-input: {height: 40px;border-radius: 0px; padding: 0em; border: none; outline: none; text-align: center; color: inherit; cursor: pointer; background-color: var(--google-grey-100); box-sizing: content-box; transition: background-color 150ms cubic-bezier(0.6, 1, 0.2, 1);}
+                --datetime-input: {
+                    height: 40px;
+                    border-radius: 0px;
+                    padding: 0em;
+                    border: none;
+                    outline: none;
+                    text-align: center;
+                    color: inherit;
+                    cursor: pointer;
+                    background-color: var(--google-grey-100);
+                    box-sizing: content-box;
+                    transition: background-color 150ms cubic-bezier(0.6, 1, 0.2, 1);
+                }
             }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -56,7 +69,10 @@
                     </div>
                     <div class="explain horizontal center layout">
                         <template is="dom-if" if="[[!hasSet]]">
-                            All previously submitted orders with a timestamp smaller than this address's cutoff will be invalidated and never get filled. You can only increase the cutoff but can never decrease it. If you set its value to a timestamp in the far future, this address is basically disabled for trading. An address's default cutoff is 0.
+                            All previously submitted orders with a timestamp smaller than this address's cutoff will be
+                            invalidated and never get filled. You can only increase the cutoff but can never decrease
+                            it. If you set its value to a timestamp in the far future, this address is basically
+                            disabled for trading. An address's default cutoff is 0.
                         </template>
                         <template is="dom-if" if="[[hasSet]]">
                             The default cutoff is 0.
@@ -98,8 +114,8 @@
                 super.ready();
             }
 
-            _computedShowCutoff(cutoff){
-                if(cutoff && cutoff >0){
+            _computedShowCutoff(cutoff) {
+                if (cutoff && cutoff > 0) {
                     return false;
                 } else {
                     return true;
@@ -107,13 +123,13 @@
             }
 
             _computedUrl(wallet, settingsVersion) {
-                if(wallet && settingsVersion) {
-                    return "Loopring/mock-relay-data/master/getCutoff.json?address="+wallet.address+"&version="+settingsVersion;
+                if (wallet && settingsVersion) {
+                    return "Loopring/mock-relay-data/master/getCutoff.json?address=" + wallet.address + "&version=" + settingsVersion;
                 }
             }
 
             _computeCutoff(resp) {
-                if(resp && resp.result.data){
+                if (resp && resp.result.data) {
                     return Number(resp.result.data) * 1000;
                 } else {
                     this.$.cutoff.datetime = "1970-01-01T00:00:00Z"; // datetime
@@ -122,20 +138,34 @@
             }
 
             commitCutoff() {
-                let cutoffNode = this.$.cutoff;
-                let currentVersion = this.settingsVersion;
-                const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
-                const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
-                const rawTx = {
-                    to: contractAddress,
-                    gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
-                    gasLimit: '0x14820',
-                    value: '0x0',
-                    data
-                };
-                const detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Set Expiration Cutoff Timestamp"}]};
-                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
-                this.hasSet = false;
+                try {
+                    let cutoffNode = this.$.cutoff;
+                    let currentVersion = this.settingsVersion;
+                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
+                    const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
+                    const rawTx = {
+                        to: contractAddress,
+                        gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
+                        gasLimit: '0x14820',
+                        value: '0x0',
+                        data
+                    };
+                    const detail = {
+                        raws: [{
+                            "raw": JSON.stringify(rawTx),
+                            "subTitle": "Set Expiration Cutoff Timestamp"
+                        }]
+                    };
+                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                    this.hasSet = false;
+                } catch (e) {
+                    var detail = {text: e.message, category: "error", duration: 8000}
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                }
             }
 
         }

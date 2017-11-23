@@ -273,7 +273,7 @@
                     data.s = target.s;
 
                     if(!data.tokenS || !data.tokenB){
-                        const detail = {text: 'Token contract address is missing, please contact to administrators to make up for '+ target.tokenS.toUpperCase()+' and '+target.tokenB.toUpperCase()+' contract Address', category: "error", duration: 8000}
+                        const detail = {text: 'Token contract address is missing, please contact to the administrators to make up for '+ target.tokenS.toUpperCase()+' and '+target.tokenB.toUpperCase()+' contract Address', category: "error", duration: 8000}
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
                             composed: true,
