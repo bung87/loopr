@@ -19,8 +19,9 @@
     "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
     "test": "polymer test",
     "test:integration": "polymer build # test that psk builds without error with the CLI",
-    "serve": "bower install && echo '' > bower_components/font-roboto/roboto.html && polymer serve",
-    "build": "bower install && echo '' > bower_components/font-roboto/roboto.html && polymer build"
+    "serve": "bower uninstall loopring.js && bower install && echo '' > bower_components/font-roboto/roboto.html && polymer serve",
+    "build": "bower uninstall loopring.js && bower install && echo '' > bower_components/font-roboto/roboto.html && polymer build",
+    "deploy": "bower uninstall loopring.js && bower install && echo '' > bower_components/font-roboto/roboto.html && polymer build && firease deploy"
   },
   "dependencies": {
     "lodash": "^4.17.4"
