@@ -294,8 +294,8 @@
 
             sellButtonState(sellAmount, tokensBalance, tokensAllowance,sellPrice,sellTotal) {
 
-                if (sellAmount && tokensBalance && Number(tokensBalance) && tokensAllowance && sellPrice && sellTotal
-                    && Number(tokensAllowance) && sellAmount <= tokensBalance && sellAmount <= tokensAllowance) {
+                if (sellAmount && Number(sellAmount) && tokensBalance && Number(tokensBalance) && tokensAllowance && Number(tokensAllowance)
+                    && sellPrice && sellTotal && Number(sellAmount) <= tokensBalance && Number(sellAmount) <= tokensAllowance) {
 
                     this.$.sellButton.disabled = false;
                     this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
@@ -496,14 +496,14 @@
 
             nonEnough(amount, balance, allowance) {
 
-                if (amount && balance && allowance) {
+                if (amount && balance && allowance && Number(amount)) {
                     return Number(amount) > balance || Number(amount) > allowance
                 }
                 return false;
             }
 
             bothNonEnough(amount, balance, allowance) {
-                if (amount && balance && allowance) {
+                if (amount && balance && allowance && Number(amount)) {
                     return Number(amount) > balance && Number(amount) > allowance
                 }
                 return false
@@ -512,7 +512,7 @@
 
             isEnough(require, left) {
 
-                if (require && left) {
+                if (require && left && Number(require)) {
                     return left >= Number(require)
                 }
                 return true;
@@ -545,7 +545,7 @@
             }
 
             _showAmountInfo(selectToken, sellAmount, priceQuote, settingsLrcFee) {
-                if (selectToken && sellAmount && priceQuote) {
+                if (selectToken && sellAmount && priceQuote && Number(sellAmount)) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * this.settingsLrcFee / 1000;
