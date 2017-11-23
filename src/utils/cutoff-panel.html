@@ -33,8 +33,8 @@
                 color: var(--app-primary-color);
             }
             overlay-datetime-picker{
-                --datetime-background: blue;
-                --datetime-color: red;
+                --datetime-selected-background: var(--paper-amber-700);
+                --datetime-picker: { box-shadow: 0 3px 4px 0 rgba(1, 1, 1, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 3px -2px rgba(0, 0, 0, 0.4); }
             }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -82,9 +82,9 @@
                         computed: '_computedUrl(wallet, settingsVersion)'
                     },
                     cutoff: {
-                        type: String,
+                        type: Number,
                         computed: '_computeCutoff(resp)',
-                        value: ''
+                        value: 0
                     },
                     hasSet: {
                         type: Boolean,
