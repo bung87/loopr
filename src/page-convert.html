@@ -399,7 +399,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         }
 
                         const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
-                        console.log(ETHBalance);
                         if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {
                                 text: 'You has insufficient ETH balance for gasLimit * gasPrice',

@@ -430,8 +430,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             async _signToSend() {
-
-
                 try {
                     if (!this.valid) {
                         return;
@@ -457,6 +455,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
+
+                    if (this.selectedTokenBalance.balance < Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)) {
+                        const detail = {
+                            text: 'You has insufficient ' + this.selectedTokenBalance.token + ' balance ',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                    if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
                     if (currentAllowance === 0) {
                         tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
