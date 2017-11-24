@@ -389,20 +389,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.value = '0x0';
                         tx.data = signer.generateWithdrawData('0x' + (Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)).toString(16));
                         subTitle = 'Convert WETH to  ETH';
-                        if (this.fromTokenBalance.balance < Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)) {
-                            const detail = {
-                                text: 'You has insufficient ' + this.fromTokenBalance.token + ' balance ',
-                                category: "warning",
-                                duration: 8000
-                            };
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: detail
-                            }));
-                            return;
-                        }
-
                         const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
                         if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {

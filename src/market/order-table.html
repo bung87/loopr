@@ -190,7 +190,11 @@
                     showPage: {
                         type: String,
                         value: "hidden"
-                    }
+                    },
+                    balances: {
+                        type: Object,
+                        computed: '_computedBalance(balancesRaw)'
+                    },
                 };
             }
 
@@ -205,6 +209,11 @@
                 }
             }
 
+            _computedBalance(data) {
+                if (data) {
+                    return _.keyBy(data.result.tokens, o => o.token);
+                }
+            }
             _computedMarket(page, subpage, third){
                 if(page && subpage){
                     if(page === "market") {
@@ -294,6 +303,21 @@
                         value: '0x0',
                         data: cancelData
                     };
+
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                    if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
 
                     var detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Cancel Order"}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));

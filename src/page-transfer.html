@@ -410,21 +410,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.to = this.selectedTokenBalance.address;
                         tx.value = '0x0';
                         tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
-
-                        if (this.selectedTokenBalance.balance < Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)) {
-                            var detail = {
-                                text: 'You has insufficient ' + this.selectedTokenBalance.token + ' balance ',
-                                category: "warning",
-                                duration: 8000
-                            }
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: detail
-                            }));
-                            return;
-                        }
-
                         const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
                         if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
