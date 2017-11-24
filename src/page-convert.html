@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 @apply(--layout-start-justified);
             }
 
-            .inputLine vaadin-text-field {
+            .inputLine vaadin-text-field, balance-text-field {
                 width: 100%;
                 height: 34px;
             }
@@ -126,13 +126,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div class="line">
                             <div class="inputContainer">
                                 <div class="inputLine">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
-                                                       pattern="[[_numPatten(fromTokenBalance.precision)]]"
-                                                       label="Amount To Convert"
-                                                       error-message="[[_numError(amount, fromTokenBalance.precision)]]"
-                                                       tabindex="1">
+                                    <balance-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
+                                                        pattern="[[_numPatten(fromTokenBalance.precision)]]"
+                                                        label="Amount To Convert"
+                                                        error-message="[[_numError(amount, fromTokenBalance.precision)]]"
+                                                        tabindex="1"
+                                                        max="[[amountShow]]">
                                         <div slot="suffix">[[fromToken]]</div>
-                                    </vaadin-text-field>
+                                    </balance-text-field>
                                 </div>
                                 <div class="inputLine">
                                     <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
@@ -199,7 +200,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_formValid(amount, gasLimit)'
+                        computed: '_formValid(amount, gasLimit,amountShow)'
                     }
                 };
             }
@@ -285,8 +286,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _formValid(amount, gasLimit) {
-                if (!amount || !gasLimit) {
+            _formValid(amount, gasLimit, amountShow) {
+                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
