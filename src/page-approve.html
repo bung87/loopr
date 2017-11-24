@@ -452,30 +452,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const currentAllowance = Number(this.balances[this.token].allowance);
 
                     const tx = {};
-                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
                     const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
-                    if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                        const detail = {
-                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                            category: "warning",
-                            duration: 8000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
+
 
                     if (currentAllowance === 0) {
                         tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
                             raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
                         };
+
                     } else {
                         tx.data = signer.generateApproveData(spender, '0x0');
                         const cancelRaw = JSON.stringify(tx);
@@ -488,6 +477,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         };
                     }
 
+                    if (ETHBalance < detail.raws.length *(Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                    
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {
                     var detail = {text: e.message, category: "error", duration: 8000}
