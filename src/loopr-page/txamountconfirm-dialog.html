@@ -38,7 +38,7 @@
                     token: Object,
                     title: String,
                     value: {
-                        type: Number,
+                        type: String,
                         computed: '_computeValue(tx,token)',
                     },
                     gasLimit: {
@@ -50,7 +50,7 @@
                         computed: '_computeGasPrice(tx)',
                     },
                     maxSend: {
-                        type: Number,
+                        type: String,
                         computed: '_computeMaxSend(token,gasLimit,gasPrice)',
                     },
 
@@ -59,7 +59,7 @@
 
             _computeValue(rawTx, token) {
                 if (rawTx && token) {
-                    return Number((Number(rawTx.value) / Number('1e' + token.digits)).toPrecision(token.precision));
+                    return (Number(rawTx.value) / Number('1e' + token.digits)).toFixed(token.precision);
                 }
             }
 
@@ -77,12 +77,15 @@
 
             _computeMaxSend(token, gasLimit, gasPrice) {
                 if (token && gasPrice && gasLimit) {
-                    return Number(((Number(token.balance) - gasLimit * gasPrice)/(Number('1e'+token.digits))).toPrecision(token.precision));
+
+
+
+                    return Math.floor((Number(token.balance) - gasLimit * gasPrice)/Number('1e'+token.digits) * Number('1e'+token.precision)) /Number('1e' + token.precision) ;
                 }
             }
 
             signToSend() {
-                this.tx.value = '0x' + (this.maxSend * Number('1e'+this.token.digits)).toString(16);
+                this.tx.value = '0x' + (Number(this.maxSend) * Number('1e'+this.token.digits)).toString(16);
                 var detail = {raws: [{"raw": JSON.stringify(this.tx), "subTitle": this.title}]};
                 this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 this.$.dialog.close();
