@@ -254,7 +254,6 @@
                     let currentVersion = this.$.settingsVersion.value;
                     const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
 
-
                     const target = e.target.order;
                     let data = {};
                     data.protocol = contractAddress;
@@ -273,9 +272,19 @@
                     data.r = target.r;
                     data.s = target.s;
 
+                    if(!data.tokenS || !data.tokenB){
+                        const detail = {text: 'Token contract address is missing, please contact to the administrators to make up for '+ target.tokenS.toUpperCase()+' and '+target.tokenB.toUpperCase()+' contract Address', category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+
+                        return;
+                    }
+
                     const order = new Order(data);
                     const amount = target.buyNoMoreThanAmountB ? target.amountB : target.amountS;
-
                     const cancelData = order.cancel(amount, this.wallet.privateKey);
 
                     const rawTx = {
@@ -285,7 +294,6 @@
                         value: '0x0',
                         data: cancelData
                     };
-
 
                     var detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Cancel Order"}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));

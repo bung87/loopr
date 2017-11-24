@@ -84,7 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet" tabindex="-1"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"
+                            tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
@@ -96,7 +97,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="line">
                                 <address-text-field id="sendTo" value="{{address}}"
                                                     label="Send To"
-                                                    error-message="invalid ETH address" tabindex="2"></address-text-field>
+                                                    error-message="invalid ETH address"
+                                                    tabindex="2"></address-text-field>
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="amount" value="{{amount}}" label="Amount to Send"
@@ -157,7 +159,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
     <script>
 
-        class PageTransfer extends AppConfigMixin(Polymer.Element)  {
+        class PageTransfer extends AppConfigMixin(Polymer.Element) {
             static get is() {
                 return 'page-transfer';
             }
@@ -202,7 +204,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computedToken(page, subpage) {
-                if(page && "transfer" === page && subpage) return subpage;
+                if (page && "transfer" === page && subpage) return subpage;
             }
 
             _computeGasLimit(appConfig) {
@@ -224,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _computeAmountShow(selectedTokenBalance) {
-                if(selectedTokenBalance) {
+                if (selectedTokenBalance) {
                     return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
                 }
             }
@@ -269,7 +271,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var combobox = this.$.tokensSelector;
                 var _this = this;
                 combobox.addEventListener('value-changed', function () {
-                    if(combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]){
+                    if (combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]) {
                         window.location.href = "#/transfer/" + combobox.value;
                     }
                 });
@@ -277,7 +279,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                 });
                 this.$.sendTo.focus();
-                document.addEventListener('keyup', function(event) {
+                document.addEventListener('keyup', function (event) {
                     if (event.keyCode == "13") {
                         this.$.send.click();
                     }
@@ -342,7 +344,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numError(num, precision) {
-                return "input number value with max " + precision + " precision"
+                return "Input number value with max " + precision + " precision"
             }
 
             _integerPatten() {
@@ -354,7 +356,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _integerError(int) {
-                return "input valid integer value"
+                return "Input valid integer value"
             }
 
             _addressPatten() {
@@ -362,31 +364,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _addressError(address) {
-                return "please input valid address"
+                return "Please input valid address"
             }
 
 
             async signToSend() {
-                if(!this.valid) {
-                    return;
+
+                try {
+                    if (!this.valid) {
+                        return;
+                    }
+                    const tx = {};
+                    tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                    tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
+                    if (this.selectedTokenBalance.token === 'ETH') {
+
+                        tx.to = this.address;
+                        tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
+                        tx.data = this.additionalData || '0x';
+                    } else {
+                        tx.to = this.selectedTokenBalance.address;
+                        tx.value = '0x0';
+                        tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
+
+                    }
+
+                    var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
+                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                } catch (e) {
+                    var detail = {text: e.message, category: "error", duration: 8000}
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
                 }
-                const tx = {};
-                tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
-                tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
-                if (this.selectedTokenBalance.token === 'ETH') {
-
-                    tx.to = this.address;
-                    tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
-                    tx.data = this.additionalData || '0x';
-                } else {
-                    tx.to = this.selectedTokenBalance.address;
-                    tx.value = '0x0';
-                    tx.data = signer.generateTransferData(this.address,'0x'+ (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
-
-                }
-
-                var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
-                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }
         }
 
