@@ -243,7 +243,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     } else if ("ETH" === subpage || "WETH" === subpage) {
                         return subpage;
                     } else {
-                        var detail = {text: "We only support ETH and WETH convert", category: "error", duration: 8000}
+                        var detail = {text: "We only support convert between ETH and WETH", category: "error", duration: 8000}
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
                             composed: true,
@@ -350,7 +350,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numError(num, precision) {
-                return "input number value with max " + precision + " precision"
+                return "Input number value with max " + precision + " precision"
             }
 
             _integerPatten() {
@@ -362,7 +362,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _integerError(int) {
-                return "input valid integer value"
+                return "Input valid integer value"
             }
 
             _walletChanged(wallet) {
