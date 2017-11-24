@@ -77,9 +77,6 @@
 
             _computeMaxSend(token, gasLimit, gasPrice) {
                 if (token && gasPrice && gasLimit) {
-
-
-
                     return Math.floor((Number(token.balance) - gasLimit * gasPrice)/Number('1e'+token.digits) * Number('1e'+token.precision)) /Number('1e' + token.precision) ;
                 }
             }
