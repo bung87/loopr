@@ -292,7 +292,7 @@
 
             }
 
-            sellButtonState(sellAmount, tokensBalance, tokensAllowance,sellPrice,sellTotal) {
+            sellButtonState(sellAmount, tokensBalance, tokensAllowance, sellPrice, sellTotal) {
 
                 if (sellAmount && Number(sellAmount) && tokensBalance && Number(tokensBalance) && tokensAllowance && Number(tokensAllowance)
                     && sellPrice && sellTotal && Number(sellAmount) <= tokensBalance && Number(sellAmount) <= tokensAllowance) {
@@ -382,7 +382,22 @@
                     data.timestamp = new Date().getTime();
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    data.lrcFee = this._showAmount(this.lrcFee);
+                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
+
+                    if(!LRC){
+                        const detail = {
+                            text: 'Can\'t get LRC Config',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                    data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
@@ -461,7 +476,24 @@
                     data.timestamp = new Date().getTime();
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    data.lrcFee = this._showAmount(this.lrcFee);
+
+                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
+
+                    if(!LRC){
+                        const detail = {
+                            text: 'Can\'t get LRC Config',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
+                    data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     const order = new Order(data);
