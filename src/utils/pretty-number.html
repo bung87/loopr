@@ -57,6 +57,9 @@
                 this.head = s.replace(/0+$/, "");
                 var zeros = s.length - this.head.length;
                 this.tail = "0".repeat(zeros);
+            } else {
+                this.head = "0.";
+                this.tail = "0".repeat(this.d);
             }
         }
     }
