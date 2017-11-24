@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="balance-text-field">
+    <script>
+        class BalanceTextField extends Vaadin.TextFieldElement {
+            static get is() {
+                return 'balance-text-field';
+            }
+
+            static get properties() {
+                return {
+                    max: Number,
+                    message: {
+                        type: String,
+                        computed: '_computedMessage(errorMessage)',
+                    }
+                }
+            }
+
+            _computedMessage(errorMessage) {
+                return errorMessage;
+            }
+
+
+            checkValidity() {
+                if (this.value.match(this.pattern)) {
+                    if (this.max && Number(this.value) > this.max) {
+                        this.errorMessage = ' You have insufficient Balance';
+                        return false;
+                    }
+                    return true;
+                } else {
+                    this.errorMessage = this.message;
+                    return false;
+                }
+            }
+        }
+
+        window.customElements.define(BalanceTextField.is, BalanceTextField);
+    </script>
+
+</dom-module>
