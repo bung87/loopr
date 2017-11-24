@@ -68,15 +68,10 @@
                         </div>
                     </div>
                     <div class="explain horizontal center layout">
-                        <template is="dom-if" if="[[!hasSet]]">
-                            All previously submitted orders with a timestamp smaller than this address's cutoff will be
-                            invalidated and never get filled. You can only increase the cutoff but can never decrease
-                            it. If you set its value to a timestamp in the far future, this address is basically
-                            disabled for trading. An address's default cutoff is 0.
-                        </template>
-                        <template is="dom-if" if="[[hasSet]]">
-                            The default cutoff is 0.
-                        </template>
+                        All previously submitted orders with a timestamp smaller than this address's cutoff will be
+                        invalidated and never get filled. You can only increase the cutoff but can never decrease
+                        it. If you set its value to a timestamp in the far future, this address is basically
+                        disabled for trading. An address's default cutoff is 0.
                     </div>
                 </div>
             </paper-card>
@@ -99,27 +94,13 @@
                     },
                     cutoff: {
                         type: Number,
-                        computed: '_computeCutoff(resp)',
-                        value: 0
-                    },
-                    hasSet: {
-                        type: Boolean,
-                        value: true,
-                        computed: '_computedShowCutoff(cutoff)'
+                        computed: '_computeCutoff(resp)'
                     }
                 };
             }
 
             ready() {
                 super.ready();
-            }
-
-            _computedShowCutoff(cutoff) {
-                if (cutoff && cutoff > 0) {
-                    return false;
-                } else {
-                    return true;
-                }
             }
 
             _computedUrl(wallet, settingsVersion) {
@@ -129,11 +110,11 @@
             }
 
             _computeCutoff(resp) {
+                this.$.cutoff.datetime = "1970-01-01T00:00:00.000Z"; //set default datetime or it will not display correctly
                 if (resp && resp.result.data) {
                     return Number(resp.result.data) * 1000;
                 } else {
-                    this.$.cutoff.datetime = "1970-01-01T00:00:00Z"; // datetime
-                    return 0;
+                    return Number(1);
                 }
             }
 
