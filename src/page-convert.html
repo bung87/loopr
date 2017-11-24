@@ -360,7 +360,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 try {
                     const tx = {};
                     let subTitle;
-                    tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     const WETHConfig = this.appConfig.tokenMap['WETH'];
                     tx.to = WETHConfig.address;
@@ -370,11 +370,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         subTitle = 'Convert ETH to  WETH';
                         if (this.fromTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {
-                                text: 'You has insufficient ETH balance for value + gasLimit* gasPrice',
-                                category: "warning",
-                                duration: 8000
+                                tx: tx,
+                                token: {
+                                    balance: this.fromTokenBalance.balance,
+                                    digits: this.fromTokenBalance.digits,
+                                    precision: this.fromTokenBalance.precision,
+                                },
+                                title: subTitle,
                             };
-                            this.dispatchEvent(new CustomEvent('notification', {
+                            this.dispatchEvent(new CustomEvent('txamountconfirm', {
                                 bubbles: true,
                                 composed: true,
                                 detail: detail

@@ -1,0 +1,101 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="txamountconfirm-dialog">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 550px;
+            }
+        </style>
+        <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
+                      entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
+            <h2>Confirm Tx Amount </h2>
+            <div class="vertical layout">
+                Your have insufficient balance to transfer [[value]] ETH with tx fee of (gasPrice * gasLimit =
+                [[gasPrice]] * [[gasLimit]] wei), you can send [[maxSend]] ETH at most.
+            </div>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button on-click="signToSend">OK</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+    <script type="text/javascript">
+
+        class TxAmountConfirmDialog extends Polymer.Element {
+            static get is() {
+                return 'txamountconfirm-dialog';
+            }
+
+            static get properties() {
+                return {
+                    tx: Object,
+                    token: Object,
+                    title: String,
+                    value: {
+                        type: Number,
+                        computed: '_computeValue(tx,token)',
+                    },
+                    gasLimit: {
+                        type: Number,
+                        computed: '_computeGasLimit(tx)',
+                    },
+                    gasPrice: {
+                        type: Number,
+                        computed: '_computeGasPrice(tx)',
+                    },
+                    maxSend: {
+                        type: Number,
+                        computed: '_computeMaxSend(token,gasLimit,gasPrice)',
+                    },
+
+                };
+            }
+
+            _computeValue(rawTx, token) {
+                if (rawTx && token) {
+                    return Number((Number(rawTx.value) / Number('1e' + token.digits)).toPrecision(token.precision));
+                }
+            }
+
+            _computeGasLimit(rawTx) {
+                if (rawTx) {
+                    return Number(rawTx.gasLimit);
+                }
+            }
+
+            _computeGasPrice(rawTx) {
+                if (rawTx) {
+                    return Number(rawTx.gasPrice);
+                }
+            }
+
+            _computeMaxSend(token, gasLimit, gasPrice) {
+                if (token && gasPrice && gasLimit) {
+                    return Number(((Number(token.balance) - gasLimit * gasPrice)/(Number('1e'+token.digits))).toPrecision(token.precision));
+                }
+            }
+
+            signToSend() {
+                this.tx.value = '0x' + (this.maxSend * Number('1e'+this.token.digits)).toString(16);
+                var detail = {raws: [{"raw": JSON.stringify(this.tx), "subTitle": this.title}]};
+                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                this.$.dialog.close();
+            }
+
+            show(detail) {
+                this.tx = detail.tx;
+                this.title = detail.title;
+                this.token = detail.token;
+                this.$.dialog.toggle();
+            }
+        }
+
+        window.customElements.define(TxAmountConfirmDialog.is, TxAmountConfirmDialog);
+    </script>
+</dom-module>
