@@ -99,7 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="line">
                                 <address-text-field id="sendTo" value="{{address}}"
                                                     label="Send To"
-                                                    error-message="invalid ETH address"
+                                                    error-message="Invalid ETH address"
                                                     tabindex="2"></address-text-field>
                             </div>
                             <div class="line">
@@ -124,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <div class="line">
                                     <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
                                                        pattern="^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$"
-                                                       error-message="invalid extra data"
+                                                       error-message="Invalid extra data"
                                                        tabindex="6">
                                     </vaadin-text-field>
                                 </div>
@@ -173,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     subpage: String,
                     token: {
                         type: String,
-                        computed: '_computedToken(page, subpage)'
+                        computed: '_computedToken(page, subpage, appConfig)'
                     },
                     amount: {
                         type: Number
@@ -206,8 +206,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computedToken(page, subpage) {
-                if (page && "transfer" === page && subpage) return subpage;
+            _computedToken(page, subpage, appConfig) {
+                if (page && "transfer" === page && subpage && appConfig) {
+                    if(appConfig.tokenMap[subpage]){
+                        return subpage;
+                    } else {
+                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
+                    }
+                }
             }
 
             _computeGasLimit(appConfig) {
@@ -247,7 +259,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 let balance = 0, allowance = 0
                 if (selected) {
                     balance = selected.balance;
-                    allowance = selected.allowance
+                    allowance = selected.allowance;
                 }
                 let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
                 if (!tokenConfig) {
