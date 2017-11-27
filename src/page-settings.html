@@ -144,6 +144,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        Current LRC Fee : [[settingsLrcFee]]
+                    </div>
+
+                    <div>
+                        Current MarginSplit : [[settingsMarginSplit]]
+                    </div>
                 </paper-card>
 
                 <div class="footer-spacer"></div>
@@ -237,6 +245,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.lrcFee.addEventListener('value-changed', function(e) {
                 if(this._isLrcFee(this.$.lrcFee.value)){
                     this.$.settingsLrcFee.value = this.$.lrcFee.value;
+                    this.settingsLrcFee = this.$.settingsLrcFee.value;
                 }
                 console.log("lrcFee change to:"+this.$.settingsLrcFee.value)
             }.bind(this));
@@ -248,11 +257,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
 
             this.$.marginSplit.addEventListener('value-changed', function() {
-                if(this._isMarginSplitFee(this.$.marginSplit.value)){
-                    this.$.settingsMarginSplit.value = this.$.marginSplit.value;
+                if(_this._isMarginSplitFee(_this.$.marginSplit.value)){
+                    _this.$.settingsMarginSplit.value = _this.$.marginSplit.value;
+                    _this.settingsMarginSplit = _this.$.settingsMarginSplit.value;
+                    console.log("_this.settingsMarginSplit: "+ _this.settingsMarginSplit);
+                    console.log("_this.$.settingsMarginSplit.value:"+ _this.$.settingsMarginSplit.value);
                 }
-                console.log("marginSplit change to:"+this.$.settingsMarginSplit.value);
-            }.bind(this));
+            });
         }
 
         setCustomRelay(){

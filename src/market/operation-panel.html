@@ -79,15 +79,15 @@
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
-        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-        <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
-        <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
-        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-        <scary-cookie name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-        <scary-cookie name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
-        <scary-cookie name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
+
+        <global-variable key="lrcFee" value="{{settingsLrcFee}}"></global-variable>
+        <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="gasPrice" value="{{settingsGasPrice}}"></global-variable>
+        <global-variable key="version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="marginSplit" value="{{settingsMarginSplit}}"></global-variable>
+
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
             <paper-tab name="sell">Sell</paper-tab>
@@ -373,7 +373,8 @@
                     }
 
                     let data = {};
-                    data.protocol = this.appConfig.contractAddress;
+                    let currentVersion = this.settingsVersion;
+                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
@@ -400,10 +401,12 @@
                     data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
+
+                    console.log(JSON.stringify(data));
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
 
-                    const relay = new Relay('http://127.0.0.1:8545');
+                    const relay = new Relay(this.settingsRelay);
                     await relay.submitLoopringOrder(signed);
 
                     const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
@@ -452,22 +455,24 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
-                        const detail = {
-                            text: 'Your address is not in white list, could not submit order',
-                            category: "warning",
-                            duration: 5000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
+//                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+//                        const detail = {
+//                            text: 'Your address is not in white list, could not submit order',
+//                            category: "warning",
+//                            duration: 5000
+//                        };
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                        return;
+//                    }
 
                     let data = {};
-                    data.protocol = this.appConfig.contractAddress;
+
+                    let currentVersion = this.settingsVersion;
+                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
@@ -496,9 +501,11 @@
                     data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
+
+                    console.log(JSON.stringify(data));
                     const order = new Order(data);
                     const signed = order.sign(this.wallet.privateKey);
-                    const relay = new Relay(settingsRelay);
+                    const relay = new Relay(this.settingsRelay);
                     await relay.submitLoopringOrder(signed);
                     const detail = {text: 'Submit order successfully', category: "info", duration: 5000};
                     this.dispatchEvent(new CustomEvent('notification', {
