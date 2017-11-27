@@ -29,7 +29,7 @@
                 appConfig: Object,
                 selectedTab: {
                     type: String,
-                    notify: true,
+                    notify: true
                 },
                 sources: {
                     type: Object
@@ -40,7 +40,7 @@
                 tabs: {
                     type: Object,
                     notify: true,
-                    computed: '_computeTabs(sources, searched)'
+                    computed: '_computeTabs(sources, searched, selectedTab)'
                 }
             };
         }
@@ -49,7 +49,7 @@
             super.ready();
         }
 
-        _computeTabs(sources, searched) {
+        _computeTabs(sources, searched, selectedTab) {
             if(sources && !searched){
                 let markets = _.map(sources, o => o.market);
                 let tabs = new Array();
@@ -60,7 +60,9 @@
                     }
                 });
                 if(tabs.length >1){
-                    this.selectedTab = tabs[0];
+                    if(!selectedTab) {
+                        this.selectedTab = tabs[0];
+                    }
                     return tabs;
                 }
             }
