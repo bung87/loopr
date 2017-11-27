@@ -66,10 +66,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 margin-top: 30px;
             }
 
-            .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field {
+            .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field, balance-text-field {
                 width: 100%;
                 height: 34px;
             }
+
+            \
 
             paper-button {
                 margin-left: 0px;
@@ -101,13 +103,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                                     tabindex="2"></address-text-field>
                             </div>
                             <div class="line">
-                                <vaadin-text-field id="amount" value="{{amount}}" label="Amount to Send"
-                                                   placeholder="[[amountShow]]"
-                                                   pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                   error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
-                                                   tabindex="3">
+                                <balance-text-field id="amount" value="{{amount}}" label="Amount to Send"
+                                                    placeholder="[[amountShow]]"
+                                                    pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                    error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
+                                                    tabindex="3"
+                                                    max="[[amountShow]]">
                                     <div slot="suffix">[[selectedTokenBalance.unit]]</div>
-                                </vaadin-text-field>
+                                </balance-text-field>
                             </div>
                             <div class="line">
                                 <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
@@ -198,7 +201,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_showOrHidden(address, amount, gasLimit, additionalData)'
+                        computed: '_showOrHidden(address, amount, gasLimit, additionalData,amountShow)'
                     }
                 }
             }
@@ -308,9 +311,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showOrHidden(address, amount, gasLimit, additionalData) {
+            _showOrHidden(address, amount, gasLimit, additionalData, amountShow) {
                 let validator = new Validator();
-                if (!address || !amount || !gasLimit) {
+                if (!address || !amount || !gasLimit || !amountShow || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
@@ -386,21 +389,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     if (!this.valid) {
                         return;
                     }
+
                     const tx = {};
-                    tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     if (this.selectedTokenBalance.token === 'ETH') {
 
                         tx.to = this.address;
                         tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
                         tx.data = this.additionalData || '0x';
+                        if (this.selectedTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
+
+                            const detail = {
+                                tx: tx,
+                                token: {
+                                    balance: this.selectedTokenBalance.balance,
+                                    digits: this.selectedTokenBalance.digits,
+                                    precision: this.selectedTokenBalance.precision
+                                },
+                                title: "transfer ETH"
+                            };
+
+                            this.dispatchEvent(new CustomEvent('txamountconfirm', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            return;
+                        }
+
                     } else {
                         tx.to = this.selectedTokenBalance.address;
                         tx.value = '0x0';
                         tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
+                        const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
+                        if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                            var detail = {
+                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                                category: "warning",
+                                duration: 8000
+                            }
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            return;
+                        }
                     }
-
                     var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {

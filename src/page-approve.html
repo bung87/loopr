@@ -78,7 +78,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 12px;
             }
 
-            .line vaadin-combo-box, vaadin-text-field, paper-button {
+            .line vaadin-combo-box, vaadin-text-field, paper-button, balance-text-field {
                 width: 100%;
                 height: 34px;
             }
@@ -123,13 +123,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <div class="amount">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
-                                                       label="Amount"
-                                                       pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                       error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
-                                                       tabindex="2">
+                                    <balance-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
+                                                        label="Amount"
+                                                        pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                        error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
+                                                        tabindex="2"
+                                                        max="[[amountShow]]">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
-                                    </vaadin-text-field>
+                                    </balance-text-field>
                                     <div class$="horizontal layout start-justified warn [[showAmountWarn]]">
                                         <iron-icon class$="warningIcon [[showAmountWarn]]" icon="warning"></iron-icon>
                                         [[amountWarnMessage]]
@@ -225,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_showOrHidden(amount, gasLimit, additionalData)'
+                        computed: '_showOrHidden(amount, gasLimit, additionalData,amountShow)'
                     },
                     gasLimit: {
                         type: Number,
@@ -384,9 +385,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showOrHidden(amount, gasLimit, additionalData) {
+            _showOrHidden(amount, gasLimit, additionalData, amountShow) {
                 let validator = new Validator();
-                if (!amount || !gasLimit) {
+                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
@@ -444,8 +445,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             async _signToSend() {
-
-
                 try {
                     if (!this.valid) {
                         return;
@@ -467,15 +466,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const currentAllowance = Number(this.balances[this.token].allowance);
 
                     const tx = {};
-                    tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+
+
                     if (currentAllowance === 0) {
                         tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
                             raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
                         };
+
                     } else {
                         tx.data = signer.generateApproveData(spender, '0x0');
                         const cancelRaw = JSON.stringify(tx);
@@ -488,6 +491,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         };
                     }
 
+                    if (ETHBalance < detail.raws.length *(Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                    
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {
                     var detail = {text: e.message, category: "error", duration: 8000}

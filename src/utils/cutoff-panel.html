@@ -56,6 +56,7 @@
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <div class="sections top">
             <paper-card transparent>Cutoff</paper-card>
             <paper-card>
@@ -95,12 +96,23 @@
                     cutoff: {
                         type: Number,
                         computed: '_computeCutoff(resp)'
-                    }
+                    },
+                    balances: {
+                        type: Object,
+                        computed: '_computedBalance(balancesRaw)'
+                    },
                 };
             }
 
             ready() {
                 super.ready();
+            }
+
+
+            _computedBalance(data) {
+                if (data) {
+                    return _.keyBy(data.result.tokens, o => o.token);
+                }
             }
 
             _computedUrl(wallet, settingsVersion) {
@@ -126,11 +138,26 @@
                     const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
                     const rawTx = {
                         to: contractAddress,
-                        gasPrice: '0x' + Number(this.settingsGasPrice).toString(16),
+                        gasPrice: '0x' + (Number(this.settingsGasPrice)*1e9).toString(16),
                         gasLimit: '0x14820',
                         value: '0x0',
                         data
                     };
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                    if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
                     const detail = {
                         raws: [{
                             "raw": JSON.stringify(rawTx),
