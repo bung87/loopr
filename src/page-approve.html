@@ -50,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 12px;
                 line-height: 1.25;
                 color: hsla(214, 27%, 26%, 0.71);
-                margin-top: 1.3em;
+                margin-top: 2.4em;
                 transition: 0.4s max-height;
                 max-height: 5em;
             }
@@ -202,7 +202,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     subpage: String,
                     token: {
                         type: String,
-                        computed: '_computedToken(page, subpage)'
+                        computed: '_computedToken(page, subpage, appConfig)'
                     },
                     selectedTokenBalance: {
                         type: Object,
@@ -243,8 +243,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 };
             }
 
-            _computedToken(page, subpage) {
-                if (page && "approve" === page && subpage) return subpage;
+            _computedToken(page, subpage, appConfig) {
+                if (page && "approve" === page && subpage && appConfig) {
+                    if(appConfig.tokenMap[subpage]){
+                        return subpage;
+                    } else {
+                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
+                    }
+                }
             }
 
             _computeGasLimit(appConfig) {
@@ -272,7 +284,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showAmountWarn(selectedTokenBalance) {
                 this.showAmountWarn = "showWarn";
-                return "we suggest you to set above " + selectedTokenBalance.defaultAllowance;
+                return "We suggest you to set above " + selectedTokenBalance.defaultAllowance;
             }
 
             _hiddenAmountWarn() {
@@ -282,7 +294,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computeTokens(appConfig) {
                 if (appConfig) {
-                    return appConfig.tokens;
+                    return appConfig.tokens.filter(function(item){
+                        return item.token != "ETH";
+                    });
                 }
             }
 
@@ -414,7 +428,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numError(num, precision) {
-                return "input number value with max " + precision + " precision"
+                return "Input number value with max " + precision + " precision"
             }
 
             _integerPatten() {
@@ -426,7 +440,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _integerError(int) {
-                return "input valid integer value"
+                return "Input valid integer value"
             }
 
             async _signToSend() {

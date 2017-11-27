@@ -175,12 +175,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     fromToken: {
                         type: String,
                         value: 'ETH',
-                        computed: '_computeFromToken(page, subpage)'
+                        computed: '_computeFromToken(page, subpage, appConfig)'
+                    },
+                    fromImg: {
+                        type: String,
+                        computed: '_tokenIcon(fromToken)'
                     },
                     toToken: {
                         type: String,
                         value: 'WETH',
                         computed: '_computeSwap(fromToken)'
+                    },
+                    toImg: {
+                        type: String,
+                        computed: '_tokenIcon(toToken)'
                     },
                     amount: {
                         type: Number
@@ -228,12 +236,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.amount.focus();
             }
 
-            _computeFromToken(page, subpage) {
-                if (page && "convert" === page) {
+            _computeFromToken(page, subpage, appConfig) {
+                if (page && "convert" === page && appConfig) {
                     if (!subpage) {
                         return "ETH";
                     } else if ("ETH" === subpage || "WETH" === subpage) {
                         return subpage;
+                    } else {
+                        var detail = {text: "We only support convert between ETH and WETH", category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
                     }
                 }
             }
@@ -334,7 +350,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numError(num, precision) {
-                return "input number value with max " + precision + " precision"
+                return "Input number value with max " + precision + " precision"
             }
 
             _integerPatten() {
@@ -346,7 +362,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _integerError(int) {
-                return "input valid integer value"
+                return "Input valid integer value"
             }
 
             _walletChanged(wallet) {
