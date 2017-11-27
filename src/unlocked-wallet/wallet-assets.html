@@ -175,7 +175,10 @@
                 const items = _.map(resp.result.tokens, function(i) {
                     var item = i;
                     const tokenConfig = this.appConfig.tokenMap[i.token];
-                    if (!tokenConfig) { return null; }
+                    if (!tokenConfig) {
+                        console.error('Data error, no token:'+i.token+" config");
+                        return null;
+                    }
 
                     item.name = tokenConfig.name
                     item.balanceValue = this.toNumber(i.balance, tokenConfig);

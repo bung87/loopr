@@ -17,6 +17,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/datetime-picker/overlay-datetime-picker.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -75,8 +76,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/time-str.html">
 <link rel="import" href="utils/global-variable.html">
 <link rel="import" href="utils/notification-panel.html">
-<link rel="import" href="utils/market-selector.html">
+<link rel="import" href="utils/cutoff-panel.html">
+<link rel="import" href="utils/market-search.html">
+<link rel="import" href="utils/market-tab.html">
 <link rel="import" href="utils/address-text-field.html">
+<link rel="import" href="utils/balance-text-field.html">
 <link rel="import" href="utils/relayname-text-field.html">
 <link rel="import" href="utils/loopr-ajax.html">
 <link rel="import" href="loopr-page/looper-toolbar.html">
@@ -86,6 +90,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/ethereum-signer.html">
 <link rel="import" href="loopr-page/signtosend-dialog.html">
 <link rel="import" href="loopr-page/customrelay-dialog.html">
+<link rel="import" href="loopr-page/txamountconfirm-dialog.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
@@ -229,6 +234,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <customrelay-dialog id="customrelay"></customrelay-dialog>
+        <txamountconfirm-dialog id="txamountconfirm"></txamountconfirm-dialog>
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
@@ -306,7 +312,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     const keystore = require('keystore');
     const privateKeyWallet = require('wallet');
     const Validator = require('validator');
-    const ethUtil = require('ethereumjs-util');
+    const signer = require('signer');
     const Relay = require('relay');
     const Order = require('order');
 
@@ -428,6 +434,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('customrelayadded', e => this.$.settings._newCustomRelay(e.detail));
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
+            this.addEventListener('txamountconfirm', e => this.$.txamountconfirm.show(e.detail));
 
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
@@ -534,7 +541,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.computeMarketId = function(tokenx, tokeny) {
                     return tokenx + "-" + tokeny;
                 }
-
                 appConfig.tokenMap = _.keyBy(appConfigRaw.tokens, o => o.token);
                 appConfig.lrc = appConfig.tokenMap["LRC"];
                 appConfig.tokenAddressMap = _.keyBy(appConfigRaw.tokens, o => o.address);

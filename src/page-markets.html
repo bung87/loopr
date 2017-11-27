@@ -31,8 +31,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
             <div class="sections">
+                <paper-card transparent>
+                    <div class="horizontal start layout">
+                        <market-tab sources="{{tickers}}" searched="{{searched}}" selected-tab="{{selectedTab}}"></market-tab>
+                        <div class="flex"></div>
+                        <market-search sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" selected-tab="{{selectedTab}}"></market-search>
+                    </div>
+                </paper-card>
                 <paper-card>
-                    <vaadin-grid aria-label="Markets" items="[[tickers]]">
+                    <vaadin-grid aria-label="Markets" items="[[searchResult]]">
                         <vaadin-grid-column>
                             <template class="header">Market</template>
                             <template><a href="#/market/[[item.market]]">[[item.market]]</a></template>
@@ -91,6 +98,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 tickers: {
                     type: Object,
                     computed: '_process(resp.result)'
+                },
+                selectedTab: {
+                    type: String
                 }
             };
         }

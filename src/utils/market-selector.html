@@ -4,9 +4,12 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style include="shared-styles">
-         :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
+            vaadin-combo-box {
+                padding-right: 5px;
+            }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal center layout">
@@ -37,9 +40,23 @@
                 }
             };
         }
+
+        ready(){
+            super.ready();
+            this.$.market.addEventListener('value-changed', function(e) {
+                let selected = e.detail.value;
+                if (selected && this.appConfig.marketMap[selected]) {
+                    window.location.href = "#/market/"+selected;
+                } else {
+                    var detail = { text: "not supported market:"+selected, category: "error", duration: 8000 }
+                    this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+                }
+            }.bind(this));
+        }
+
         _computeItems(marketIds) {
             return _.map(marketIds, function(id) {
-                return { "value": id, "label": Id };
+                return { "value": id, "label": id };
             })
         }
     }

@@ -40,13 +40,15 @@ const AppConfigMixin = (superclass) => class extends superclass {
     };
 
     _numberFormat(value, digits, precision){
-        if(value && digits && precision){
+        if(digits && precision){
             if(value >0){
                 let v = value / Math.pow(10, digits);
                 return v.toFixed(precision);
             } else {
                 return "0."+"0".repeat(precision);
             }
+        } else {
+            return 0;
         }
     }
 

@@ -1,0 +1,183 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="cutoff-panel">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style include="shared-styles">
+            :host {
+            }
+
+            .top {
+                padding-top: 0px;
+            }
+
+            overlay-datetime-picker {
+                width: 260px;
+                height: 44px;
+            }
+
+            .button {
+                margin-left: 10px;
+                height: 44px;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .show {
+                display: block;
+            }
+
+            .explain {
+                margin-top: 10px;
+                color: var(--app-primary-color);
+            }
+
+            overlay-datetime-picker {
+                --datetime-selected-background: var(--paper-amber-700);
+                --datetime-input: {
+                    height: 40px;
+                    border-radius: 0px;
+                    padding: 0em;
+                    border: none;
+                    outline: none;
+                    text-align: center;
+                    color: inherit;
+                    cursor: pointer;
+                    background-color: var(--google-grey-100);
+                    box-sizing: content-box;
+                    transition: background-color 150ms cubic-bezier(0.6, 1, 0.2, 1);
+                }
+            }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
+
+        <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <div class="sections top">
+            <paper-card transparent>Cutoff</paper-card>
+            <paper-card>
+                <div class="vertical center layout">
+                    <div class="horizontal center layout">
+                        <overlay-datetime-picker id="cutoff" native
+                                                 value="{{cutoff}}"></overlay-datetime-picker>
+                        <div class="button">
+                            <paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button>
+                        </div>
+                    </div>
+                    <div class="explain horizontal center layout">
+                        All previously submitted orders with a timestamp smaller than this address's cutoff will be
+                        invalidated and never get filled. You can only increase the cutoff but can never decrease
+                        it. If you set its value to a timestamp in the far future, this address is basically
+                        disabled for trading. An address's default cutoff is 0.
+                    </div>
+                </div>
+            </paper-card>
+            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="[[url]]" last-response="{{resp}}"
+                        loading="{{loading}}"></loopr-ajax>
+        </div>
+    </template>
+    <script>
+        class CutoffPanel extends Polymer.Element {
+            static get is() {
+                return 'cutoff-panel';
+            }
+
+            static get properties() {
+                return {
+                    url: {
+                        type: String,
+                        computed: '_computedUrl(wallet, settingsVersion)'
+                    },
+                    cutoff: {
+                        type: Number,
+                        computed: '_computeCutoff(resp)'
+                    },
+                    balances: {
+                        type: Object,
+                        computed: '_computedBalance(balancesRaw)'
+                    },
+                };
+            }
+
+            ready() {
+                super.ready();
+            }
+
+
+            _computedBalance(data) {
+                if (data) {
+                    return _.keyBy(data.result.tokens, o => o.token);
+                }
+            }
+
+            _computedUrl(wallet, settingsVersion) {
+                if (wallet && settingsVersion) {
+                    return "Loopring/mock-relay-data/master/getCutoff.json?address=" + wallet.address + "&version=" + settingsVersion;
+                }
+            }
+
+            _computeCutoff(resp) {
+                this.$.cutoff.datetime = "1970-01-01T00:00:00.000Z"; //set default datetime or it will not display correctly
+                if (resp && resp.result.data) {
+                    return Number(resp.result.data) * 1000;
+                } else {
+                    return Number(1);
+                }
+            }
+
+            commitCutoff() {
+                try {
+                    let cutoffNode = this.$.cutoff;
+                    let currentVersion = this.settingsVersion;
+                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
+                    const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
+                    const rawTx = {
+                        to: contractAddress,
+                        gasPrice: '0x' + (Number(this.settingsGasPrice)*1e9).toString(16),
+                        gasLimit: '0x14820',
+                        value: '0x0',
+                        data
+                    };
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                    if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
+                    const detail = {
+                        raws: [{
+                            "raw": JSON.stringify(rawTx),
+                            "subTitle": "Set Expiration Cutoff Timestamp"
+                        }]
+                    };
+                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                    this.hasSet = false;
+                } catch (e) {
+                    var detail = {text: e.message, category: "error", duration: 8000}
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                }
+            }
+
+        }
+
+        window.customElements.define(CutoffPanel.is, CutoffPanel);
+    </script>
+</dom-module>

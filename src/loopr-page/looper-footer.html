@@ -5,57 +5,59 @@
         <style include="shared-styles">
          :host {
             display: block;
-            background: var(--app-text-color-light);
+            background: var(--paper-grey-300);
             width: 100%;
             font-size: 12px;
         }
 
         .social a {
             padding: 0 8px 0 8px;
-            color: rgba(255, 255, 255, 0.54);
+            color: var(--app-text-color);
         }
 
         .social a:hover {
-            color: var(--app-primary-color);
+            color: var(--app-primary-color-dark);
         }
 
         .social {
-            background: var(--app-text-color);
+            /*background: var(--app-primary-color);*/
             width: 100%;
-            height: 80px;
+            height: 100px;
         }
 
         .menus {
             min-height: 100px;
             min-width: 1024px;
             padding: 48px 0 48px 0;
-            /*border-top: 1px dashed rgba(0, 0, 0, .1);*/
+            border-top: 1px solid rgba(0, 0, 0, .1);
         }
 
         .menus>div {
-            padding-left: 8px;
+            /*padding-left: 8px;*/
         }
 
         .menus a {
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.78);
+            color: var(--app-text-color);
+            display: inline-block;
+            height:24px;
         }
 
         .menus a:hover {
-            color: white;
+            color: var(--app-primary-color-dark);
         }
 
         .copyright {
-            color: rgba(255, 255, 255, 0.78);
+            color: var(--app-text-color);
             padding-bottom: 0;
             font-size: 12px;
             height: 28px;
         }
 
         .title {
-            font-weight: 500;
+            font-weight: 700;
             text-transform: uppercase;
-            color: white;
+            color: var(--app-text-color);
             padding-bottom: 16px;
         }
         </style>
@@ -94,6 +96,7 @@
                     <div><a target="_blank" href="https://github.com/Loopring/whitepaper/raw/master/en_whitepaper.pdf">Whitepaper</a></div>
                     <div><a href="/#/doc/smart-contracts">Ethereum Smart Contracts</a></div>
                     <div><a target="_blank" href="https://github.com/Loopring">Github Repositories</a></div>
+                    <div><a target="_blank" href="https://github.com/Loopring/Loopring-Audit">Protocol Audit Report</a></div>
                 </div>
                 <div class="vertical start layout">
                     <div class="title">Wallet & DEX</div>

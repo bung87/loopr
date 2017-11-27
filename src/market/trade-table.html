@@ -20,6 +20,13 @@
             color: var(--app-green-color);
         }
 
+        vaadin-grid {
+            --vaadin-grid-cell: {
+                padding: 1px;
+                background: transparent;
+            };
+        }
+
         vaadin-grid-column {
             min-width: 10px;
         }
@@ -61,7 +68,7 @@
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
@@ -323,9 +330,15 @@
                 item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
                 item.feeLrc = Number(item.feeLrc);
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
+                if(marginSplitToken){
+                    item.marginSplitUnit = marginSplitToken.unit;
+                    item.marginSplitPrecision = marginSplitToken.precision;
+                } else {
+                    console.error("Data error, no token:"+item.marginSplitToken+" config")
+                    item.marginSplitUnit = item.marginSplitToken.toUpperCase();
+                    item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
+                }
                 item.marginSplit = Number(item.marginSplit);
-                item.marginSplitUnit = marginSplitToken.unit;
-                item.marginSplitPrecision = marginSplitToken.precision;
                 return item;
             }
         }

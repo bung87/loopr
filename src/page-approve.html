@@ -50,7 +50,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 12px;
                 line-height: 1.25;
                 color: hsla(214, 27%, 26%, 0.71);
-                margin-top: 1.3em;
+                margin-top: 2.4em;
                 transition: 0.4s max-height;
                 max-height: 5em;
             }
@@ -74,11 +74,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 height: 30px;
                 margin-top: 20px;
                 font-weight: 500;
-                color:rgba(0, 0, 0, .54);
+                color: rgba(0, 0, 0, .54);
                 font-size: 12px;
             }
 
-            .line vaadin-combo-box, vaadin-text-field, paper-button {
+            .line vaadin-combo-box, vaadin-text-field, paper-button, balance-text-field {
                 width: 100%;
                 height: 34px;
             }
@@ -106,12 +106,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-            <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
-            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet" tabindex="-1"></simple-toolbar>
+            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+
+            <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"
+                            tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
@@ -122,12 +123,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="line">
                                 <div class="amount">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
-                                                       label="Amount" pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                       error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
-                                                       tabindex="2">
+                                    <balance-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
+                                                        label="Amount"
+                                                        pattern="[[_numPatten(selectedTokenBalance.precision)]]"
+                                                        error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
+                                                        tabindex="2"
+                                                        max="[[amountShow]]">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
-                                    </vaadin-text-field>
+                                    </balance-text-field>
                                     <div class$="horizontal layout start-justified warn [[showAmountWarn]]">
                                         <iron-icon class$="warningIcon [[showAmountWarn]]" icon="warning"></iron-icon>
                                         [[amountWarnMessage]]
@@ -200,7 +203,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     subpage: String,
                     token: {
                         type: String,
-                        computed: '_computedToken(page, subpage)'
+                        computed: '_computedToken(page, subpage, appConfig)'
                     },
                     selectedTokenBalance: {
                         type: Object,
@@ -223,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_showOrHidden(amount, gasLimit, additionalData)'
+                        computed: '_showOrHidden(amount, gasLimit, additionalData,amountShow)'
                     },
                     gasLimit: {
                         type: Number,
@@ -241,8 +244,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 };
             }
 
-            _computedToken(page, subpage) {
-                if(page && "approve" === page && subpage) return subpage;
+            _computedToken(page, subpage, appConfig) {
+                if (page && "approve" === page && subpage && appConfig) {
+                    if(appConfig.tokenMap[subpage]){
+                        return subpage;
+                    } else {
+                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
+                    }
+                }
             }
 
             _computeGasLimit(appConfig) {
@@ -270,7 +285,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showAmountWarn(selectedTokenBalance) {
                 this.showAmountWarn = "showWarn";
-                return "we suggest you to set above " + selectedTokenBalance.defaultAllowance;
+                return "We suggest you to set above " + selectedTokenBalance.defaultAllowance;
             }
 
             _hiddenAmountWarn() {
@@ -280,12 +295,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computeTokens(appConfig) {
                 if (appConfig) {
-                    return appConfig.tokens;
+                    return appConfig.tokens.filter(function(item){
+                        return item.token != "ETH";
+                    });
                 }
             }
 
             _computeAmountShow(selectedTokenBalance) {
-                if(selectedTokenBalance) {
+                if (selectedTokenBalance) {
                     return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
                 }
             }
@@ -298,7 +315,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _selectedToken(appConfig, balances, token) {
                 if (appConfig && balances && token) {
-                    let currentVersion = this.$.settingsVersion.value;
+                    let currentVersion = this.settingsVersion;
                     this.authorizeToAddress = appConfig.contractVersionMap[currentVersion].address;
                     var combobox = this.$.tokensSelector;
                     combobox.value = token.toUpperCase();
@@ -311,7 +328,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var combobox = this.$.tokensSelector;
                 var _this = this;
                 combobox.addEventListener('value-changed', function () {
-                    if(combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]){
+                    if (combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]) {
                         window.location.href = "#/approve/" + combobox.value;
                     }
                 });
@@ -319,7 +336,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     _this.gasLimit = _this.$.gasLimit.value;
                 });
                 this.$.amount.focus();
-                document.addEventListener('keyup', function(event) {
+                document.addEventListener('keyup', function (event) {
                     if (event.keyCode == "13") {
                         this.$.send.click();
                     }
@@ -368,9 +385,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showOrHidden(amount, gasLimit, additionalData) {
+            _showOrHidden(amount, gasLimit, additionalData, amountShow) {
                 let validator = new Validator();
-                if (!amount || !gasLimit) {
+                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
@@ -412,7 +429,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numError(num, precision) {
-                return "input number value with max " + precision + " precision"
+                return "Input number value with max " + precision + " precision"
             }
 
             _integerPatten() {
@@ -424,63 +441,79 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _integerError(int) {
-                return "input valid integer value"
+                return "Input valid integer value"
             }
 
             async _signToSend() {
-                if(!this.valid) {
-                    return;
-                }
-                let detail = {};
-                if (!this.amount || !this.selectedTokenBalance) {
-                    detail = {text: "input value and select token", category: "warning", duration: 8000}
+                try {
+                    if (!this.valid) {
+                        return;
+                    }
+                    let detail = {};
+                    if (!this.amount || !this.selectedTokenBalance) {
+                        detail = {text: "input value and select token", category: "warning", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
+                    let currentVersion = this.settingsVersion;
+                    const spender = this.appConfig.contractVersionMap[currentVersion].address;
+
+                    const currentAllowance = Number(this.balances[this.token].allowance);
+
+                    const tx = {};
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
+                    tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
+                    tx.to = this.selectedTokenBalance.address;
+                    tx.value = '0x0';
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+
+
+                    if (currentAllowance === 0) {
+                        tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
+                        detail = {
+                            raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+                        };
+
+                    } else {
+                        tx.data = signer.generateApproveData(spender, '0x0');
+                        const cancelRaw = JSON.stringify(tx);
+                        tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
+                        detail = {
+                            raws: [{
+                                "raw": cancelRaw,
+                                "subTitle": "Cancel Older Authorization"
+                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+                        };
+                    }
+
+                    if (ETHBalance < detail.raws.length *(Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        const detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                    
+                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
+                } catch (e) {
+                    var detail = {text: e.message, category: "error", duration: 8000}
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
                         detail: detail
                     }));
-                    return;
                 }
-
-                let currentVersion = this.$.settingsVersion.value;
-                const spender = this.appConfig.contractVersionMap[currentVersion].address;
-
-                const currentAllowance = Number(this.balances[this.token].allowance);
-                
-                const tx = {};
-                tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
-                tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
-                tx.to = this.selectedTokenBalance.address;
-                tx.value = '0x0';
-                const method = '0x' + ethUtil.sha3('approve(address,uint)').toString('hex').slice(0, 8);
-                if (currentAllowance === 0 ) {
-                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-                    tx.data = method + params;
-
-                    detail = {
-                        raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                    };
-
-                } else {
-
-                    tx.data = method + ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(0), 32).toString('hex');
-
-                    const cancelRaw = JSON.stringify(tx);
-
-                    const params = ethUtil.setLengthLeft(ethUtil.toBuffer(spender), 32).toString('hex') +
-                        ethUtil.setLengthLeft(ethUtil.toBuffer(Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)), 32).toString('hex');
-                    tx.data = method + params;
-                    detail = {
-                        raws: [{
-                            "raw": cancelRaw,
-                            "subTitle": "Cancel Older Authorization"
-                        }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                    };
-                }
-
-                this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
             }
         }
 

@@ -57,7 +57,8 @@
     "hot-ajax-paging": "mercmobily/hot-ajax-paging#^0.2.5",
     "bignumber.js": "^4.1.0",
     "loopring.js": "git://github.com/Loopring/loopring.js.git",
-    "highcharts": "^6.0.2"
+    "highcharts": "^6.0.2",
+    "datetime-picker": "fooloomanzoo/datetime-picker#^2.5.0"
   },
   "resolutions": {
     "polymer": "^2.0.0",
