@@ -80,6 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/market-search.html">
 <link rel="import" href="utils/market-tab.html">
 <link rel="import" href="utils/address-text-field.html">
+<link rel="import" href="utils/balance-text-field.html">
 <link rel="import" href="utils/relayname-text-field.html">
 <link rel="import" href="utils/loopr-ajax.html">
 <link rel="import" href="loopr-page/looper-toolbar.html">
@@ -89,6 +90,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/ethereum-signer.html">
 <link rel="import" href="loopr-page/signtosend-dialog.html">
 <link rel="import" href="loopr-page/customrelay-dialog.html">
+<link rel="import" href="loopr-page/txamountconfirm-dialog.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
@@ -111,8 +113,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      :host {
             --app-primary-color: var(--paper-blue-500);
             --app-primary-color-dark: var(--paper-blue-700);
-            --app-primary-color-light: var(--paper-blue-300);
-            --app-primary-color-super-light: var(--paper-blue-50);
             --app-secondary-color: black;
             --paper-spinner-color: var(--app-primary-color);
             --paper-spinner-stroke-width: 1px;
@@ -234,6 +234,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <signtosend-dialog id="signtosend"></signtosend-dialog>
         <notification-panel id="notification"></notification-panel>
         <customrelay-dialog id="customrelay"></customrelay-dialog>
+        <txamountconfirm-dialog id="txamountconfirm"></txamountconfirm-dialog>
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
@@ -433,6 +434,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('customrelayadded', e => this.$.settings._newCustomRelay(e.detail));
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
+            this.addEventListener('txamountconfirm', e => this.$.txamountconfirm.show(e.detail));
 
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";

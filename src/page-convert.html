@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 @apply(--layout-start-justified);
             }
 
-            .inputLine vaadin-text-field {
+            .inputLine vaadin-text-field, balance-text-field {
                 width: 100%;
                 height: 34px;
             }
@@ -94,9 +94,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+
+        <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="gasPrice" value="{{settingsGasPrice}}"></global-variable>
+
         <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"></simple-toolbar>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ether ERC20 Conversion" back-link="#/wallet"
@@ -126,13 +127,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div class="line">
                             <div class="inputContainer">
                                 <div class="inputLine">
-                                    <vaadin-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
-                                                       pattern="[[_numPatten(fromTokenBalance.precision)]]"
-                                                       label="Amount To Convert"
-                                                       error-message="[[_numError(amount, fromTokenBalance.precision)]]"
-                                                       tabindex="1">
+                                    <balance-text-field id="amount" value="{{amount}}" placeholder="[[amountShow]]"
+                                                        pattern="[[_numPatten(fromTokenBalance.precision)]]"
+                                                        label="Amount To Convert"
+                                                        error-message="[[_numError(amount, fromTokenBalance.precision)]]"
+                                                        tabindex="1"
+                                                        max="[[amountShow]]">
                                         <div slot="suffix">[[fromToken]]</div>
-                                    </vaadin-text-field>
+                                    </balance-text-field>
                                 </div>
                                 <div class="inputLine">
                                     <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
@@ -207,7 +209,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_formValid(amount, gasLimit)'
+                        computed: '_formValid(amount, gasLimit,amountShow)'
                     }
                 };
             }
@@ -301,8 +303,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _formValid(amount, gasLimit) {
-                if (!amount || !gasLimit) {
+            _formValid(amount, gasLimit, amountShow) {
+                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
@@ -375,7 +377,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 try {
                     const tx = {};
                     let subTitle;
-                    tx.gasPrice = '0x' + Number(this.settingsGasPrice).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     const WETHConfig = this.appConfig.tokenMap['WETH'];
                     tx.to = WETHConfig.address;
@@ -383,10 +385,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
                         tx.data = '0x';
                         subTitle = 'Convert ETH to  WETH';
+                        if (this.fromTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                            const detail = {
+                                tx: tx,
+                                token: {
+                                    balance: this.fromTokenBalance.balance,
+                                    digits: this.fromTokenBalance.digits,
+                                    precision: this.fromTokenBalance.precision,
+                                },
+                                title: subTitle,
+                            };
+                            this.dispatchEvent(new CustomEvent('txamountconfirm', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            return;
+                        }
                     } else {
                         tx.value = '0x0';
                         tx.data = signer.generateWithdrawData('0x' + (Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)).toString(16));
                         subTitle = 'Convert WETH to  ETH';
+                        const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                        if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                            const detail = {
+                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                                category: "warning",
+                                duration: 8000
+                            };
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            return;
+                        }
                     }
                     const detail = {raws: [{raw: JSON.stringify(tx), subTitle}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));

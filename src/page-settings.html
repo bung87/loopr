@@ -90,6 +90,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
             <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
+
+
+            <global-variable key="currency" value="{{settingsCurrency}}"></global-variable>
+            <global-variable key="lrcFee" value="{{settingsLrcFee}}"></global-variable>
+            <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+            <global-variable key="relayConfig" value="{{settingsRelayConfig}}"></global-variable>
+            <global-variable key="gasPrice" value="{{settingsGasPrice}}"></global-variable>
+            <global-variable key="version" value="{{settingsVersion}}"></global-variable>
+            <global-variable key="marginSplit" value="{{settingsMarginSplit}}"></global-variable>
+            <global-variable key="lang" value="{{settingsLang}}"></global-variable>
+
             <loopr-toolbar slot="secondary-toolbar" active-tab="settings"></loopr-toolbar>
             <div class="sections">
                 <paper-card>
@@ -139,6 +150,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div>
+                        Current LRC Fee : [[settingsLrcFee]]
+                    </div>
+
+                    <div>
+                        Current MarginSplit : [[settingsMarginSplit]]
                     </div>
                 </paper-card>
 
@@ -237,6 +256,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.$.lrcFee.addEventListener('value-changed', function(e) {
                 if(this._isLrcFee(this.$.lrcFee.value)){
                     this.$.settingsLrcFee.value = this.$.lrcFee.value;
+                    this.settingsLrcFee = this.$.settingsLrcFee.value;
                 }
                 console.log("lrcFee change to:"+this.$.settingsLrcFee.value)
             }.bind(this));
@@ -248,11 +268,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
 
             this.$.marginSplit.addEventListener('value-changed', function() {
-                if(this._isMarginSplitFee(this.$.marginSplit.value)){
-                    this.$.settingsMarginSplit.value = this.$.marginSplit.value;
+                if(_this._isMarginSplitFee(_this.$.marginSplit.value)){
+                    _this.$.settingsMarginSplit.value = _this.$.marginSplit.value;
+                    _this.settingsMarginSplit = _this.$.settingsMarginSplit.value;
+                    console.log("_this.settingsMarginSplit: "+ _this.settingsMarginSplit);
+                    console.log("_this.$.settingsMarginSplit.value:"+ _this.$.settingsMarginSplit.value);
                 }
-                console.log("marginSplit change to:"+this.$.settingsMarginSplit.value);
-            }.bind(this));
+            });
         }
 
         setCustomRelay(){
