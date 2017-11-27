@@ -106,11 +106,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-            <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+
+            <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+            <global-variable key="gasPrice" value="{{settingsGasPrice}}"></global-variable>
+            <global-variable key="version" value="{{settingsVersion}}"></global-variable>
+
             <simple-toolbar slot="secondary-toolbar" title="ERC20 Authorize" back-link="#/wallet"
                             tabindex="-1"></simple-toolbar>
             <div class="sections">
@@ -315,7 +315,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _selectedToken(appConfig, balances, token) {
                 if (appConfig && balances && token) {
-                    let currentVersion = this.$.settingsVersion.value;
+                    let currentVersion = this.settingsVersion;
                     this.authorizeToAddress = appConfig.contractVersionMap[currentVersion].address;
                     var combobox = this.$.tokensSelector;
                     combobox.value = token.toUpperCase();
@@ -460,7 +460,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         return;
                     }
 
-                    let currentVersion = this.$.settingsVersion.value;
+                    let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.contractVersionMap[currentVersion].address;
 
                     const currentAllowance = Number(this.balances[this.token].allowance);

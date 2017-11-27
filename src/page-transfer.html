@@ -71,8 +71,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 height: 34px;
             }
 
-            \
-
             paper-button {
                 margin-left: 0px;
                 margin-right: 0px;
@@ -82,10 +80,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-            <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
+            <global-variable key="gasPrice" value="{{gasPrice}}"></global-variable>
+            <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+
             <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"
                             tabindex="-1"></simple-toolbar>
             <div class="sections">
@@ -391,7 +388,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
 
                     const tx = {};
-                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
+
+                    console.log(this.gasPrice);
+                    tx.gasPrice = '0x' + (Number(this.gasPrice)*1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     if (this.selectedTokenBalance.token === 'ETH') {
 
@@ -438,6 +437,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             return;
                         }
                     }
+
+
+                    console.log(JSON.stringify(tx));
                     var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {

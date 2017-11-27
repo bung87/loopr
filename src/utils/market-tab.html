@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<script src="../../bower_components/moment/moment.js"></script>
+<dom-module id="market-tab">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+            vaadin-combo-box {
+                padding-right: 5px;
+            }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+            <template is="dom-repeat" items="[[tabs]]">
+                <paper-tab name="[[item]]">[[item]]</paper-tab>
+            </template>
+        </paper-tabs>
+    </template>
+    <script>
+    class MarketTab extends Polymer.Element {
+        static get is() {
+            return 'market-tab';
+        }
+
+        static get properties() {
+            return {
+                appConfig: Object,
+                selectedTab: {
+                    type: String,
+                    notify: true
+                },
+                sources: {
+                    type: Object
+                },
+                searched: {
+                    type: Boolean
+                },
+                tabs: {
+                    type: Object,
+                    notify: true,
+                    computed: '_computeTabs(sources, searched, selectedTab)'
+                }
+            };
+        }
+
+        ready(){
+            super.ready();
+        }
+
+        _computeTabs(sources, searched, selectedTab) {
+            if(sources && !searched){
+                let markets = _.map(sources, o => o.market);
+                let tabs = new Array();
+                _.forEach(markets, function(market) {
+                    let tab = market.split("-")[1];
+                    if(tabs.indexOf(tab) === -1){
+                        tabs.push(tab);
+                    }
+                });
+                if(tabs.length >1){
+                    if(!selectedTab) {
+                        this.selectedTab = tabs[0];
+                    }
+                    return tabs;
+                }
+            }
+        }
+    }
+
+    customElements.define(MarketTab.is, MarketTab);
+    </script>
+</dom-module>

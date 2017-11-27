@@ -46,7 +46,8 @@
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
-        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <template is="dom-repeat" items="[[detail.raws]]">

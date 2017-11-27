@@ -60,13 +60,14 @@
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-        <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-        <scary-cookie name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
-        <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
+
+        <global-variable key="gasPrice" value="{{settingsGasPrice}}"></global-variable>
+        <global-variable key="version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="relay" value="{{settingsRelay}}"></global-variable>
+
+
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -260,7 +261,7 @@
 
              _cancel(e) {
                 try {
-                    let currentVersion = this.$.settingsVersion.value;
+                    let currentVersion = this.settingsVersion;
                     const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
 
                     const target = e.target.order;
