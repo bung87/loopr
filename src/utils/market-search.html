@@ -1,0 +1,86 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<script src="../../bower_components/moment/moment.js"></script>
+<dom-module id="market-search">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+            vaadin-combo-box {
+                padding-right: 5px;
+            }
+            .label {
+                height: 44px;
+            }
+        </style>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <div class="horizontal end layout">
+            <div class="label horizontal center layout"><iron-icon icon="icons:search"></iron-icon></div>
+            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Market"></vaadin-text-field>
+        </div>
+    </template>
+    <script>
+    class MarketSearch extends Polymer.Element {
+        static get is() {
+            return 'market-search';
+        }
+
+        static get properties() {
+            return {
+                appConfig: Object,
+                keyword: String,
+                sources: {
+                    type: Object
+                },
+                selectedTab: {
+                    type: String,
+                    observer: '_tabChange'
+                },
+                results: {
+                    type: Object,
+                    notify: true,
+                    computed: '_computeResult(sources, keyword, selectedTab)'
+                },
+                searched: {
+                    type: Boolean,
+                    notify: true,
+                    computed: '_computeSearched(keyword)'
+                }
+            };
+        }
+
+        ready(){
+            super.ready();
+        }
+
+        _tabChange(){
+            this.keyword = '';
+        }
+
+        _computeResult(sources, keyword, selectedTab) {
+            if(sources){
+                if(keyword){ //priority higher than tab
+                    return sources.filter(function(item){
+                        return item.market.indexOf(keyword.toUpperCase()) > -1;
+                    });
+                } else {
+                    if(selectedTab) {
+                        return sources.filter(function(item){
+                            return item.market.indexOf("-"+selectedTab.toUpperCase()) > -1;
+                        });
+                    } else {
+                        return sources;
+                    }
+                }
+            }
+        }
+
+        _computeSearched(keyword) {
+            return keyword;
+        }
+    }
+
+    customElements.define(MarketSearch.is, MarketSearch);
+    </script>
+</dom-module>

@@ -75,6 +75,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+            <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
+            <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
+            <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
+            <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
+            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+            <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
             <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
             <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
@@ -149,6 +156,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         static get properties() {
             return {
                 cookieValue: Object,
+                settingsCalculate: {
+                    type: Object,
+                    computed: '_computeCookie(appConfig, cookieValues)'
+                },
                 settingsLrcFee: {
                     type: Number,
                     computed: '_computedLrcFee(appConfig, cookieValues)'
@@ -246,6 +257,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         setCustomRelay(){
             this.dispatchEvent(new CustomEvent('customrelay', { bubbles: true, composed: true }));
+        }
+
+        _computeCookie(appConfig, cookieValues){
+            if (appConfig && cookieValues) {
+                let value = null;
+                if (cookieValues["settingsLrcFee"]) {
+                    value = cookieValues["settingsLrcFee"];
+                } else {
+                    value = appConfig.defaultLrcFeePermillage;
+                }
+                return value;
+            }
         }
 
         _computedLrcFee(appConfig, cookieValues) {
