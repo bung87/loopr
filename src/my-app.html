@@ -92,6 +92,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="loopr-page/signtosend-dialog.html">
 <link rel="import" href="loopr-page/customrelay-dialog.html">
 <link rel="import" href="loopr-page/txamountconfirm-dialog.html">
+<link rel="import" href="loopr-page/order-dialog.html">
 <link rel="lazy-import" href="page-markets.html">
 <link rel="lazy-import" href="page-market.html">
 <link rel="lazy-import" href="page-ring.html">
@@ -236,6 +237,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <notification-panel id="notification"></notification-panel>
         <customrelay-dialog id="customrelay"></customrelay-dialog>
         <txamountconfirm-dialog id="txamountconfirm"></txamountconfirm-dialog>
+        <order-dialog id="orderdialog"></order-dialog>
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
@@ -436,6 +438,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('reset-wallet', e => this._resetWallet());
             this.addEventListener('nout-found', e => this._showPage404(e.detail));
             this.addEventListener('txamountconfirm', e => this.$.txamountconfirm.show(e.detail));
+            this.addEventListener('placeorder', e => this.$.orderdialog.show(e.detail));
 
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
