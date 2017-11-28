@@ -472,7 +472,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.value = '0x0';
                     const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
-
                     if (currentAllowance === 0) {
                         tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
