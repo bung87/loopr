@@ -420,7 +420,7 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokenb.allowanceWarn) * Number('1e' + this.tokenb.digits);
+                    const defaultValue = Number(this.tokenb.allowance) * Number('1e' + this.tokenb.digits);
                     console.log(allowance);
                     console.log(Number(data.amountS));
 
@@ -562,7 +562,7 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokens.token.toUpperCase()] ? Number(balances[this.tokens.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokens.allowanceWarn) * Number('1e' + this.tokens.digits);
+                    const defaultValue = Number(this.tokens.allowance) * Number('1e' + this.tokens.digits);
                     if (Number(data.amountS) > allowance) {
 
                         let amount;
