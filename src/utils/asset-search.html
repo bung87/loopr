@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <script src="../../bower_components/moment/moment.js"></script>
-<dom-module id="market-search">
+<dom-module id="asset-search">
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style include="shared-styles">
@@ -17,13 +17,13 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal end layout">
             <div class="label horizontal center layout"><iron-icon icon="icons:search"></iron-icon></div>
-            <vaadin-text-field id="search" value="{{keyword}}" placeholder="{{placeholder}}"></vaadin-text-field>
+            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Token"></vaadin-text-field>
         </div>
     </template>
     <script>
-    class MarketSearch extends Polymer.Element {
+    class AssetSearch extends Polymer.Element {
         static get is() {
-            return 'market-search';
+            return 'asset-search';
         }
 
         static get properties() {
@@ -38,14 +38,14 @@
                     notify: true,
                     computed: '_computeResult(sources, keyword, selectedTab)'
                 },
+                placeholder: {
+                    type: String,
+                    value: ''
+                },
                 searched: {
                     type: Boolean,
                     notify: true,
                     computed: '_computeSearched(keyword)'
-                },
-                placeholder: {
-                    type: String,
-                    value: ''
                 }
             };
         }
@@ -54,15 +54,11 @@
             super.ready();
         }
 
-        _tabChange(value){
-            this.keyword = '';
-        }
-
         _computeResult(sources, keyword) {
             if(sources){
                 if(keyword){
                     return sources.filter(function(item){
-                        return item.market.indexOf(keyword.toUpperCase()) > -1;
+                        return ((item.token.indexOf(keyword.toUpperCase()) > -1) || (item.name.toUpperCase().indexOf(keyword.toUpperCase()) > -1));
                     });
                 } else {
                     return sources;
@@ -75,6 +71,6 @@
         }
     }
 
-    customElements.define(MarketSearch.is, MarketSearch);
+    customElements.define(AssetSearch.is, AssetSearch);
     </script>
 </dom-module>
