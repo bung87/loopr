@@ -51,6 +51,18 @@
             color: var(--app-text-color-light);
             padding-left: 4px;
         }
+
+        .search {
+            width: 150px;
+        }
+
+        .split {
+            width: 2%;
+        }
+
+        .hidebalance {
+            height: 44px;
+        }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -106,9 +118,21 @@
                     </vaadin-grid-column>
                 </vaadin-grid>
             </paper-card>
-            <paper-card transparent>ERC20 Tokens</paper-card>
+            <paper-card transparent>
+                ERC20 Tokens
+            </paper-card>
+            <paper-card transparent>
+                <div class="horizontal start layout">
+                    <div class="search"><asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search></div>
+                    <div class="split"></div>
+                    <div class="hidebalance horizontal center layout">
+                        <a href="javascript:void(0)" on-click="_hideOrShowTips">{{hideOrShowTips}}</a>
+                    </div>
+                    <div class="flex"></div>
+                </div>
+            </paper-card>
             <paper-card tablewrapper>
-                <vaadin-grid aria-label="Tokens" items="[[erc20Tokens]]">
+                <vaadin-grid aria-label="Tokens" items="[[result]]">
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
@@ -165,8 +189,55 @@
                 erc20Tokens: {
                     type: Array,
                     computed: '_computeBalances(balancesRaw)'
+                },
+                hideBalance: {
+                    type: Boolean,
+                    value: false
+                },
+                hideOrShowTips: {
+                    type: String,
+                    computed: '_computeTips(hideBalance, searched)',
+                    value: 'Hide 0 Balances'
+                },
+                result: {
+                    type: Object
                 }
             };
+        }
+
+        _hideOrShowTips(){
+            if(this.hideBalance) {
+                this.hideBalance = false;
+                this.result = this._computeZeroBalance(this.erc20Tokens, false);
+            } else {
+                this.hideBalance = true;
+                this.result = this._computeZeroBalance(this.erc20Tokens, true);
+            }
+        }
+
+        _computeTips(hideBalance, searched) {
+            if(searched) {
+                this.hideBalance = false;
+                return 'Hide 0 Balances';
+            } else {
+                if(hideBalance) {
+                    return 'Show 0 Balances';
+                } else {
+                    return 'Hide 0 Balances';
+                }
+            }
+        }
+
+        _computeZeroBalance(erc20Tokens, hideBalance) {
+            if(erc20Tokens){
+                if(hideBalance){
+                    return erc20Tokens.filter(function(item){
+                        return Number(item.balanceValue) > 0;
+                    });
+                } else {
+                    return erc20Tokens;
+                }
+            }
         }
 
         _computeBalances(resp) {
