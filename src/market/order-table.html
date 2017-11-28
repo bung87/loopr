@@ -7,6 +7,12 @@
                 display: block;
             }
 
+            vaadin-grid {
+                --vaadin-grid-cell: {
+                    background-color: transparent;
+                };
+            }
+
             paper-progress {
                 width: 100%;
                 --paper-progress-active-color: var(--app-primary-color);
@@ -77,12 +83,14 @@
                         </a>
                     </div>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="20px">
                 <template class="header">Type</template>
                 <template>
                     <span class$="[[item.typeClass]]">[[item.typeTitle]]</span>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
@@ -90,12 +98,14 @@
                     <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]]
                                    postfix="[[item.tokenS]]"></pretty-number>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Price</template>
                 <template>
                     <pretty-number v="[[item.price]]" d=[[item.pricePrecision]]></pretty-number>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
@@ -103,6 +113,7 @@
                     <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]]
                                    postfix="[[item.tokenB]]"></pretty-number>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Status</template>
@@ -120,6 +131,7 @@
                         </paper-tooltip>
                     </div>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -130,6 +142,7 @@
                         <time-str seconds="[[item.orginalOrder.timestamp]]"></time-str>
                     </div>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
             <vaadin-grid-column hidden$="[[hiddenCancel]]" width="50px">
                 <template class="header">
@@ -140,9 +153,10 @@
                         <a href="javascript:void(0)" order="[[item.orginalOrder]]" on-click="_cancel">Cancel</a>
                     </div>
                 </template>
+                <template class="footer"></template>
             </vaadin-grid-column>
-            <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         </vaadin-grid>
+        <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         <div class$="[[showSeeMore]] horizontal end-justified layout">
             <div class="seeMoreLink"><a id="showMore" href="javascript:void(0)" on-click="_showMore">See More...</a></div>
         </div>
