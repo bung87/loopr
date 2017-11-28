@@ -27,10 +27,7 @@
         static get properties() {
             return {
                 appConfig: Object,
-                selectedTab: {
-                    type: String,
-                    notify: true
-                },
+                selectedTab: String,
                 sources: {
                     type: Object
                 },
@@ -41,6 +38,11 @@
                     type: Object,
                     notify: true,
                     computed: '_computeTabs(sources, searched, selectedTab)'
+                },
+                results: {
+                    type: Object,
+                    notify: true,
+                    computed: '_computeResult(sources, selectedTab)'
                 }
             };
         }
@@ -64,6 +66,18 @@
                         this.selectedTab = tabs[0];
                     }
                     return tabs;
+                }
+            }
+        }
+
+        _computeResult(sources, selectedTab) {
+            if(sources){
+                if(selectedTab) {
+                    return sources.filter(function(item){
+                        return item.market.indexOf("-"+selectedTab.toUpperCase()) > -1;
+                    });
+                } else {
+                    return sources;
                 }
             }
         }
