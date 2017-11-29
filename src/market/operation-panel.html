@@ -426,7 +426,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
+                    data.lrcFee = '0x'+ (this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     detail.order = {
@@ -565,7 +565,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this._showAmount(this.lrcFee) * Number('1e' + LRC.digits);
+                    data.lrcFee = '0x'+ this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = this.settingsMarginSplit;
                     detail.order = {
