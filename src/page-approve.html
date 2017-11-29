@@ -35,6 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             .line {
                 height: 80px;
+                width: 350px;
                 @apply(--layout-horizontal);
                 @apply(--layout-start-justified);
             }
@@ -226,7 +227,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_showOrHidden(amount, gasLimit, additionalData,amountShow)'
+                        computed: '_showOrHidden(amount, gasLimit, additionalData, amountShow, selectedTokenBalance)'
                     },
                     gasLimit: {
                         type: Number
@@ -238,7 +239,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     amountWarnMessage: {
                         type: String,
                         value: "",
-                        computed: '_showAmountWarnMessage(amount, selectedTokenBalance)'
+                        computed: '_showAmountWarnMessage(amount, selectedTokenBalance, amountShow)'
                     }
                 };
             }
@@ -271,9 +272,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showAmountWarnMessage(amount, selectedTokenBalance) {
-                if (selectedTokenBalance) {
-                    if (this._isNum(amount)) {
+            _showAmountWarnMessage(amount, selectedTokenBalance, amountShow) {
+                if (selectedTokenBalance && amountShow) {
+                    if (this._isNum(amount, selectedTokenBalance.precision) && amount <= Number(amountShow)) {
                         let num = Number(amount);
                         if (selectedTokenBalance.defaultAllowance > num) {
                             return this._showAmountWarn(selectedTokenBalance)
@@ -390,25 +391,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showOrHidden(amount, gasLimit, additionalData, amountShow) {
+            _showOrHidden(amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
                 let validator = new Validator();
-                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
+                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
                     this._buttonDisable();
                     return false;
                 }
-                if (this._isNum(amount) && this._isNum(gasLimit)) {
-                    if (additionalData) {
-                        if (this._isNum(additionalData)) {
-                            this._buttonAvailable();
-                            return true;
-                        } else {
-                            this._buttonDisable();
-                            return false;
-                        }
-                    } else {
-                        this._buttonAvailable();
-                        return true;
-                    }
+                if (this._isNum(amount, selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
+                    this._buttonAvailable();
+                    return true;
                 } else {
                     this._buttonDisable();
                     return false;
@@ -426,7 +417,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numPatten(precision) {
-                return "^[0-9]+(.[0-9]{1," + precision + "})?$";
+                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1,"+(precision-1)+"})?[1-9]$";
             }
 
             _isNum(num, precision) {
