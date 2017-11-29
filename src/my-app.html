@@ -326,37 +326,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                cookieValues: {
-                    type: Object
-                },
-                settingsLang: {
-                    type: String,
-                    computed: '_computedLang(appConfig, cookieValues)'
-                },
-                settingsCurrency: {
-                    type: String,
-                    computed: '_computedCurrency(appConfig, cookieValues)'
-                },
-                settingsRelay: {
-                    type: String,
-                    computed: '_computedRelay(appConfig, cookieValues)'
-                },
-                settingsLrcFee: {
-                    type: Number,
-                    computed: '_computedLrcFee(appConfig, cookieValues)'
-                },
-                settingsGasPrice: {
-                    type: Number,
-                    computed: '_computedGasPrice(appConfig, cookieValues)'
-                },
-                settingsVersion: {
-                    type: Number,
-                    computed: '_computedVersion(appConfig, cookieValues)'
-                },
-                settingsMarginSplit: {
-                    type: Number,
-                    computed: '_computedMarginSplit(appConfig, cookieValues)'
-                },
+                cookieValues: Object,
+                settingsLang: String,
+                settingsCurrency: String,
+                settingsRelay: String,
+                settingsLrcFee: Number,
+                settingsGasPrice: Number,
+                settingsVersion: Number,
+                settingsMarginSplit: Number,
                 page: {
                     type: String,
                     reflectToAttribute: true,
@@ -445,64 +422,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         }
 
-        _computeBalances(data) {
-            if (data) {
-                return _.keyBy(data.result.tokens, o => o.token);
-            }
-        }
-
-        _computedLang(appConfig, cookieValues) {
+        _initSetting(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
                 if (cookieValues["settingsLang"]) {
-                    return cookieValues["settingsLang"];
+                    this.settingsLang = cookieValues["settingsLang"];
                 } else {
-                    return appConfig.langs[0].value;
+                    this.settingsLang = appConfig.langs[0].value;
                 }
-            }
-        }
-
-        _computedCurrency(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
                 if (cookieValues["settingsCurrency"]) {
-                    return cookieValues["settingsCurrency"];
+                    this.settingsCurrency = cookieValues["settingsCurrency"];
                 } else {
-                    return appConfig.fiat[0].value;
+                    this.settingsCurrency = appConfig.fiat[0].value;
                 }
-            }
-        }
-
-        _computedRelay(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
                 if (cookieValues["settingsRelay"]) {
-                    return cookieValues["settingsRelay"];
+                    this.settingsRelay = cookieValues["settingsRelay"];
                 } else {
-                    return appConfig.relays[0].value;
+                    this.settingsRelay = appConfig.relays[0].value;
                 }
-            }
-        }
-
-        _computedLrcFee(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
                 if (cookieValues["settingsLrcFee"]) {
-                    return cookieValues["settingsLrcFee"];
+                    this.settingsLrcFee = cookieValues["settingsLrcFee"];
                 } else {
-                    return appConfig.defaultLrcFeePermillage;
+                    this.settingsLrcFee = appConfig.defaultLrcFeePermillage;
                 }
-            }
-        }
-
-        _computedGasPrice(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
                 if (cookieValues["settingsGasPrice"]) {
-                    return cookieValues["settingsGasPrice"]
+                    this.settingsGasPrice = cookieValues["settingsGasPrice"]
                 } else {
-                    return appConfig.defaultGasPrice;
+                    this.settingsGasPrice = appConfig.defaultGasPrice;
                 }
-            }
-        }
-
-        _computedVersion(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
                 let latestVersion = appConfig.contracts[appConfig.contracts.length - 1].version;
                 if (cookieValues["settingsVersion"]) {
                     let currentVersion = cookieValues["settingsVersion"];
@@ -522,20 +468,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             this.warnedVersion = latestVersion;
                         }
                     }
-                    return currentVersion;
+                    this.settingsVersion = currentVersion;
                 } else {
-                    return latestVersion;
+                    this.settingsVersion = latestVersion;
+                }
+                if (cookieValues["settingsMarginSplit"]) {
+                    this.settingsMarginSplit = cookieValues["settingsMarginSplit"];
+                } else {
+                    this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
                 }
             }
         }
 
-        _computedMarginSplit(appConfig, cookieValues) {
-            if (appConfig && cookieValues) {
-                if (cookieValues["settingsMarginSplit"]) {
-                    return cookieValues["settingsMarginSplit"];
-                } else {
-                    return appConfig.defaultMarginSplitPercentage;
-                }
+        _computeBalances(data) {
+            if (data) {
+                return _.keyBy(data.result.tokens, o => o.token);
             }
         }
 
@@ -595,7 +542,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return [
                 '_routePageChanged(routeData.page)',
                 '_routeIdChanged(subrouteData.pageId)',
-                'isUnlocked(wallet)'
+                'isUnlocked(wallet)',
+                '_initSetting(appConfig, cookieValues)'
             ];
         }
 
