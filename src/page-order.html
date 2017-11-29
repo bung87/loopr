@@ -71,8 +71,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <loopr-footer></loopr-footer>
             </div>
         </loopr-page>
-        <!--<iron-ajax auto url="[[settingsRelay]]/Loopring/mock-relay-data/master/order.json" handle-as="json" last-response="{{resp}}" debounce-duration="300">
-        </iron-ajax>-->
         <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/order.json" last-response="{{resp}}"></loopr-ajax>
     </template>
     <script>
@@ -109,9 +107,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 let data = resp.result.data;
                 let tokenS = this.getTokenByName(data.orginalOrder.tokenS);
                 let tokenB = this.getTokenByName(data.orginalOrder.tokenB);
+                if (!tokenS || !tokenB) {
+                    return;
+                }
+                let amountS = this.toNumber(data.orginalOrder.amountS, tokenS);
+                let amountB = this.toNumber(data.orginalOrder.amountB, tokenB);
+                let dealedS = this.toNumber(data.totalDealedAmountS, tokenS);
+                let dealedB = this.toNumber(data.totalDealedAmountB, tokenB);
                 let result = {
-                    tokenS: tokenS.unit, amountS: Number(data.orginalOrder.amountS), precisionS: tokenS.precision, totalDealedAmountS: Number(data.totalDealedAmountS),
-                    tokenB: tokenB.unit, amountB: Number(data.orginalOrder.amountB), precisionB: tokenB.precision, totalDealedAmountB: Number(data.totalDealedAmountB),
+                    tokenS: tokenS.unit, amountS: amountS, precisionS: tokenS.precision, totalDealedAmountS: dealedS,
+                    tokenB: tokenB.unit, amountB: amountB, precisionB: tokenB.precision, totalDealedAmountB: dealedB,
                     status: data.status
                 };
                 return result;

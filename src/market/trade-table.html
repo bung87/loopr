@@ -166,7 +166,6 @@
         <div class$="[[showPage]] horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
         <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}"
                             loading="{{loading}}"></loopr-ajax>
     </template>
@@ -317,8 +316,13 @@
                     item.buyOrSell = item.tokenS + "⇢" + item.tokenB;
                     this._computePrecision(item, appConfig)
                 }
-                item.fillAmountS = Number(item.fillAmountS);
-                item.fillAmountB = Number(item.fillAmountB);
+                let tokenS = this.getTokenByName(item.tokenS);
+                let tokenB = this.getTokenByName(item.tokenB);
+                if (!tokenS || !tokenB) {
+                    return;
+                }
+                item.fillAmountS = this.toNumber(item.fillAmountS, tokenS);
+                item.fillAmountB = this.toNumber(item.fillAmountB, tokenB);
                 item.fee = Number(item.fee);
                 item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
                 item.feeLrc = Number(item.feeLrc);
