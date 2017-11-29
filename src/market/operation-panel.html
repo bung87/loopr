@@ -406,8 +406,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x' + Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountS = Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
+                    data.amountB = Number(this.buyAmount) * Number('1e' + this.tokens.digits);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
@@ -438,9 +438,6 @@
                     const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
                     const defaultValue = Number(this.tokenb.allowance) * Number('1e' + this.tokenb.digits);
-                    console.log(allowance);
-                    console.log(Number(data.amountS));
-
                     if (Number(data.amountS) > allowance) {
 
                         let amount;
@@ -553,8 +550,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
-                    data.amountB = '0x' + ((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountS = Number(this.sellAmount) * Number('1e' + this.tokens.digits);
+                    data.amountB = Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
