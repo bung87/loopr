@@ -102,7 +102,8 @@
                     </vaadin-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
-                                       error-message="[[sellPriceError]]">
+                                       pattern="[[_numPatten(marketPrecision)]]"
+                                       error-message="number with max [[marketPrecision]] precision">
                         <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
@@ -160,7 +161,8 @@
                     </vaadin-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
-                                       error-message="[[buyPriceError]]">
+                                       pattern="[[_numPatten(marketPrecision)]]"
+                                       error-message="number with max [[marketPrecision]] precision">
                         <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
@@ -220,6 +222,10 @@
             static get properties() {
                 return {
                     market: String,
+                    marketPrecision: {
+                        type: Number,
+                        computed: '_computePrecision(market,appConfig)'
+                    },
                     tokens: {
                         type: Object,
                         computed: '_computeTokenS(market,appConfig)'
@@ -243,7 +249,7 @@
                     },
                     buyTotal: {
                         type: Number,
-                        computed: '_divide(buyAmount, buyPrice)'
+                        computed: '_computeBuyTotal(buyAmount, buyPrice,tokenb)'
                     },
                     sellAmount: {
                         type: Number,
@@ -255,7 +261,7 @@
                     },
                     sellTotal: {
                         type: Number,
-                        computed: '_divide(sellAmount, sellPrice)',
+                        computed: '_computeSellTotal(sellAmount, sellPrice,tokenb)',
 
                     },
                     tokensBalance: Number,
@@ -280,26 +286,35 @@
             }
 
             static get observers() {
-                return ['buyButtonState(buyTotal,tokenbBalance)',
-                    'computeTokenBalances(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokensBalance,sellPrice,sellTotal)'];
+                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance)',
+                    'computeTokenBalances(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokens,sellPrice,marketPrecision,tokensBalance,sellPrice,sellTotal)'];
             }
 
-            buyButtonState(buyTotal, tokenbBalance) {
+            _computePrecision(market, appConfig) {
+                if (market && appConfig) {
+                    return Number(appConfig.marketMap[market.toUpperCase()].pricePrecision);
+                }
+            }
 
-                if (buyTotal && tokenbBalance && tokenbBalance && buyTotal <= tokenbBalance) {
 
+            buyButtonState(buyAmount, tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance) {
+
+                if (tokens && buyAmount && new RegExp(this._numPatten(this.tokens.precision)).test(buyAmount.toString())
+                    && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
+                    && buyTotal && Number(buyTotal) && tokenbBalance && Number(tokenbBalance) && buyTotal <= tokenbBalance) {
                     this.$.buyButton.disabled = false;
                     this.$.buyButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
                     this.$.buyButton.disabled = true;
                     this.$.buyButton.style.backgroundColor = 'var(--paper-grey-500)';
                 }
-
             }
 
-            sellButtonState(sellAmount, tokensBalance, sellPrice, sellTotal) {
+            sellButtonState(sellAmount, tokens, marketPrecision, tokensBalance, sellPrice, sellTotal) {
 
-                if (sellAmount && Number(sellAmount) && tokensBalance && Number(tokensBalance) && sellPrice && sellTotal && Number(sellAmount) <= tokensBalance) {
+                if (tokens && sellAmount && new RegExp(this._numPatten(this.tokens.precision)).test(sellAmount.toString())
+                    && marketPrecision && sellPrice && new RegExp(this._numPatten(marketPrecision)).test(sellPrice.toString())
+                    && tokensBalance && Number(tokensBalance) && sellTotal && Number(sellAmount) <= tokensBalance) {
                     this.$.sellButton.disabled = false;
                     this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
@@ -328,20 +343,22 @@
 
 
             _numPatten(precision) {
-                return "\\d+(\\.\\d{0," + precision + "})?";
+                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1,"+(precision-1)+"})?[1-9]$";
             }
 
-            _multiply(amount, price) {
-                if (amount && price) {
-                    return (amount * price);
+            _computeBuyTotal(amount, price,tokenb) {
+                if (amount && price && Number(price) > 0) {
+                    return Math.ceil((amount / price) * Number('1e' + tokenb.precision))/ Number('1e' + tokenb.precision);
                 }
             }
 
-            _divide(amount, price) {
-                if (amount && price) {
-                    return (amount / price);
+            _computeSellTotal(amount, price,tokenb) {
+                if (amount && price && Number(price) > 0) {
+                    return Math.floor((amount / price) * Number('1e' + tokenb.precision))/ Number('1e' + tokenb.precision);
                 }
             }
+
+
 
             async placeBuyOrder() {
 
@@ -389,9 +406,9 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x' + Number((Number(this.buyTotal)* Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
-                    data.timestamp = new Date().getTime();
+                    data.amountS = Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
+                    data.amountB = Number(this.buyAmount) * Number('1e' + this.tokens.digits);
+                    data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
                     const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
@@ -420,10 +437,7 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokenb.allowanceWarn) * Number('1e' + this.tokenb.digits);
-                    console.log(allowance);
-                    console.log(Number(data.amountS));
-
+                    const defaultValue = Number(this.tokenb.allowance) * Number('1e' + this.tokenb.digits);
                     if (Number(data.amountS) > allowance) {
 
                         let amount;
@@ -536,9 +550,9 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
-                    data.amountB = '0x' + ((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.timestamp = new Date().getTime();
+                    data.amountS = Number(this.sellAmount) * Number('1e' + this.tokens.digits);
+                    data.amountB = Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
+                    data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
                     const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
@@ -562,7 +576,7 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokens.token.toUpperCase()] ? Number(balances[this.tokens.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokens.allowanceWarn) * Number('1e' + this.tokens.digits);
+                    const defaultValue = Number(this.tokens.allowance) * Number('1e' + this.tokens.digits);
                     if (Number(data.amountS) > allowance) {
 
                         let amount;
