@@ -200,8 +200,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_computeAmountShow(fromTokenBalance)'
                     },
                     gasLimit: {
-                        type: Number,
-                        computed: '_computeGasLimit(appConfig)'
+                        type: Number
                     },
                     fromTokenBalance: {
                         type: Object,
@@ -238,6 +237,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.amount.focus();
             }
 
+            static get observers() {
+                return [
+                    '_computeGasLimit(appConfig)'
+                ]
+            }
+
             _computeFromToken(page, subpage, appConfig) {
                 if (page && "convert" === page && appConfig) {
                     if (!subpage) {
@@ -264,7 +269,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computeGasLimit(appConfig) {
                 if (appConfig) {
-                    return appConfig.defaultGasLimit;
+                    this.gasLimit = appConfig.defaultGasLimit;
                 }
             }
 
@@ -308,7 +313,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this._buttonDisable();
                     return false;
                 }
-                if (this._isNum(amount) && this._isNum(gasLimit)) {
+                if (this._isNum(amount) && this._isInteger(gasLimit)) {
                     this._buttonAvailable();
                     return true;
                 } else {
