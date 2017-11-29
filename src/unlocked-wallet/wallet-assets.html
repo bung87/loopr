@@ -257,7 +257,8 @@
                     item.precision = tokenConfig.precision;
                     item.unit = tokenConfig.unit;
                     item.address = tokenConfig.address;
-                    item.allowanceWarning = (item.allowanceValue < tokenConfig.allowanceWarn);
+                    let allowanceWarn = this.toNumber(tokenConfig.allowanceWarn, tokenConfig);
+                    item.allowanceWarning = (item.allowanceValue < allowanceWarn);
                     item.price = this.priceQuote.getPrice(item.token);
                     item.total = item.price * item.balanceValue;
                     totalValue += item.total;
