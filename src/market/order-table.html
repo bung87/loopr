@@ -119,14 +119,13 @@
                 <template class="header">Status</template>
                 <template>
                     <div id="progress[[index]]" class="horizontal end-justified layout">
-                        <paper-progress value="[[item.totalDealedAndCanceled]]" secondary-progress="[[item.rest]]"
+                        <paper-progress value="[[item.totalDealed]]" secondary-progress="[[item.dealedAndCanceled]]"
                                         max="[[item.total]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
                                 <div>Original: [[item.total]]</div>
                                 <div>Filled: [[item.totalDealed]]</div>
                                 <div>Cancelled: [[item.totalCanceled]]</div>
-                                <div>Rest: [[item.rest]]</div>
                             </div>
                         </paper-tooltip>
                     </div>
@@ -342,7 +341,6 @@
                         detail: detail
                     }));
                 }
-
             }
 
 
@@ -380,8 +378,10 @@
 
                 order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.totalDealedAmountB, tokenb) : this.numberFormat(order.totalDealedAmountS, tokens);
                 order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
-                order.totalDealedAndCanceled = order.totalDealed + order.totalCanceled;
+                order.dealedAndCanceled = order.totalDealed + order.totalCanceled
                 order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
+
+
 
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
@@ -428,7 +428,6 @@
                 order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS, tokens);
                 order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS, tokens);
 
-                order.rest = this._computeRest(rawBalances, tokenb, tokens, order);
                 return order;
             }
 
