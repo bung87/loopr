@@ -43,6 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             .line {
                 height: 80px;
+                width: 350px;
                 @apply(--layout-horizontal);
                 @apply(--layout-start-justified);
             }
@@ -193,14 +194,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_selectedToken(appConfig, balances, token)'
                     },
                     gasLimit: {
-                        type: Number,
-                        computed: '_computeGasLimit(appConfig)'
+                        type: Number
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_showOrHidden(address, amount, gasLimit, additionalData,amountShow)'
+                        computed: '_showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance)'
                     }
                 }
+            }
+
+            static get observers() {
+                return [
+                    '_computeGasLimit(appConfig)'
+                ]
             }
 
             _computedToken(page, subpage, appConfig) {
@@ -221,7 +227,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computeGasLimit(appConfig) {
                 if (appConfig) {
-                    return appConfig.defaultGasLimit;
+                    this.gasLimit = appConfig.defaultGasLimit;
                 }
             }
 
@@ -308,9 +314,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _showOrHidden(address, amount, gasLimit, additionalData, amountShow) {
+            _showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
                 let validator = new Validator();
-                if (!address || !amount || !gasLimit || !amountShow || amountShow < Number(amount)) {
+                if (!address || !amount || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
                     this._buttonDisable();
                     return false;
                 }
@@ -318,7 +324,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this._buttonDisable();
                     return false;
                 }
-                if (this._isNum(amount, this.selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
+                if (this._isNum(amount, selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
                     if (additionalData) {
                         const dataRegex = /^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$/i;
                         if (additionalData.match(dataRegex)) {
@@ -348,7 +354,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numPatten(precision) {
-                return "^[0-9]+(.[0-9]{1," + precision + "})?$";
+                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1,"+(precision-1)+"})?[1-9]$";
             }
 
             _isNum(num, precision) {

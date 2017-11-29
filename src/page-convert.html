@@ -36,6 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             .inputLine {
                 height: 80px;
+                width: 350px;
                 @apply(--layout-horizontal);
                 @apply(--layout-start-justified);
             }
@@ -200,8 +201,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         computed: '_computeAmountShow(fromTokenBalance)'
                     },
                     gasLimit: {
-                        type: Number,
-                        computed: '_computeGasLimit(appConfig)'
+                        type: Number
                     },
                     fromTokenBalance: {
                         type: Object,
@@ -209,7 +209,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     valid: {
                         type: Boolean,
-                        computed: '_formValid(amount, gasLimit,amountShow)'
+                        computed: '_formValid(amount, gasLimit,amountShow,fromTokenBalance)'
                     }
                 };
             }
@@ -238,6 +238,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.amount.focus();
             }
 
+            static get observers() {
+                return [
+                    '_computeGasLimit(appConfig)'
+                ]
+            }
+
             _computeFromToken(page, subpage, appConfig) {
                 if (page && "convert" === page && appConfig) {
                     if (!subpage) {
@@ -245,7 +251,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     } else if ("ETH" === subpage || "WETH" === subpage) {
                         return subpage;
                     } else {
-                        var detail = {text: "We only support convert between ETH and WETH", category: "error", duration: 8000}
+                        var detail = {
+                            text: "We only support convert between ETH and WETH",
+                            category: "error",
+                            duration: 8000
+                        }
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
                             composed: true,
@@ -264,7 +274,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _computeGasLimit(appConfig) {
                 if (appConfig) {
-                    return appConfig.defaultGasLimit;
+                    this.gasLimit = appConfig.defaultGasLimit;
                 }
             }
 
@@ -303,12 +313,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _formValid(amount, gasLimit, amountShow) {
-                if (!amount || !Number(amount) || !gasLimit || !amountShow || amountShow < Number(amount)) {
+            _formValid(amount, gasLimit, amountShow, fromTokenBalance) {
+                if (!amount || !gasLimit || !amountShow ||!fromTokenBalance || amountShow < Number(amount)) {
                     this._buttonDisable();
                     return false;
                 }
-                if (this._isNum(amount) && this._isNum(gasLimit)) {
+                if (this._isNum(amount, fromTokenBalance.precision) && this._isInteger(gasLimit)) {
                     this._buttonAvailable();
                     return true;
                 } else {
@@ -344,11 +354,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _numPatten(precision) {
-                return "^[0-9]+(.[0-9]{1," + precision + "})?$";
+                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
             }
 
             _isNum(num, precision) {
                 return num.toString().match(this._numPatten(precision));
+            }
+
+            _isInteger(num){
+                console.log(new RegExp(this._integerPatten()).test(num.toString()));
+                console.log(num);
+                return  new RegExp(this._integerPatten()).test(num.toString());
             }
 
             _numError(num, precision) {
@@ -377,7 +393,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 try {
                     const tx = {};
                     let subTitle;
-                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
+                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
                     const WETHConfig = this.appConfig.tokenMap['WETH'];
                     tx.to = WETHConfig.address;
