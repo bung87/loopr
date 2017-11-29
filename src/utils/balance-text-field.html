@@ -22,7 +22,8 @@
 
 
             checkValidity() {
-                if (this.value.match(this.pattern)) {
+
+                if (super.checkValidity()) {
                     if (this.max && Number(this.value) > this.max) {
                         this.errorMessage = ' You have insufficient Balance';
                         return false;
