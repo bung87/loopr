@@ -384,19 +384,19 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
-                        const detail = {
-                            text: 'Your address is not in white list, could not submit order',
-                            category: "warning",
-                            duration: 5000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
+//                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+//                        const detail = {
+//                            text: 'Your address is not in white list, could not submit order',
+//                            category: "warning",
+//                            duration: 5000
+//                        };
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                        return;
+//                    }
 
                     let data = {};
                     const detail = {};
@@ -406,8 +406,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
-                    data.amountB = Number(this.buyAmount) * Number('1e' + this.tokens.digits);
+                    data.amountS = '0x'+ Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountB = '0x'+ (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
@@ -428,7 +428,7 @@
                     }
                     data.lrcFee = '0x'+ (this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
-                    data.marginSplitPercentage = this.settingsMarginSplit;
+                    data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
                         raw: JSON.stringify(data),
                         subTitle: "Place Order"
@@ -550,8 +550,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = Number(this.sellAmount) * Number('1e' + this.tokens.digits);
-                    data.amountB = Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0));
+                    data.amountS = '0x'+ (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountB = '0x'+ Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
@@ -565,9 +565,9 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x'+ this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
+                    data.lrcFee = '0x'+ this._showAmount(this.lrcFee) * Number('1e' + LRC.digits).toString(16);
                     data.buyNoMoreThanAmountB = true;
-                    data.marginSplitPercentage = this.settingsMarginSplit;
+                    data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
                         raw: JSON.stringify(data),
                         subTitle: "Place Order"
