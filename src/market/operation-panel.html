@@ -135,7 +135,7 @@
                             </template>
                             <template is="dom-if" if="[[!isAllowanceWarn(tokensAllowance,tokens)]]">
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
-                                    [[tokens.allowanceWarn]] </a>
+                                    [[[[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]]]] </a>
                             </template>
                             <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                         </template>
@@ -194,7 +194,7 @@
                             </template>
                             <template is="dom-if" if="[[!isAllowanceWarn(tokenbAllowance,tokenb)]]">
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
-                                    [[tokenb.allowanceWarn]] </a>
+                                    [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
                             </template>
                             <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                         </template>
@@ -699,6 +699,13 @@
 
             _showAmount(amount) {
                 return Math.floor(amount * 100) / 100;
+            }
+
+            _numFormat(amount, digits,precision) {
+
+                if(amount && digits && precision){
+                    return (Number(amount) / Number('1e'+digits)).toFixed(precision)
+                }
             }
 
             _showAmountInfo(selectToken, sellAmount, priceQuote, settingsLrcFee) {
