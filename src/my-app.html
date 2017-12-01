@@ -242,12 +242,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}"></loopr-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
-        <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
@@ -372,10 +370,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 thirdParam: {
                     type: Object,
                     computed: '_computedThirdParam(thirdrouteData)'
-                },
-                balances: {
-                    type: Object,
-                    computed: '_computeBalances(balancesRaw)'
                 }
             };
         }
@@ -478,12 +472,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
                 }
-            }
-        }
-
-        _computeBalances(data) {
-            if (data) {
-                return _.keyBy(data.result.tokens, o => o.token);
             }
         }
 

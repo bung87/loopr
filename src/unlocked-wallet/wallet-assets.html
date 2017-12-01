@@ -67,9 +67,9 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
+        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -174,6 +174,7 @@
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             </paper-card>
         </div>
     </template>
@@ -183,6 +184,8 @@
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 priceQuote: Object,
                 totalValue: Number,
                 etherTokens: Array,
@@ -201,6 +204,10 @@
                 },
                 result: {
                     type: Object
+                },
+                wallet: {
+                    type: Object,
+                    observer: '_walletChanged'
                 }
             };
         }
@@ -280,7 +287,15 @@
         _isWETH(token) { return token === 'WETH'; }
 
         go() {
-            //this.$.ajax.generateRequest();
+            if("wallet" === this.page){
+                this.$.ajax.generateRequest();
+            }
+        }
+
+        _walletChanged(wallet) {
+            if (wallet) {
+                this.$.ajax.generateRequest();
+            }
         }
     }
 
