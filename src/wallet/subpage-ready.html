@@ -87,9 +87,9 @@
             }
         }
 
-        go(page) {
-            if(this.page && this.page === "wallet" && this.wallet && page && page.go) {
-                page.go();
+        go(selectedPage) {
+            if(this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
+                selectedPage.go();
             }
         }
     }

@@ -81,9 +81,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        go(page) {
-            if(this.page && this.page === "wallet" && page && page.go) {
-                page.go();
+        go(selectedPage) {
+            if(this.page && this.page === "wallet" && selectedPage && selectedPage.go) {
+                selectedPage.go();
             }
         }
     }
