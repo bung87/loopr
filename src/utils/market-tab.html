@@ -4,12 +4,24 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
-            vaadin-combo-box {
-                padding-right: 5px;
-            }
+         :host {
+            display: block;
+        }
+
+        vaadin-combo-box {
+            padding-right: 5px;
+        }
+
+        paper-tabs {
+            height: 32px;
+            text-transform: none;
+            margin-bottom: 16px;
+        }
+
+        paper-tab {
+            min-width: 120px;
+            height: 32px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
@@ -47,22 +59,22 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready();
         }
 
         _computeTabs(sources, searched, selectedTab) {
-            if(sources && !searched){
+            if (sources && !searched) {
                 let markets = _.map(sources, o => o.market);
                 let tabs = new Array();
                 _.forEach(markets, function(market) {
                     let tab = market.split("-")[1];
-                    if(tabs.indexOf(tab) === -1){
+                    if (tabs.indexOf(tab) === -1) {
                         tabs.push(tab);
                     }
                 });
-                if(tabs.length >1){
-                    if(!selectedTab) {
+                if (tabs.length > 1) {
+                    if (!selectedTab) {
                         this.selectedTab = tabs[0];
                     }
                     return tabs;
@@ -71,10 +83,10 @@
         }
 
         _computeResult(sources, selectedTab) {
-            if(sources){
-                if(selectedTab) {
-                    return sources.filter(function(item){
-                        return item.market.indexOf("-"+selectedTab.toUpperCase()) > -1;
+            if (sources) {
+                if (selectedTab) {
+                    return sources.filter(function(item) {
+                        return item.market.indexOf("-" + selectedTab.toUpperCase()) > -1;
                     });
                 } else {
                     return sources;
