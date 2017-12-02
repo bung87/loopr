@@ -41,8 +41,17 @@
                 width: 1024px;
             }
         }
+
+        @media(min-width:1024px) {
+                .sections {
+                    padding-top: 32px;
+                }
+                .sections[unresolved] {
+                    padding-top: 96px;
+                }
+        }
         </style>
-        <div class="sections">
+        <div class="sections" unresolved>
             <div class="container horizontal center center-justified layout">
                 <paper-card>
                     <div class="card-content">Generating Ethereum wallets happens entirely in your browser. You are responsible for safely backing it up.</div>

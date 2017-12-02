@@ -39,11 +39,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .sections {
                 padding-top: 32px;
             }
+            .sections[unresolved]{
+                padding-top: 96px;
+            }
         }
         </style>
         <loopr-page>
             <loopr-toolbar slot="secondary-toolbar" active-tab="history"></loopr-toolbar>
-            <div class="sections">
+            <div class="sections" unresolved>
                 <paper-card transparent>
                     <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                         <paper-tab name="trades"><a styleless href="/#/history/trades/{{third}}">Trades</a></paper-tab>

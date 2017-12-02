@@ -23,12 +23,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .increase {
             color: var(--app-red-color);
         }
-
-        @media(min-width:1024px) {
-            .sections {
-                padding-top: 32px;
-            }
-        }
         </style>
         <loopr-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -36,7 +30,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
-            <div class="sections">
+            <div class="sections" unresolved>
                 <paper-card transparent>
                     <div class="horizontal start layout">
                         <market-tab sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}"></market-tab>

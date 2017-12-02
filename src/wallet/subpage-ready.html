@@ -16,11 +16,13 @@
         }
 
         @media(min-width:1024px) {
-            .sections {
-                padding-top: 32px;
-            }
+                .sections {
+                    padding-top: 32px;
+                }
+                .sections[unresolved] {
+                    padding-top: 96px;
+                }
         }
-
         paper-tabs {
             height: 32px;
             text-transform: none;
@@ -32,7 +34,7 @@
         }
         </style>
 
-        <div class="sections">
+        <div class="sections" unresolved>
             <paper-card transparent>
                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                     <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
@@ -40,8 +42,8 @@
                     <paper-tab name="trades"><a styleless href="/#/wallet/trades">My Trades</a></paper-tab>
                 </paper-tabs>
             </paper-card>
-            <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                <wallet-assets name="assets"></wallet-assets>
+            <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name" >
+                <wallet-assets name="assets" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-assets>
                 <wallet-trades name="trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-trades>
                 <wallet-orders name="orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-orders>
             </iron-pages>

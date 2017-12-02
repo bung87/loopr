@@ -21,6 +21,27 @@
         static get properties() {
             return {};
         }
+        ready() {
+            super.ready();
+  
+            let app = document.querySelector("my-app");
+            if (app.inited) {
+              
+                let initedPage =app.initedPage
+                let initedPageObj = app.$.pages.querySelector("page-"+initedPage)
+                let sections = initedPageObj.shadowRoot.querySelectorAll('div.sections');
+                sections.forEach((v) => v.removeAttribute("unresolved"));
+                let initedIrons = initedPageObj.shadowRoot.querySelector("iron-pages")
+                initedIrons && initedIrons.childNodes.forEach( (node) => node.nodeType ===1 && node.shadowRoot && node.shadowRoot.querySelectorAll('div.sections').forEach(v => v.removeAttribute("unresolved") ) )
+                let currentSections = this.querySelectorAll('div.sections');
+                currentSections.forEach((v) => v.removeAttribute("unresolved"));
+
+                let subPages = this.querySelector("iron-pages");
+                subPages && subPages.childNodes.forEach( (node) => node.nodeType ===1 && node.shadowRoot && node.shadowRoot.querySelectorAll('div.sections').forEach(v => v.removeAttribute("unresolved") ) )
+            }
+
+        }
+        
     }
 
     window.customElements.define(LooprPage.is, LooprPage);

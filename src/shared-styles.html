@@ -69,7 +69,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             @apply --layout-vertical;
             @apply --layout-flex;
             width: 100%;
-            padding-top: 32px;
             font-size: 14px;
             color: var(--app-text-color);
         }
@@ -242,9 +241,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             /*text-align: right;*/
         }
 
+		.sections{
+			 padding-top: 32px;
+        }
+        .sections[unresolved] {
+            padding-top: 96px;
+        }
         @media(min-width:1024px) {
             .sections {
                 padding-top: 64px;
+            }
+            .sections[unresolved] {
+                padding-top: 128px;
             }
             .sections>paper-card {
                 width: 1024px;

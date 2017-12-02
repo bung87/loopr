@@ -25,6 +25,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 .sections {
                     padding-top: 32px;
                 }
+                .sections[unresolved] {
+                    padding-top: 96px;
+                }
             }
         </style>
         <loopr-page>
@@ -84,8 +87,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if(!this.secondaryPage){
                 this.secondaryPage = "assets";
             }
-            const page = this.$.pages.selectedItem;
-            if (page && page.go) page.go();
+            //const page = this.$.pages.selectedItem;
+            //if (page && page.go) page.go();
         }
     }
 

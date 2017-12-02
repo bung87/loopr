@@ -327,6 +327,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+				inited:{
+		            type:Boolean,
+		            value:false
+	            },
+				initedPage:{
+					type:String
+				},
                 cookieValues: Object,
                 settingsLang: String,
                 settingsCurrency: String,
@@ -608,14 +615,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _pageChanged(page) {
+            if(this.inited ==false){
+                if(!this.initedPage){
+                    this.initedPage = this.page;
+                }
+               
+                if(this.selectedPage){
+                    this.inited = true;
+                    
+                }
+            }
             const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
             Polymer.importHref(
                 resolvedPageUrl,
                 null,
                 this._showPage404.bind(this),
                 true);
-        }
-
+		}
         _selectedPageChanged(page) {
             if (page && page.go) {
                 page.go();
