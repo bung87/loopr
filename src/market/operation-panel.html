@@ -234,6 +234,10 @@
                         type: Object,
                         computed: '_computeTokenB(market,appConfig)'
                     },
+                    lrc:{
+                        type: Object,
+                        computed: '_computelrc(appConfig)'
+                    },
                     sellOrBuy: {
                         type: String,
                         value: "buy",
@@ -286,7 +290,7 @@
             }
 
             static get observers() {
-                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance)',
+                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance,lrc)',
                     'computeTokenBalances(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokens,sellPrice,marketPrecision,tokensBalance,sellPrice,sellTotal)'];
             }
 
@@ -297,7 +301,7 @@
             }
 
 
-            buyButtonState(buyAmount, tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance) {
+            buyButtonState(buyAmount, tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance,lrc) {
 
                 if (tokens && buyAmount && new RegExp(this._numPatten(this.tokens.precision)).test(buyAmount.toString())
                     && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
@@ -338,6 +342,12 @@
                     const tokenPair = market.split('-');
                     const tokenx = tokenPair[1];
                     return _.find(appConfig.tokens, {token: tokenx});
+                }
+            }
+
+            _computelrc(appConfig) {
+                if(appConfig){
+                    return _.find(appConfig.tokens, {token: "LRC"});
                 }
             }
 
@@ -411,9 +421,7 @@
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
-
-                    if (!LRC) {
+                    if (!this.lrc) {
                         const detail = {
                             text: 'Can\'t get LRC Config',
                             category: "warning",
