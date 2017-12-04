@@ -9,13 +9,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <dom-module id="page-404">
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
     <template>
         <style>
          :host {
             display: block;
+            user-select: none;
+        }
+
+
+        .container {
+            @apply(--layout-vertical);
+            @apply(--layout-center-center);
+            height: 100%;
+            color: white;
+            background-color: var(--app-primary-color);
+            padding-bottom: 200px;
+        }
+
+        .container a {
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            border: solid 1px white;
+            text-decoration: none;
+            margin-top: 16px;
+        }
+
+        .container a:hover {
+            color: var(--app-primary-color);
+            background-color: white;
+        }
+
+        .txt404 {
+            font-size: 160px;
+            font-weight: 100;
         }
         </style>
-        Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+        <loopr-page>
+            <div class="container">
+                <div class="txt404">404</div>
+                <div>It looks like you are lost.</div>
+                <a href="[[rootPath]]">
+                    <iron-icon icon="home"></iron-icon> Head back to home</a>
+            </div>
+        </loopr-page>
     </template>
     <script>
     class Page404 extends Polymer.Element {

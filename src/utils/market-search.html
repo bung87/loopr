@@ -10,14 +10,15 @@
             vaadin-text-field {
                --valo-text-field-border-radius : 5px;
             }
-            .label {
-                height: 44px;
+            iron-icon {
+                color: var(--app-text-color-light);
             }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal end layout">
-            <div class="label horizontal center layout"><iron-icon icon="icons:search"></iron-icon></div>
-            <vaadin-text-field id="search" value="{{keyword}}" placeholder="{{placeholder}}"></vaadin-text-field>
+            <vaadin-text-field id="search" value="{{keyword}}" placeholder="{{placeholder}}">
+                <iron-icon slot="prefix" icon="icons:search"></iron-icon>
+            </vaadin-text-field>
         </div>
     </template>
     <script>

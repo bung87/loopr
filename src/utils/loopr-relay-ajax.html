@@ -1,0 +1,69 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<dom-module id="loopr-relay-ajax">
+    <template>
+        <iron-ajax id="ajax" auto
+            url="[[url]]"
+            headers='{"Content-Type":"application/json"}'
+            method="POST"
+            body="[[methodParams]]"
+            handle-as="json"
+            last-response="{{lastResponse}}"
+            debounce-duration="300"
+            loading={{loading}}>
+        </iron-ajax>
+    </template>
+    <script>
+        class LooprRelayAjax extends Polymer.Element {
+            static get is() {
+                return 'loopr-relay-ajax';
+            }
+
+            static get properties() {
+                return {
+                    relay: String,
+                    suffix: String,
+                    url: {
+                        type: String,
+                        value: '',
+                        computed: '_computedUrl(relay, suffix)'
+                    },
+                    lastResponse: {
+                        type: Object,
+                        notify: true
+                    },
+                    loading: {
+                        type: Boolean,
+                        notify: true
+                    },
+                    // relay rpc method name
+                    method: String,
+                    // relay rpc post parameters
+                    params: Object,
+                    methodParams: {
+                        type: Object,
+                        computed: '_computeParams(method, params)'
+                    }
+                }
+            }
+
+            _computedUrl(relay){
+                if(relay){
+                    return relay;
+                }
+            }
+
+            _computeParams(method, params) {
+                if(method && params){
+                    return {method: method, params: params, id: Math.ceil(Math.random()*1e18)}
+                }
+            }
+
+            generateRequest(){
+                this.$.ajax.generateRequest();
+            }
+        }
+        window.customElements.define(LooprRelayAjax.is, LooprRelayAjax);
+    </script>
+
+</dom-module>
