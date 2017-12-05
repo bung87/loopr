@@ -31,7 +31,7 @@
             width: 100%;
         }
         </style>
-
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <div class="sections">
             <paper-card transparent>
                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
@@ -41,7 +41,7 @@
                 </paper-tabs>
             </paper-card>
             <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                <wallet-assets name="assets"></wallet-assets>
+                <wallet-assets name="assets" page="{{page}}" subpage="{{subpage}}"></wallet-assets>
                 <wallet-trades name="trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-trades>
                 <wallet-orders name="orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-orders>
             </iron-pages>
@@ -63,7 +63,7 @@
                 third: String,
                 selectedTab: {
                     type: String,
-                    computed: '_computeSelected(subpage)'
+                    computed: '_computeSelected(page, subpage)'
                 },
                 selectedPage: {
                     type: Object,
@@ -76,18 +76,21 @@
             super.ready();
         }
 
-        _computeSelected(subpage) {
-            if (subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
-                return subpage;
-            } else {
-                //TODO: send a 404 error event.
-                return 'assets';
+        _computeSelected(page, subpage) {
+            if (page && "wallet" === page){
+                if (subpage && subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
+                    return subpage;
+                } else {
+                    //TODO: send a 404 error event.
+                    return 'assets';
+                }
             }
         }
 
-        go() {
-            const page = this.$.pages.selectedItem;
-            if (page && page.go) page.go();
+        go(selectedPage) {
+            if(this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
+                selectedPage.go();
+            }
         }
     }
 
