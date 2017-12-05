@@ -116,32 +116,34 @@
                 </div>
                 <div class="balance">
                     <div class="error">
-                        <template is="dom-if" if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            <template is="dom-if" if="[[!isEnough(sellAmount,tokensBalance)]]">
-                                You have insufficient balance([[tokensBalance]]).<br>
+                        <template is="dom-if"
+                                  if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,lrcFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensBalance,tokens,lrcFee)]]">
+                                [[_showBalanceNonEnough(tokensBalance,tokens,lrcFee,sellAmount)]].<br>
                             </template>
                         </template>
-                        <template is="dom-if" if="[[bothNonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            You have insufficient balance([[tokensBalance]]) and allowance([[tokensAllowance]]).
+                        <template is="dom-if"
+                                  if="[[bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,lrcFee)]]">
+                            [[_showBothNonEnough(tokensBalance,tokensAllowance,tokens,sellAmount,lrcFee)]]
+                        </template>
+                        <template is="dom-if" if="[[!isEnoughFee(lrcFee,lrcBalance,tokens)]]">
+                            You have insufficient LRC balance( [[lrcBalance]]) to afford LRC fee.
                         </template>
                     </div>
                     <div class="common">
-                        <template is="dom-if" if="[[!nonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            <template is="dom-if" if="[[tokensBalance]]">
-                                Your balance is [[tokensBalance]].
-                            </template>
-                            <template is="dom-if" if="[[tokensAllowance]]">
-                                Your allowance is [[tokensAllowance]].
-                            </template>
-                            <template is="dom-if" if="[[!isAllowanceWarn(tokensAllowance,tokens)]]">
+                        <template is="dom-if"
+                                  if="[[!nonEnough(sellAmount, tokensBalance,tokensAllowance,tokens,lrcFee)]]">
+                            Your balance is [[tokensBalance]].
+                            Your allowance is [[tokensAllowance]].
+                            <template is="dom-if" if="[[isAllowanceWarn(tokensAllowance,tokens)]]">
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
                                     [[[[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]]]] </a>
                             </template>
                             <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                         </template>
-
-                        <template is="dom-if" if="![[bothNonEnough(sellAmount,tokensBalance,tokensAllowance)]]">
-                            <template is="dom-if" if="[[!isEnough(sellAmount,tokensAllowance)]]">
+                        <template is="dom-if"
+                                  if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,lrcFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensAllowance,tokens,lrcFee)]]">
                                 You have insufficient allowance([[tokensAllowance]]). <a
                                     href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
                                 <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
@@ -175,33 +177,34 @@
                 </div>
                 <div class="balance">
                     <div class="error">
-                        <template is="dom-if" if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
+                        <template is="dom-if"
+                                  if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,lrcFee)]]">
                             <template is="dom-if" if="[[!isEnough(buyTotal,tokenbBalance)]]">
-                                You have insufficient balance([[tokenbBalance]]).<br>
+                                [[_showBalanceNonEnough(tokenbBalance,tokenb,lrcFee,buyTotal)]].<br>
                             </template>
                         </template>
-                        <template is="dom-if" if="[[bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
-                            You have insufficient balance([[tokenbBalance]]) and allowance([[tokenbAllowance]]).
+                        <template is="dom-if" if="[[bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,lrcFee)]]">
+                            [[_showBothNonEnough(tokenbBalance,tokenbAllowance,tokenb,buyTotal,lrcFee)]]
+                        </template>
+                        <template is="dom-if" if="[[!isEnoughFee(lrcFee,lrcBalance,tokenb)]]">
+                            You have insufficient LRC balance( [[lrcBalance]]) to afford LRC fee.
                         </template>
                     </div>
                     <div class="common">
-                        <template is="dom-if" if="[[!nonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
-                            <template is="dom-if" if="[[tokenbBalance]]">
-                                Your balance is [[tokenbBalance]].
-                            </template>
-                            <template is="dom-if" if="[[tokenbAllowance]]">
-                                Your allowance is [[tokenbAllowance]].
-                            </template>
-                            <template is="dom-if" if="[[!isAllowanceWarn(tokenbAllowance,tokenb)]]">
+                        <template is="dom-if" if="[[!nonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,lrcFee)]]">
+                            Your balance is [[tokenbBalance]].
+                            Your allowance is [[tokenbAllowance]].
+                            <template is="dom-if" if="[[isAllowanceWarn(tokenbAllowance,tokenb)]]">
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
                             </template>
                             <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                         </template>
-                        <template is="dom-if" if="![[bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance)]]">
-                            <template is="dom-if" if="[[!isEnough(buyTotal,tokenbAllowance)]]">
-                                You have insufficient allowance([[tokenbAllowance]]). <a
-                                    href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
+                        <template is="dom-if"
+                                  if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,lrcFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(buyTotal,tokenbAllowance,tokenb,lrcFee)]]">
+                                You have insufficient allowance([[tokenbAllowance]]).
+                                <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
                                 <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote,settingsLrcFee)]]
                             </template>
                         </template>
@@ -233,6 +236,10 @@
                     tokenb: {
                         type: Object,
                         computed: '_computeTokenB(market,appConfig)'
+                    },
+                    lrc: {
+                        type: Object,
+                        computed: '_computelrc(appConfig)'
                     },
                     sellOrBuy: {
                         type: String,
@@ -268,6 +275,8 @@
                     tokensAllowance: Number,
                     tokenbBalance: Number,
                     tokenbAllowance: Number,
+                    lrcBalance: Number,
+                    lrcAllowance: Number,
                     lrcFee: Number
                 };
             }
@@ -286,8 +295,9 @@
             }
 
             static get observers() {
-                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance)',
-                    'computeTokenBalances(tokens,tokenb,balancesRaw)', 'sellButtonState(sellAmount,tokens,sellPrice,marketPrecision,tokensBalance,sellPrice,sellTotal)'];
+                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance,lrcBalance,lrcFee)',
+                    'computeTokenBalances(tokens,tokenb,lrc,balancesRaw)',
+                    'sellButtonState(sellAmount,tokens,sellPrice,marketPrecision,tokensBalance,sellTotal, lrcBalance, lrcFee)'];
             }
 
             _computePrecision(market, appConfig) {
@@ -297,11 +307,13 @@
             }
 
 
-            buyButtonState(buyAmount, tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance) {
+            buyButtonState(buyAmount, tokenb, buyPrice, marketPrecision, buyTotal, tokenbBalance, lrcBalance, lrcFee) {
 
-                if (tokens && buyAmount && new RegExp(this._numPatten(this.tokens.precision)).test(buyAmount.toString())
-                    && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
-                    && buyTotal && Number(buyTotal) && tokenbBalance && Number(tokenbBalance) && buyTotal <= tokenbBalance) {
+                if ((tokenb && buyAmount && new RegExp(this._numPatten(tokenb.precision)).test(buyAmount.toString())
+                        && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
+                        && buyTotal && Number(buyTotal) && tokenbBalance && Number(tokenbBalance) && lrcBalance && lrcFee)
+                    && ((tokenb.token.toUpperCase() !== "LRC" && lrcBalance >= lrcFee && buyTotal <= tokenbBalance)
+                        || (tokenb.token.toUpperCase() === "LRC" && (lrcFee + buyTotal) <= tokenbBalance))) {
                     this.$.buyButton.disabled = false;
                     this.$.buyButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
@@ -310,11 +322,13 @@
                 }
             }
 
-            sellButtonState(sellAmount, tokens, marketPrecision, tokensBalance, sellPrice, sellTotal) {
+            sellButtonState(sellAmount, tokens, sellPrice, marketPrecision, tokensBalance, sellTotal, lrcBalance, lrcFee) {
 
-                if (tokens && sellAmount && new RegExp(this._numPatten(this.tokens.precision)).test(sellAmount.toString())
-                    && marketPrecision && sellPrice && new RegExp(this._numPatten(marketPrecision)).test(sellPrice.toString())
-                    && tokensBalance && Number(tokensBalance) && sellTotal && Number(sellAmount) <= tokensBalance) {
+                if ((tokens && sellAmount && new RegExp(this._numPatten(tokens.precision)).test(sellAmount.toString())
+                        && marketPrecision && sellPrice && new RegExp(this._numPatten(marketPrecision)).test(sellPrice.toString())
+                        && tokensBalance && Number(tokensBalance) && sellTotal && lrcBalance && lrcFee )
+                    && ((tokens.token.toUpperCase() !== 'LRC' && Number(sellAmount) <= tokensBalance && lrcFee <= lrcBalance)
+                        || ((tokens.token.toUpperCase() === 'LRC') && (Number(sellAmount) + lrcFee) <= tokensBalance))) {
                     this.$.sellButton.disabled = false;
                     this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
@@ -341,23 +355,28 @@
                 }
             }
 
+            _computelrc(appConfig) {
+                if (appConfig) {
+                    return _.find(appConfig.tokens, {token: "LRC"});
+                }
+            }
+
 
             _numPatten(precision) {
-                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1,"+(precision-1)+"})?[1-9]$";
+                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
             }
 
-            _computeBuyTotal(amount, price,tokenb) {
+            _computeBuyTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0) {
-                    return Math.ceil((amount / price) * Number('1e' + tokenb.precision))/ Number('1e' + tokenb.precision);
+                    return Math.ceil((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
-            _computeSellTotal(amount, price,tokenb) {
+            _computeSellTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0) {
-                    return Math.floor((amount / price) * Number('1e' + tokenb.precision))/ Number('1e' + tokenb.precision);
+                    return Math.floor((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
-
 
 
             async placeBuyOrder() {
@@ -400,20 +419,21 @@
 
                     let data = {};
                     const detail = {};
+                    const raws = [];
                     let currentVersion = this.settingsVersion;
+                    const gasLimit = '0x14820';
+                    const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     const spender = this.appConfig.contractVersionMap[currentVersion].address;
                     data.protocol = spender;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x'+ Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.amountB = '0x'+ (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountS = '0x' + Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
-
-                    if (!LRC) {
+                    if (!this.lrc) {
                         const detail = {
                             text: 'Can\'t get LRC Config',
                             category: "warning",
@@ -426,7 +446,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x'+ (this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
+                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -437,55 +457,139 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokenb.allowance) * Number('1e' + this.tokenb.digits);
-                    if (Number(data.amountS) > allowance) {
+                    const defaultValue = Number(this.tokenb.allowance);
 
-                        let amount;
+                    if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        if (balance < defaultValue) {
-                            amount = balance;
+                        const require = Number(data.amounts) + this.lrcFee * Number('1e' + this.lrc.digits);
+
+                        if (require > allowance) {
+
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > require ? defaultValue : require
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": "New Authorization"});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"});
+                            }
                         }
 
-                        if (balance > defaultValue) {
-                            amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                    } else {
+
+                        if (Number(data.amountS) > allowance) {
+
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase()
+                                });
+                            }
                         }
-                        const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
-                        const tx = {};
-                        tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
-                        tx.gasLimit = '0x14820';
-                        tx.to = this.tokenb.address;
-                        tx.value = '0x0';
 
-                        if (allowance === 0) {
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                        } else {
-                            tx.data = signer.generateApproveData(spender, '0x0');
-                            const cancelRaw = JSON.stringify(tx);
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{
-                                "raw": cancelRaw,
-                                "subTitle": "Cancel Older Authorization"
-                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+
+                        if (this.lrcFee > this.lrcAllowance) {
+
+                            const defaultlrc = Number(this.lrc.allowance);
+                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
+                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+
+                            let lrcAmount;
+                            if (defaultlrc >= lrcBalance) {
+                                lrcAmount = lrcBalance;
+                            }
+
+                            if (defaultlrc < lrcBalance) {
+                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (this.lrcAllowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC "});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of LRC"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC"});
+                            }
 
                         }
-
-                        if (ETHBalance < detail.raws.length * (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                            const errorDetail = {
-                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                                category: "warning",
-                                duration: 8000
-                            };
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: errorDetail
-                            }));
-                            return;
-                        }
-
                     }
-
+                    const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
+                    if (ETHBalance < raws.length * (Number(gasLimit) * Number(gasPrice))) {
+                        const errorDetail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: errorDetail
+                        }));
+                        return;
+                    }
+                    detail.raws = raws;
                     this.dispatchEvent(new CustomEvent('placeorder', {
                         bubbles: true,
                         composed: true,
@@ -509,7 +613,6 @@
             async placeSellOrder() {
 
                 try {
-
                     if (!this.wallet) {
                         const noWalletDetail = {
                             text: 'Set Wallet First!',
@@ -544,19 +647,22 @@
                     }
                     const detail = {};
                     const data = {};
+                    const raws = [];
+                    const gasLimit = '0x14820';
+                    const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.contractVersionMap[currentVersion].address;
                     data.protocol = spender;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = '0x'+ (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
-                    data.amountB = '0x'+ Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountB = '0x' + Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
-                    if (!LRC) {
+
+                    if (!this.lrc) {
                         const detail = {text: 'Can\'t get LRC Config', category: "warning", duration: 5000};
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
@@ -565,7 +671,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x'+ this._showAmount(this.lrcFee) * Number('1e' + LRC.digits).toString(16);
+                    data.lrcFee = '0x' + this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -576,55 +682,142 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokens.token.toUpperCase()] ? Number(balances[this.tokens.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokens.allowance) * Number('1e' + this.tokens.digits);
-                    if (Number(data.amountS) > allowance) {
+                    const defaultValue = Number(this.tokens.allowance);
 
-                        let amount;
 
-                        if (balance < defaultValue) {
-                            amount = balance;
+                    if (this.tokens.token.toUpperCase() === 'LRC') {
+
+                        const require = Number(data.amountS) + this.lrcFee * Number('1e'+this.lrc.digits);
+
+                        if (require > allowance) {
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > require ? defaultValue :require
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokens.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            }
                         }
 
-                        if (balance > defaultValue) {
-                            amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                    } else {
+                        if (Number(data.amountS) > allowance) {
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokens.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+
+                            }
                         }
-                        const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
-                        const tx = {};
-                        tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
-                        tx.gasLimit = '0x14820';
-                        tx.to = this.tokens.address;
-                        tx.value = '0x0';
 
-                        if (allowance === 0) {
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                        } else {
-                            tx.data = signer.generateApproveData(spender, '0x0');
-                            const cancelRaw = JSON.stringify(tx);
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{
-                                "raw": cancelRaw,
-                                "subTitle": "Cancel Older Authorization"
-                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
 
+                        if (this.lrcFee > this.lrcAllowance) {
+                            const defaultlrc = Number(this.lrc.allowance);
+                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
+                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+
+                            let lrcAmount;
+                            if (defaultlrc >= lrcBalance) {
+                                lrcAmount = lrcBalance;
+                            }
+
+                            if (defaultlrc < lrcBalance) {
+                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (this.lrcAllowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC "});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of LRC"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC"});
+                            }
                         }
-
-                        if (ETHBalance < detail.raws.length * (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                            const errorDetail = {
-                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                                category: "warning",
-                                duration: 8000
-                            };
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: errorDetail
-                            }));
-                            return;
-                        }
-
                     }
 
+
+                    const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
+                    if (ETHBalance < raws.length * (Number(gasLimit) * Number(gasPrice))) {
+                        const errorDetail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: errorDetail
+                        }));
+                        return;
+                    }
+                    detail.raws = raws;
                     this.dispatchEvent(new CustomEvent('placeorder', {
                         bubbles: true,
                         composed: true,
@@ -646,65 +839,93 @@
 
             isAllowanceWarn(allowance, token) {
                 if (allowance && token) {
-                    return allowance >= token.allowanceWarn;
+                    return allowance < token.allowanceWarn / Number('1e' + token.digits);
                 }
                 return false;
             }
 
-            nonEnough(amount, balance, allowance) {
+            nonEnough(amount, balance, allowance, token, lrcFee) {
 
-                if (amount && balance && allowance && Number(amount)) {
-                    return Number(amount) > balance || Number(amount) > allowance
+                if (balance >= 0 && allowance >= 0 && Number(amount) >= 0 && token) {
+                    return (lrcFee && token.token.toUpperCase() === 'LRC') ?
+                        Number(amount) + lrcFee > balance || Number(amount) + lrcFee > allowance :
+                        Number(amount) > balance || Number(amount) > allowance
                 }
                 return false;
             }
 
-            bothNonEnough(amount, balance, allowance) {
-                if (amount && balance && allowance && Number(amount)) {
-                    return Number(amount) > balance && Number(amount) > allowance
+            bothNonEnough(amount, balance, allowance, token, lrcFee) {
+                if (balance >= 0 && allowance >= 0 && Number(amount) >= 0 && token) {
+                    return (lrcFee && token.token.toUpperCase() === 'LRC') ?
+                        Number(amount) + lrcFee > balance && Number(amount) + lrcFee > allowance :
+                        Number(amount) > balance && Number(amount) > allowance
                 }
                 return false
-
             }
 
             isEnough(require, left) {
 
-                if (require && left && Number(require)) {
+                if (left >= 0 && Number(require) >= 0) {
                     return left >= Number(require)
                 }
                 return true;
             }
 
-            computeTokenBalances(tokens, tokenb, rawBalances) {
+            isEnoughFee(lrcFee, lrcBalance, token) {
+                if (lrcFee >= 0 && lrcBalance >= 0 && token) {
+                    return token.token.toUpperCase() === "LRC" ? true : lrcFee <= lrcBalance;
+                }
+                return true
+            }
+
+            isBalanceEnough(require, left, token, lrcFee) {
+                if (left >= 0 && Number(require) >= 0 && token) {
+                    return (lrcFee && token.token.toUpperCase() === 'LRC') ? left >= Number(require) + lrcFee : left >= Number(require)
+                }
+                return true
+            }
+
+
+            computeTokenBalances(tokens, tokenb, lrc, rawBalances) {
 
                 if (rawBalances) {
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
                     if (tokens) {
                         const balance = balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].balance) : 0;
                         const allowance = balances[tokens.token.toUpperCase()] ? Number(balances[tokens.token.toUpperCase()].allowance) : 0;
-                        this.tokensBalance = ((balance ? balance : 0) / Number('1e' + tokens.digits)).toFixed(tokens.precision);
-                        this.tokensAllowance = ((allowance ? allowance : 0 ) / Number('1e' + tokens.digits)).toFixed(tokens.precision);
+                        this.tokensBalance = Number(((balance ? balance : 0) / Number('1e' + tokens.digits)).toFixed(tokens.precision));
+                        this.tokensAllowance = Number(((allowance ? allowance : 0 ) / Number('1e' + tokens.digits)).toFixed(tokens.precision));
 
                     }
                     if (tokenb) {
                         const balance = balances[tokenb.token.toUpperCase()] ? Number(balances[tokenb.token.toUpperCase()].balance) : 0;
                         const allowance = balances[tokenb.token.toUpperCase()].allowance ? Number(balances[tokenb.token.toUpperCase()].allowance) : 0;
-                        this.tokenbBalance = ((balance ? balance : 0) / Number('1e' + tokenb.digits)).toFixed(tokens.precision);
-                        this.tokenbAllowance = ((allowance ? allowance : 0) / Number('1e' + tokenb.digits)).toFixed(tokens.precision);
+                        this.tokenbBalance = Number(((balance ? balance : 0) / Number('1e' + tokenb.digits)).toFixed(tokenb.precision));
+                        this.tokenbAllowance = Number(((allowance ? allowance : 0) / Number('1e' + tokenb.digits)).toFixed(tokenb.precision));
+                    }
+
+                    if (lrc) {
+                        const balance = balances[lrc.token.toUpperCase()] ? Number(balances[lrc.token.toUpperCase()].balance) : 0;
+                        const allowance = balances[lrc.token.toUpperCase()].allowance ? Number(balances[lrc.token.toUpperCase()].allowance) : 0;
+//                             this.lrcBalance = Number(((balance ? balance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+//                        this.lrcAllowance = Number(((allowance ? allowance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+
+                        this.lrcBalance = 1000;
+                        this.lrcAllowance = 10;
+
                     }
 
                 }
-
             }
 
             _showAmount(amount) {
                 return Math.floor(amount * 100) / 100;
             }
 
-            _numFormat(amount, digits,precision) {
+            _numFormat(amount, digits, precision) {
 
-                if(amount && digits && precision){
-                    return (Number(amount) / Number('1e'+digits)).toFixed(precision)
+                if (amount && digits && precision) {
+                    return (Number(amount) / Number('1e' + digits)).toFixed(precision)
                 }
             }
 
@@ -718,6 +939,28 @@
                     return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.fiat + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.fiat + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showAmount(lrcFee) + " LRC)";
                 }
             }
+
+            _showBalanceNonEnough(balance, token, lrcFee, amount) {
+                if (token && token.token.toUpperCase() === 'LRC') {
+                    return "You have insufficient balance(" + balance + ") to place an order with value(" + amount + ") and lrcFee(" + lrcFee + ") ";
+                } else {
+                    return "You have insufficient balance(" + balance + ") to place an order with value(" + amount + ")";
+                }
+
+            }
+
+
+            _showBothNonEnough(balance, allowance, token, amount, lrcFee) {
+
+                if (token && token.token.toUpperCase() === 'LRC') {
+                    return "You have insufficient balance(" + balance + ") and insufficient allowance(" + allowance + ") to place an order with value(" + amount + ") and lrcFee(" + lrcFee + ") ";
+                } else {
+                    return "You have insufficient balance(" + balance + ")and insufficient allowance(" + allowance + ") to place an order with value(" + amount + ")";
+                }
+
+            }
+
+
         }
 
         window.customElements.define(OperationPanel.is, OperationPanel);
