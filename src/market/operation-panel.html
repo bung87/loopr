@@ -419,7 +419,10 @@
 
                     let data = {};
                     const detail = {};
+                    const raws = [];
                     let currentVersion = this.settingsVersion;
+                    const gasLimit = '0x14820';
+                    const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     const spender = this.appConfig.contractVersionMap[currentVersion].address;
                     data.protocol = spender;
                     data.owner = this.wallet.address;
@@ -443,7 +446,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + LRC.digits)).toString(16);
+                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -454,55 +457,139 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokenb.allowance) * Number('1e' + this.tokenb.digits);
-                    if (Number(data.amountS) > allowance) {
+                    const defaultValue = Number(this.tokenb.allowance);
 
-                        let amount;
+                    if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        if (balance < defaultValue) {
-                            amount = balance;
+                        const require = Number(data.amounts) + this.lrcFee * Number('1e' + this.lrc.digits);
+
+                        if (require > allowance) {
+
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > require ? defaultValue : require
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": "New Authorization"});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"});
+                            }
                         }
 
-                        if (balance > defaultValue) {
-                            amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                    } else {
+
+                        if (Number(data.amountS) > allowance) {
+
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase()
+                                });
+                            }
                         }
-                        const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
-                        const tx = {};
-                        tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
-                        tx.gasLimit = '0x14820';
-                        tx.to = this.tokenb.address;
-                        tx.value = '0x0';
 
-                        if (allowance === 0) {
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                        } else {
-                            tx.data = signer.generateApproveData(spender, '0x0');
-                            const cancelRaw = JSON.stringify(tx);
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{
-                                "raw": cancelRaw,
-                                "subTitle": "Cancel Older Authorization"
-                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
+
+                        if (this.lrcFee > this.lrcAllowance) {
+
+                            const defaultlrc = Number(this.lrc.allowance);
+                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
+                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+
+                            let lrcAmount;
+                            if (defaultlrc >= lrcBalance) {
+                                lrcAmount = lrcBalance;
+                            }
+
+                            if (defaultlrc < lrcBalance) {
+                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (this.lrcAllowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC "});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of LRC"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC"});
+                            }
 
                         }
-
-                        if (ETHBalance < detail.raws.length * (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                            const errorDetail = {
-                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                                category: "warning",
-                                duration: 8000
-                            };
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: errorDetail
-                            }));
-                            return;
-                        }
-
                     }
-
+                    const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
+                    if (ETHBalance < raws.length * (Number(gasLimit) * Number(gasPrice))) {
+                        const errorDetail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: errorDetail
+                        }));
+                        return;
+                    }
+                    detail.raws = raws;
                     this.dispatchEvent(new CustomEvent('placeorder', {
                         bubbles: true,
                         composed: true,
@@ -526,7 +613,6 @@
             async placeSellOrder() {
 
                 try {
-
                     if (!this.wallet) {
                         const noWalletDetail = {
                             text: 'Set Wallet First!',
@@ -561,6 +647,9 @@
                     }
                     const detail = {};
                     const data = {};
+                    const raws = [];
+                    const gasLimit = '0x14820';
+                    const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.contractVersionMap[currentVersion].address;
                     data.protocol = spender;
@@ -572,8 +661,8 @@
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
                     data.salt = Math.round(Math.random() * 1e18);
-                    const LRC = _.find(this.appConfig.tokens, {token: 'LRC'});
-                    if (!LRC) {
+
+                    if (!this.lrc) {
                         const detail = {text: 'Can\'t get LRC Config', category: "warning", duration: 5000};
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
@@ -582,7 +671,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + this._showAmount(this.lrcFee) * Number('1e' + LRC.digits).toString(16);
+                    data.lrcFee = '0x' + this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -593,55 +682,142 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const balance = balances[this.tokens.token.toUpperCase()] ? Number(balances[this.tokens.token.toUpperCase()].balance) : 0;
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokens.allowance) * Number('1e' + this.tokens.digits);
-                    if (Number(data.amountS) > allowance) {
+                    const defaultValue = Number(this.tokens.allowance);
 
-                        let amount;
 
-                        if (balance < defaultValue) {
-                            amount = balance;
+                    if (this.tokens.token.toUpperCase() === 'LRC') {
+
+                        const require = Number(data.amountS) + this.lrcFee * Number('1e'+this.lrc.digits);
+
+                        if (require > allowance) {
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > require ? defaultValue :require
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokens.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            }
                         }
 
-                        if (balance > defaultValue) {
-                            amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                    } else {
+                        if (Number(data.amountS) > allowance) {
+                            let amount;
+
+                            if (balance < defaultValue) {
+                                amount = balance;
+                            }
+
+                            if (balance > defaultValue) {
+                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokens.address;
+                            tx.value = '0x0';
+
+                            if (allowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                }, {
+                                    "raw": JSON.stringify(tx),
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                });
+
+                            }
                         }
-                        const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
-                        const tx = {};
-                        tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
-                        tx.gasLimit = '0x14820';
-                        tx.to = this.tokens.address;
-                        tx.value = '0x0';
 
-                        if (allowance === 0) {
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
-                        } else {
-                            tx.data = signer.generateApproveData(spender, '0x0');
-                            const cancelRaw = JSON.stringify(tx);
-                            tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
-                            detail.raws = [{
-                                "raw": cancelRaw,
-                                "subTitle": "Cancel Older Authorization"
-                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization"}]
 
+                        if (this.lrcFee > this.lrcAllowance) {
+                            const defaultlrc = Number(this.lrc.allowance);
+                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
+                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+
+                            let lrcAmount;
+                            if (defaultlrc >= lrcBalance) {
+                                lrcAmount = lrcBalance;
+                            }
+
+                            if (defaultlrc < lrcBalance) {
+                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
+                            }
+
+                            const tx = {};
+                            tx.gasPrice = gasPrice;
+                            tx.gasLimit = gasLimit;
+                            tx.to = this.tokenb.address;
+                            tx.value = '0x0';
+
+                            if (this.lrcAllowance === 0) {
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC "});
+                            } else {
+                                tx.data = signer.generateApproveData(spender, '0x0');
+                                const cancelRaw = JSON.stringify(tx);
+                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+
+                                raws.push({
+                                    "raw": cancelRaw,
+                                    "subTitle": "Cancel Older Authorization Of LRC"
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC"});
+                            }
                         }
-
-                        if (ETHBalance < detail.raws.length * (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                            const errorDetail = {
-                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                                category: "warning",
-                                duration: 8000
-                            };
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: errorDetail
-                            }));
-                            return;
-                        }
-
                     }
 
+
+                    const ETHBalance = balances['ETH'] ? balances['ETH'].balance : 0;
+                    if (ETHBalance < raws.length * (Number(gasLimit) * Number(gasPrice))) {
+                        const errorDetail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: errorDetail
+                        }));
+                        return;
+                    }
+                    detail.raws = raws;
                     this.dispatchEvent(new CustomEvent('placeorder', {
                         bubbles: true,
                         composed: true,
@@ -731,8 +907,11 @@
                     if (lrc) {
                         const balance = balances[lrc.token.toUpperCase()] ? Number(balances[lrc.token.toUpperCase()].balance) : 0;
                         const allowance = balances[lrc.token.toUpperCase()].allowance ? Number(balances[lrc.token.toUpperCase()].allowance) : 0;
-                        this.lrcBalance = Number(((balance ? balance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
-                        this.lrcAllowance = Number(((allowance ? allowance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+//                             this.lrcBalance = Number(((balance ? balance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+//                        this.lrcAllowance = Number(((allowance ? allowance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+
+                        this.lrcBalance = 1000;
+                        this.lrcAllowance = 10;
 
                     }
 
@@ -771,12 +950,12 @@
             }
 
 
-            _showBothNonEnough(balance,allowance,token,amount,lrcFee) {
+            _showBothNonEnough(balance, allowance, token, amount, lrcFee) {
 
                 if (token && token.token.toUpperCase() === 'LRC') {
-                    return "You have insufficient balance(" + balance + ") and insufficient allowance("+allowance+") to place an order with value(" + amount + ") and lrcFee(" + lrcFee + ") ";
+                    return "You have insufficient balance(" + balance + ") and insufficient allowance(" + allowance + ") to place an order with value(" + amount + ") and lrcFee(" + lrcFee + ") ";
                 } else {
-                    return "You have insufficient balance(" + balance + ")and insufficient allowance("+allowance+") to place an order with value(" + amount + ")";
+                    return "You have insufficient balance(" + balance + ")and insufficient allowance(" + allowance + ") to place an order with value(" + amount + ")";
                 }
 
             }
