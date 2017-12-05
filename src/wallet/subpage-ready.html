@@ -33,7 +33,7 @@
             width: 100%;
         }
         </style>
-
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <div class="sections" unresolved>
             <paper-card transparent>
                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
@@ -65,7 +65,7 @@
                 third: String,
                 selectedTab: {
                     type: String,
-                    computed: '_computeSelected(subpage)'
+                    computed: '_computeSelected(page, subpage)'
                 },
                 selectedPage: {
                     type: Object,
@@ -78,18 +78,21 @@
             super.ready();
         }
 
-        _computeSelected(subpage) {
-            if (subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
-                return subpage;
-            } else {
-                //TODO: send a 404 error event.
-                return 'assets';
+        _computeSelected(page, subpage) {
+            if (page && "wallet" === page){
+                if (subpage && subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
+                    return subpage;
+                } else {
+                    //TODO: send a 404 error event.
+                    return 'assets';
+                }
             }
         }
 
-        go() {
-            const page = this.$.pages.selectedItem;
-            if (page && page.go) page.go();
+        go(selectedPage) {
+            if(this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
+                selectedPage.go();
+            }
         }
     }
 

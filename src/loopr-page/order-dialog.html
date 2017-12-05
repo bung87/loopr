@@ -87,9 +87,10 @@
             <div class="content vertical layout">
                 <div class="horizontal start-justified layout">
                     <template is="dom-if" if="{{_hasSubTitle(detail.order)}}">
-                        <h3>[[item.subTitle]]</h3>
+                        <h3>[[detail.order.subTitle]]</h3>
                     </template>
                 </div>
+
                 <div class="horizontal center layout">
                     <div class="part raw vertical layout flex">
                         <div class="title">Raw Order:</div>

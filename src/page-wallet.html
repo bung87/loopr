@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <loopr-page>
             <loopr-toolbar slot="secondary-toolbar" active-tab="wallet"> </loopr-toolbar>
-            <iron-pages id="pages" selected="[[subpage]]" attr-for-selected="name" role="main">
+            <iron-pages id="pages" selected="[[selectedTab]]" selected-item="{{selectedPage}}" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
                 <subpage-ready name="ready" page="{{page}}" subpage="{{secondaryPage}}" third="{{third}}"></subpage-ready>
             </iron-pages>
@@ -60,7 +60,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 selectedTab: {
                     type: String,
-                    computed: '_computeSelected(subpage)'
+                    computed: '_computeSelected(page, subpage)'
                 },
                 selectedPage: {
                     type: Object,
@@ -74,18 +74,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             this.addEventListener('reset-wallet', e => this.subpage = 'default');
         }
 
-        _computeSelected(subpage) {
-            if (subpage === 'assets' || subpage === 'trades' || subpage === 'orders') {
+        _computeSelected(page, subpage) {
+            if("wallet" != page) return;
+            if (subpage === 'default' || subpage === 'ready') {
                 return subpage;
             } else {
                 //TODO: send a 404 error event.
-                return 'assets';
+                return 'default';
             }
         }
 
-        go() {
-            if(!this.secondaryPage){
-                this.secondaryPage = "assets";
+        go(selectedPage) {
+            if(this.page && this.page === "wallet" && selectedPage && selectedPage.go) {
+                selectedPage.go();
             }
             //const page = this.$.pages.selectedItem;
             //if (page && page.go) page.go();

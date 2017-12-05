@@ -127,9 +127,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        go() {
-            const page = this.$.pages.selectedItem;
-            if (page && page.go) page.go();
+        go(selectedPage) {
+            if(this.page && this.page === "history" && selectedPage && selectedPage.go){
+                selectedPage.go();
+            }
         }
     }
 
