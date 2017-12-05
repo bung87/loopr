@@ -10,7 +10,9 @@
             handle-as="json"
             last-response="{{lastResponse}}"
             debounce-duration="300"
-            loading={{loading}}>
+            loading="{{loading}}"
+            timeout="{{timeout}}"
+            on-error="_onError">
         </iron-ajax>
     </template>
     <script>
@@ -22,11 +24,10 @@
             static get properties() {
                 return {
                     relay: String,
-                    suffix: String,
                     url: {
                         type: String,
                         value: '',
-                        computed: '_computedUrl(relay, suffix)'
+                        computed: '_computedUrl(relay, method, params)'
                     },
                     lastResponse: {
                         type: Object,
@@ -42,20 +43,34 @@
                     params: Object,
                     methodParams: {
                         type: Object,
-                        computed: '_computeParams(method, params)'
+                        computed: '_computeParams(relay, method, params)'
+                    },
+                    timeout: {
+                        type: Number,
+                        value: 0
+                    },
+                    error: {
+                        type: Object,
+                        notify: true
                     }
                 }
             }
 
-            _computedUrl(relay){
-                if(relay){
+            _computedUrl(relay, method, params){
+                if(relay && method && params){
                     return relay;
                 }
             }
 
-            _computeParams(method, params) {
-                if(method && params){
+            _computeParams(relay, method, params) {
+                if(relay && method && params){
                     return {method: method, params: params, id: Math.ceil(Math.random()*1e18)}
+                }
+            }
+
+            _onError(e) {
+                if (e) {
+                    this.error = e;
                 }
             }
 
